@@ -14,30 +14,30 @@ body{margin:0;background:var(--w);color:var(--tx);font:16px/1.65 system-ui,-appl
 a{color:var(--g);text-underline-offset:3px}
 header{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--w);box-shadow:0 1px 0 var(--bd)}
 /* 1 Top notice bar */
-.notice{background:var(--b2);font-size:13px;padding:7px 20px;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;text-align:center}
-.who{font-weight:700;color:var(--g)}
-.notice a{font-weight:700}
+.notice{background:#3a1228;color:#ecd3df;font-size:13px;padding:7px 20px;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;text-align:center}
+.who{font-weight:700;color:#f0c46a}
+.notice a{font-weight:700;color:#fff}
 .sep{opacity:.35}
 .cm{border:1px solid #d3a3bd;background:var(--w);color:var(--tx);border-radius:999px;font-size:12px;padding:3px 12px;cursor:pointer;font-family:inherit}
 .cm:hover{background:var(--b)}
 /* 2 Branding */
 .brand{max-width:1200px;margin:auto;padding:10px 20px;display:flex;align-items:center;gap:14px}
 .brand svg{width:58px;height:58px;flex:none}
-.brand h1{font-size:clamp(1rem,2.4vw,1.35rem);margin:0;color:var(--g);font-weight:650}
+.brand h1{font-family:Georgia,"Times New Roman",serif;font-size:clamp(1rem,2.4vw,1.35rem);margin:0;color:var(--g);font-weight:650}
 /* 3 Navigation + 4 Action */
 .navrow{max-width:1200px;margin:auto;padding:2px 20px 10px;display:flex;align-items:flex-start;gap:14px}
 .navrow[hidden]{display:none}
 nav{flex:1}
 nav ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:2px 4px}
-nav a{display:block;padding:5px 9px;font-size:13.5px;color:var(--tx);text-decoration:none;border-radius:6px}
-nav a:hover,nav a.on{background:var(--b2);color:var(--g)}
+nav a{display:block;padding:6px 10px;font-size:13.5px;color:var(--tx);text-decoration:none;border-radius:0;border-bottom:2px solid transparent}
+nav a:hover,nav a.on{background:transparent;color:var(--g);border-bottom-color:#e0b45a}
 nav li{position:relative}
 nav li.has>a::after{content:" ▾";font-size:10px;opacity:.7}
 .dd{display:none;position:absolute;top:100%;left:0;min-width:240px;background:var(--w);border:1px solid var(--bd);border-radius:10px;padding:6px;box-shadow:0 12px 28px #2a1b2422;z-index:40}
 nav li:hover>.dd,nav li:focus-within>.dd,nav li.open>.dd{display:block}
 .dd a{padding:9px 12px;font-size:14px;white-space:nowrap}
 .subs{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:18px}
-.sub{background:var(--w);border:1px solid var(--bd);border-radius:14px;padding:18px}
+.sub{background:var(--w);border:1px solid var(--bd);border-top:4px solid #e0b45a;border-radius:4px;padding:20px}
 .sub h4{margin:0 0 4px;color:var(--g)}
 .sub p{margin:0 0 8px;color:var(--mut);font-size:.95rem}
 .act{display:flex;gap:8px;align-items:center}
@@ -48,28 +48,28 @@ nav li:hover>.dd,nav li:focus-within>.dd,nav li.open>.dd{display:block}
 .btn.o{background:var(--w);color:var(--g)}
 .btn.o:hover{background:var(--b2)}
 /* 5 Hero */
-.hero{position:relative;overflow:hidden;background:linear-gradient(160deg,var(--b) 0%,var(--b2) 100%);text-align:center;padding:96px 20px 84px}
-.hero svg.bg{position:absolute;right:-90px;top:-70px;width:520px;opacity:.5;pointer-events:none}
+.hero{position:relative;overflow:hidden;background:linear-gradient(135deg,#3a1228 0%,#5a1f3d 55%,#7a2f55 100%);text-align:left;padding:110px max(20px,calc(50% - 500px)) 90px}
+.hero svg.bg{position:absolute;right:-60px;top:20px;width:480px;opacity:.35;pointer-events:none}
 .hero>*{position:relative}
-.pill{display:inline-block;background:var(--w);color:var(--g);border:1px solid var(--bd);border-radius:999px;font-size:13px;font-weight:600;padding:4px 16px;margin-bottom:22px}
-.hero h2{font-size:clamp(2.4rem,7vw,4.4rem);line-height:1.05;margin:0 0 18px;color:var(--g);letter-spacing:-1.5px}
-.hero h2 em{font-style:normal;background:linear-gradient(transparent 68%,#e9b4cf 68%)}
-.hero p{max-width:600px;margin:0 auto 32px;color:var(--mut);font-size:1.1rem}
-.hero .btn{padding:14px 32px;font-size:15px}
-.facts{display:flex;justify-content:center;gap:10px 28px;flex-wrap:wrap;margin-top:40px;color:var(--mut);font-size:14px}
-.facts span::before{content:"✓ ";color:var(--g);font-weight:700}
+.pill{display:inline-block;background:transparent;color:#f0c46a;border:1px solid #f0c46a;border-radius:999px;font-size:13px;font-weight:600;padding:4px 16px;margin-bottom:22px}
+.hero h2{color:#fff!important;font-family:Georgia,"Times New Roman",serif;font-size:clamp(2.4rem,7vw,4.4rem);line-height:1.05;margin:0 0 18px;color:var(--g);letter-spacing:-1.5px}
+.hero h2 em{font-style:italic;color:#f0c46a}
+.hero p{max-width:560px;margin:0 0 32px;color:#ecd3df!important;color:var(--mut);font-size:1.1rem}
+.hero .btn{padding:14px 32px;font-size:15px;background:#f0c46a;border-color:#f0c46a;color:#3a1228;margin-right:8px}.hero .btn.o{background:transparent;color:#fff;border-color:#fff}.hero .btn.o:hover{background:#ffffff22}
+.facts{display:flex;justify-content:flex-start;gap:10px 28px;flex-wrap:wrap;margin-top:40px;color:#ecd3df;font-size:14px}
+.facts span::before{content:"◆ ";color:#f0c46a;font-weight:700}
 /* sections */
 .wrap{max-width:1000px;margin:auto;padding:0 20px}
-section{padding:56px 0}
+section{padding:64px 0}section h3{border-left:5px solid #e0b45a;padding-left:14px}
 section:nth-of-type(even){background:var(--b)}
-h3{font-size:clamp(1.5rem,4vw,2rem);margin:0 0 10px;color:var(--g)}
+h3{font-family:Georgia,"Times New Roman",serif;font-size:clamp(1.5rem,4vw,2rem);margin:0 0 10px;color:var(--g)}
 .d{color:var(--mut);max-width:680px;margin:0 0 14px}
 .list{list-style:none;padding:0;margin:0;max-width:760px}
-.list li{background:var(--w);border:1px solid var(--bd);border-radius:12px;margin-bottom:8px}
+.list li{background:var(--w);border:1px solid var(--bd);border-left:4px solid var(--g);border-radius:4px;margin-bottom:10px}
 .list a{display:flex;justify-content:space-between;gap:12px;padding:12px 16px;color:var(--tx);text-decoration:none}
 .list a:hover{color:var(--g)}
 .list time{color:var(--mut);font-size:13px;white-space:nowrap}
-footer{background:var(--g);color:#ecd3df;text-align:center;padding:26px 20px;font-size:14px}
+footer{background:#3a1228;color:#ecd3df;text-align:center;padding:26px 20px;font-size:14px}
 footer a{color:#fff}
 @media(max-width:700px){.navrow{flex-direction:column}.act{width:100%}.hero svg.bg{width:340px}}
 </style>
@@ -93,7 +93,7 @@ footer a{color:#fff}
   <!-- 1. Top notice bar -->
   <div class="notice">
     <span class="who">Leo Martínez</span><span class="sep">|</span>
-    <span data-zh="課堂作業 · 非官方網站">Student project · Not the official website</span><span class="sep">|</span>
+    <span data-zh="課堂作業 · 非官方網站">Student project · Unofficial site</span><span class="sep">|</span>
     <a href="https://www.management.fju.edu.tw/esubweb/immbaengindex/" target="_blank" rel="noopener" data-zh="imMBA 官方網站 ↗">Official imMBA website ↗</a>
     <button class="cm" id="cm" aria-expanded="true">Collapse main menu</button>
   </div>
@@ -113,12 +113,12 @@ footer a{color:#fff}
 <!-- 5. Hero section -->
 <div class="hero" id="top">
   <svg class="bg" viewBox="0 0 200 200" fill="none" stroke="#d3a3bd" stroke-width="1" aria-hidden="true"><circle cx="100" cy="100" r="90"/><ellipse cx="100" cy="100" rx="40" ry="90"/><ellipse cx="100" cy="100" rx="75" ry="90"/><path d="M100 10v180M10 100h180M22 60h156M22 140h156"/></svg>
-  <span class="pill" data-zh="輔仁大學 · AACSB 認證">Fu Jen Catholic University · AACSB-accredited</span>
-  <h2 data-zh="打造<em>全球職涯</em><br>從 imMBA 起步">Build a <em>Worldwide Career</em><br>starting at imMBA</h2>
+  <span class="pill" data-zh="輔仁大學 · AACSB 認證">Taipei · AACSB-accredited</span>
+  <h2 data-zh="打造<em>全球職涯</em><br>從 imMBA 起步">Your <em>worldwide career</em><br>starts at imMBA</h2>
   <p data-zh="輔仁大學國際經營管理碩士班，以 AACSB 認證的卓越品質，培育全球管理人才。">An English-taught MBA at Fu Jen Catholic University in Taipei, training internationally minded managers to AACSB standards.</p>
   <a class="btn" href="https://www.management.fju.edu.tw/esubweb/immbaengindex/enroll.php?IID=3" target="_blank" rel="noopener" data-zh="立即報名">Apply today</a>
   <a class="btn o" href="#marketplace" data-zh="書籍教材市集">Book swap marketplace</a>
-  <div class="facts"><span data-zh="英語授課">100% in English</span><span data-zh="雙聯學位與海外交換">Dual degree &amp; exchange</span><span data-zh="國際化學習社群">Global classmates</span></div>
+  <div class="facts"><span data-zh="英語授課">100% in English</span><span data-zh="雙聯學位與海外交換">Dual degrees &amp; exchange</span><span data-zh="國際化學習社群">Global classmates</span></div>
 </div>
 
 <div id="secs"></div>
@@ -129,13 +129,13 @@ var O="https://www.management.fju.edu.tw/esubweb/immbaengindex/";
 var S=[
 ["about","About","關於","An English-taught international MBA that blends a global outlook with practical learning, preparing managers who thrive across cultures.","以英語授課的國際 MBA，結合國際視野與實務學習，培養能跨文化發揮的管理人才。",O+"profile.php?IID=2"],
 ["admissions","Admissions","招生資訊","Check eligibility, prepare your documents and apply online.","了解申請資格、準備文件並線上報名。",O+"enroll.php?IID=3"],
-["curriculum","Curriculum","課程資訊","Core management courses, electives and graduation requirements.","管理核心課程、選修課與畢業要求。",O+"class.php?CID=1"],
 ["faculty","Faculty","師資介紹","Meet the teaching team behind the program.","認識本班的教師團隊。",O+"teacher.php"],
+["curriculum","Curriculum","課程資訊","Core management courses, electives and graduation requirements.","管理核心課程、選修課與畢業要求。",O+"class.php?CID=1"],
 ["guide","imMBA Guide","imMBA 全攻略","A practical guide for new and current students.","給新生與在學生的實用指南。",O+"subedit.php?EID=35"],
 ["graduation","Graduation","畢業與離校","Graduation requirements and procedures.","畢業要求與離校流程。",O+"subedit.php?EID=16"],
 ["dual","Dual Degree","雙聯學位","Earn degrees from partner universities.","與合作大學取得雙學位。",O+"subedit.php?EID=24"],
 ["exchange","Overseas Exchange","海外交換","Study abroad at international partner schools.","前往國際合作學校交換學習。",O+"subedit.php?EID=25"],
-["marketplace","Marketplace","書籍教材市集","A corner for students to swap or sell books and course materials.","學生交流書籍與教材的平台。",""],
+["marketplace","Marketplace","書籍教材市集","Buy, sell or swap books and course materials with other students.","學生交流書籍與教材的平台。",""],
 ["events","Events","活動集錦","Info sessions and program activities.","說明會與各項活動。","",[2,4,3]],
 ["announcements","Announcements","公告","Latest notices for applicants and students.","給申請者與學生的最新公告。",O+"news.php",[0,1,2]],
 ["downloads","Downloads","表格下載","Forms and program documents.","表格與課程文件。",O+"download.php"],
