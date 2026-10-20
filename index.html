@@ -272,17 +272,17 @@ about:[["overview","Overview and Ranking","概況與排名","Program overview, a
 admissions:[["apply","Apply for Fu Jen imMBA","申請輔仁 imMBA","Requirements, documents and how to apply.","申請資格、文件與報名方式。","/page.html?p=admissions"]],
 curriculum:[["requirements","Curriculum and Requirements","課程與修業規定","Courses, electives and program requirements.","課程、選修與修業規定。","/page.html?p=curriculum"]]};
 function L(u){return u.charAt(0)=="/"?'<a class="rm" href="'+u+'" data-zh="閱讀更多 →">Read more →</a>':'<a href="'+u+'" target="_blank" rel="noopener" data-zh="前往官方頁面 ↗">View on official site ↗</a>'}
+var DIRECT={about:"/page.html?p=overview",admissions:"/page.html?p=admissions",curriculum:"/page.html?p=curriculum",guide:"/page.html?p=guide",graduation:"/page.html?p=graduation",dual:"/page.html?p=dual-degree",exchange:"/page.html?p=exchange",marketplace:"/marketplace.html",downloads:"/downloads.html",college:"https://www.management.fju.edu.tw/index_en.php"};
+var HOME={faculty:1,events:1,announcements:1};
 var m="",s="";
 S.forEach(function(x){
- var sb=SUB[x[0]];
- m+='<li'+(sb?' class="has"':'')+'><a href="#'+x[0]+'" data-zh="'+x[2]+'">'+x[1]+'</a>'+(sb?'<div class="dd">'+sb.map(function(y){return '<a href="#'+y[0]+'" data-zh="'+y[2]+'">'+y[1]+'</a>'}).join("")+'</div>':'')+'</li>';
+ var sb=SUB[x[0]],h=DIRECT[x[0]]||"#"+x[0],ext=h.indexOf("http")==0;
+ m+='<li'+(sb?' class="has"':'')+'><a href="'+h+'"'+(ext?' target="_blank" rel="noopener"':'')+' data-zh="'+x[2]+(ext?' ↗':'')+'">'+x[1]+(ext?' ↗':'')+'</a>'+(sb?'<div class="dd">'+sb.map(function(y){return '<a href="'+y[5]+'" data-zh="'+y[2]+'">'+y[1]+'</a>'}).join("")+'</div>':'')+'</li>';
+ if(!HOME[x[0]])return;
  s+='<section id="'+x[0]+'"><div class="wrap"><h3 data-zh="'+x[2]+'">'+x[1]+'</h3><p class="d" data-zh="'+x[4]+'">'+x[3]+'</p>';
- if(sb){s+='<div class="subs">'+sb.map(function(y){return '<div class="sub" id="'+y[0]+'"><h4 data-zh="'+y[2]+'">'+y[1]+'</h4><p data-zh="'+y[4]+'">'+y[3]+'</p>'+L(y[5])+'</div>'}).join("")+'</div>'}
- if(x[6]){s+='<ul class="list">'+x[6].map(function(i){var n=N[i];return '<li><a href="'+O+'news-detail.php?NID='+n[2]+'" target="_blank" rel="noopener"><span>'+n[0]+'</span><time>'+n[1]+'</time></a></li>'}).join("")+'</ul>'}
- if(x[0]=='announcements'){s+='<div id="news-grid" class="ncards"><p class="d">Loading announcements…</p></div><p class="src"><span data-zh="資料來源：">Source:</span> <a href="'+x[5]+'" target="_blank" rel="noopener" data-zh="輔大 imMBA 官方公告 ↗">Fu Jen imMBA official announcements ↗</a></p>';x[5]=''}
+ if(x[0]=='announcements'){s+='<div id="news-grid" class="ncards"><p class="d">Loading announcements…</p></div><p class="src"><span data-zh="資料來源：">Source:</span> <a href="'+x[5]+'" target="_blank" rel="noopener" data-zh="輔大 imMBA 官方公告 ↗">Fu Jen imMBA official announcements ↗</a></p>'}
  if(x[0]=='faculty'){s+='<div id="faculty-list" class="fgrid"><p class="d">Loading faculty…</p></div><p class="src"><span data-zh="資料來源：">Source:</span> <a href="'+O+'teacher.php" target="_blank" rel="noopener" data-zh="輔大 imMBA 官方師資頁 ↗">Fu Jen imMBA official faculty page ↗</a></p>'}
  if(x[0]=='events'){s+='<div id="events-grid" class="ncards"><p class="d">Loading events…</p></div>'}
- if(x[5]&&!sb){s+=L(x[5])}
  s+='</div></section>'});
 document.getElementById("menu").innerHTML=m;document.getElementById("secs").innerHTML=s;
 var zh=false,els=[].slice.call(document.querySelectorAll("[data-zh]"));
@@ -300,7 +300,7 @@ document.querySelectorAll("#menu li.has>a").forEach(function(a){a.addEventListen
 document.addEventListener("click",function(e){if(!e.target.closest("#menu"))document.querySelectorAll("#menu li.open").forEach(function(x){x.classList.remove("open")})});
 var links=[].slice.call(document.querySelectorAll("#menu>li>a"));
 window.addEventListener("scroll",function(){var y=window.scrollY+220,c=null;
-links.forEach(function(a){var e=document.querySelector(a.getAttribute("href"));if(e&&e.offsetTop<=y)c=a});
+links.forEach(function(a){var h=a.getAttribute("href");if(h.charAt(0)!="#")return;var e=document.querySelector(h);if(e&&e.offsetTop<=y)c=a});
 links.forEach(function(a){a.classList.toggle("on",a===c)})});
 </script>
 <script type="module" src="/src/news.js"></script>
