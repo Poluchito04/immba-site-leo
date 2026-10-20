@@ -58,11 +58,26 @@ function renderAuth(mode = 'login') {
     const redirect = location.origin + '/admin.html'
     let error, ok
     if (mode === 'login') ({ error } = await supabase.auth.signInWithPassword({ email, password }))
-    else if (mode === 'register') { ({ error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: redirect } })); ok = 'Account created. Check your email and click the verification link, then log in.' }
-    else { ({ error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: redirect })); ok = 'If that email exists, a reset link is on its way.' }
+    else if (mode === 'register') {
+      const res = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: redirect } })
+      error = res.error
+      if (!error && !res.data.session) return renderCheckEmail(email)
+    } else { ({ error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: redirect })); ok = 'If that email exists, a reset link is on its way.' }
     btn.disabled = false
+    if (error && /not confirmed/i.test(error.message)) return renderCheckEmail(email, true)
     if (error) notify(error.message, 'err'), renderAuth(mode)
     else if (ok) { flash = { text: ok, type: 'ok' }; renderAuth('login') }
+  }
+}
+
+function renderCheckEmail(email, unconfirmed = false) {
+  app.innerHTML = `<div class="box auth"><h3 style="margin-top:0">${unconfirmed ? 'Email not confirmed yet' : 'Check your email'}</h3>
+    <p>${unconfirmed ? 'You still need to confirm' : 'We sent a verification link to'} <b>${esc(email)}</b>. Click it, then come back and log in. Check your spam folder too.</p>
+    <p class="acts"><button class="btn o" id="resend">Resend email</button><button class="btn" id="back">Back to log in</button></p><div id="rs"></div></div>`
+  document.getElementById('back').onclick = () => renderAuth('login')
+  document.getElementById('resend').onclick = async () => {
+    const { error } = await supabase.auth.resend({ type: 'signup', email, options: { emailRedirectTo: location.origin + '/admin.html' } })
+    document.getElementById('rs').innerHTML = `<div class="msg ${error ? 'err' : 'ok'}">${esc(error ? error.message : 'Email sent again.')}</div>`
   }
 }
 
