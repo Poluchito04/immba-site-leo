@@ -4,7 +4,7 @@ const app = document.getElementById('app')
 const who = document.getElementById('who')
 const BUCKET = 'faculty-photos'
 const FIELDS = ['name', 'title', 'education', 'research_fields', 'department', 'phone', 'email', 'website', 'category']
-let session = null, profile = null, faculty = [], tab = 'faculty', editing = null, flash = null
+let session = null, profile = null, faculty = [], news = [], editingNews = null, tab = 'news', editing = null, flash = null
 
 const notify = (text, type = 'ok') => { flash = { text, type }; render() }
 const flashHtml = () => { if (!flash) return ''; const h = `<div class="msg ${flash.type}">${esc(flash.text)}</div>`; flash = null; return h }
@@ -97,10 +97,116 @@ function renderNewPassword() {
 function renderDashboard() {
   const isSuper = profile.role === 'super_admin'
   if (tab === 'approvals' && !isSuper) tab = 'faculty'
-  app.innerHTML = `${flashHtml()}<div class="tabs"><button data-t="faculty" class="${tab === 'faculty' ? 'on' : ''}">Faculty</button>
+  app.innerHTML = `${flashHtml()}<div class="tabs"><button data-t="news" class="${tab === 'news' ? 'on' : ''}">News</button><button data-t="faculty" class="${tab === 'faculty' ? 'on' : ''}">Faculty</button>
     ${isSuper ? `<button data-t="approvals" class="${tab === 'approvals' ? 'on' : ''}">Administrators</button>` : ''}</div><div id="pane"></div>`
   app.querySelectorAll('[data-t]').forEach((b) => (b.onclick = () => { tab = b.dataset.t; editing = null; renderDashboard() }))
-  tab === 'faculty' ? loadFaculty() : loadApprovals()
+  tab === 'faculty' ? loadFaculty() : tab === 'news' ? loadNews() : loadApprovals()
+}
+
+
+/* ---------- AdminNews: one record, two languages ---------- */
+const NEWS_TXT = ['title_zh', 'title_en', 'content_zh', 'content_en']
+const filled = (v) => Boolean((v || '').trim())
+const syncState = (n) => {
+  const miss = NEWS_TXT.filter((k) => !filled(n[k]))
+  return miss.length ? { ok: false, text: 'Missing: ' + miss.map((k) => k.replace('_', ' ').replace('zh', '中文').replace('en', 'English')).join(', ') } : { ok: true, text: 'Both languages complete' }
+}
+
+async function translate(text, from, to) {
+  const chunks = []
+  for (const para of text.split(/\n/)) {
+    if (!para.trim()) { chunks.push(''); continue }
+    for (let i = 0; i < para.length; i += 450) chunks.push(para.slice(i, i + 450))
+  }
+  const out = []
+  for (const c of chunks) {
+    if (!c) { out.push(''); continue }
+    const r = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(c)}&langpair=${from}|${to}`)
+    const j = await r.json()
+    if (!j.responseData || j.responseStatus >= 400 && j.responseStatus !== '200') throw new Error(j.responseDetails || 'Translation service unavailable')
+    out.push(j.responseData.translatedText)
+  }
+  return out.join('\n')
+}
+
+async function loadNews() {
+  const pane = document.getElementById('pane')
+  const { data, error } = await supabase.from('news').select('*').order('pinned', { ascending: false }).order('news_date', { ascending: false }).order('sort_order')
+  if (error) { pane.innerHTML = `<div class="msg err">${esc(error.message)} — did you run supabase/news.sql?</div>`; return }
+  news = data
+  pane.innerHTML = `<div class="box"><div class="spread"><h3 style="margin:0">Announcements (${news.length})</h3><button class="btn" id="addn">+ Add announcement</button></div>
+    <div id="nform"></div><div class="scroll"><table><thead><tr><th>Date</th><th>English title</th><th>中文標題</th><th>Sync</th><th>Status</th><th></th></tr></thead><tbody>
+    ${news.map((n) => { const st = syncState(n); return `<tr><td style="white-space:nowrap">${esc(n.news_date)}</td><td>${n.pinned ? '<span class="pill">PINNED</span> ' : ''}${esc(n.title_en || '—')}</td><td>${esc(n.title_zh || '—')}</td>
+      <td><span class="pill ${st.ok ? '' : 'pending'}" title="${esc(st.text)}">${st.ok ? 'EN ⇄ 中文 ✓' : 'Out of sync'}</span></td>
+      <td><span class="pill ${n.published ? '' : 'rejected'}">${n.published ? 'published' : 'draft'}</span></td>
+      <td><div class="acts"><button class="btn o sm" data-nedit="${n.id}">Edit</button><button class="btn danger sm" data-ndel="${n.id}">Delete</button></div></td></tr>` }).join('')}
+    </tbody></table></div></div>`
+  document.getElementById('addn').onclick = () => showNewsForm(null)
+  pane.querySelectorAll('[data-nedit]').forEach((b) => (b.onclick = () => showNewsForm(news.find((n) => n.id === b.dataset.nedit))))
+  pane.querySelectorAll('[data-ndel]').forEach((b) => (b.onclick = () => removeNews(news.find((n) => n.id === b.dataset.ndel))))
+}
+
+function showNewsForm(n) {
+  editingNews = n
+  const v = (k) => esc(n?.[k] ?? '')
+  const host = document.getElementById('nform')
+  host.innerHTML = `<form id="nf" style="border-top:1px solid var(--bd);margin-top:18px;padding-top:6px"><h4 style="margin:12px 0 0">${n ? 'Edit announcement' : 'New announcement'} <small style="color:var(--mut);font-weight:400">— one record, both languages</small></h4>
+    <div class="row2"><div><label>Date *</label><input type="date" name="news_date" required value="${v('news_date') || new Date().toISOString().slice(0, 10)}"></div>
+    <div><label>Display order (lower first, same date)</label><input type="number" name="sort_order" value="${n?.sort_order ?? 0}"></div>
+    <div><label>Link URL (English)</label><input type="url" name="link_url" value="${v('link_url')}" placeholder="https://…"></div>
+    <div><label>Link URL (中文, optional)</label><input type="url" name="link_url_zh" value="${v('link_url_zh')}" placeholder="https://…"></div></div>
+    <p style="margin:12px 0 0"><label style="display:inline;margin-right:18px"><input type="checkbox" name="published" style="width:auto" ${n?.published === false ? '' : 'checked'}> Published</label>
+    <label style="display:inline"><input type="checkbox" name="pinned" style="width:auto" ${n?.pinned ? 'checked' : ''}> Pinned to top</label></p>
+    <div class="row2"><div><label>English title</label><input name="title_en" value="${v('title_en')}"></div><div><label>中文標題</label><input name="title_zh" value="${v('title_zh')}"></div>
+    <div><label>English content</label><textarea name="content_en" rows="7">${v('content_en')}</textarea></div><div><label>中文內容</label><textarea name="content_zh" rows="7">${v('content_zh')}</textarea></div></div>
+    <p class="acts"><button class="btn o" type="button" id="t-en2zh">Auto-translate English → 中文</button><button class="btn o" type="button" id="t-zh2en">Auto-translate 中文 → English</button><span id="tstat" style="font-size:13px;color:var(--mut);align-self:center"></span></p>
+    <div id="npreview"></div>
+    <p class="acts"><button class="btn" type="submit">${n ? 'Save changes' : 'Publish'}</button><button class="btn o" type="button" id="ncancel">Cancel</button></p></form>`
+  const f = document.getElementById('nf')
+  const preview = () => {
+    const g = (k) => f[k].value
+    const st = syncState({ title_zh: g('title_zh'), title_en: g('title_en'), content_zh: g('content_zh'), content_en: g('content_en') })
+    const card = (lang, t, c) => `<div class="card" style="display:block"><div style="font-size:12px;color:var(--mut);font-weight:700">${lang} · ${esc(g('news_date').replace(/-/g, '/'))}${f.pinned.checked ? ' · PINNED' : ''}</div><h4 style="margin:6px 0">${esc(t) || '<i>(no title)</i>'}</h4><p style="margin:0;white-space:pre-line">${esc((c || '').slice(0, 220))}${(c || '').length > 220 ? '…' : ''}</p></div>`
+    document.getElementById('npreview').innerHTML = `<h4 style="margin:18px 0 8px">Preview <span class="pill ${st.ok ? '' : 'pending'}">${esc(st.text)}</span></h4><div class="row2">${card('EN', g('title_en'), g('content_en'))}${card('中文', g('title_zh'), g('content_zh'))}</div>`
+  }
+  f.addEventListener('input', preview); preview()
+  const tr = (from, to, srcP, dstP) => async () => {
+    const stat = document.getElementById('tstat'); stat.textContent = 'Translating…'
+    try {
+      for (const k of ['title', 'content']) {
+        const src = f[`${k}_${srcP}`].value
+        if (src.trim()) f[`${k}_${dstP}`].value = await translate(src, from, to)
+      }
+      stat.textContent = 'Done — review and edit the translation before publishing.'; preview()
+    } catch (e) { stat.textContent = 'Translation failed: ' + e.message }
+  }
+  document.getElementById('t-en2zh').onclick = tr('en', 'zh-TW', 'en', 'zh')
+  document.getElementById('t-zh2en').onclick = tr('zh-TW', 'en', 'zh', 'en')
+  document.getElementById('ncancel').onclick = () => { host.innerHTML = ''; editingNews = null }
+  f.onsubmit = saveNews
+  host.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+}
+
+async function saveNews(e) {
+  e.preventDefault()
+  const f = e.target, btn = f.querySelector('[type=submit]')
+  const val = (k) => f[k].value.trim() || null
+  const row = { news_date: f.news_date.value, sort_order: parseInt(f.sort_order.value, 10) || 0, link_url: val('link_url'), link_url_zh: val('link_url_zh'),
+    published: f.published.checked, pinned: f.pinned.checked, title_en: val('title_en'), title_zh: val('title_zh'), content_en: val('content_en'), content_zh: val('content_zh') }
+  for (const k of ['link_url', 'link_url_zh']) if (row[k] && !safeUrl(row[k])) return notify('Links must start with http:// or https://', 'err')
+  if (!row.title_en && !row.title_zh) return notify('Add a title in at least one language.', 'err')
+  const st = syncState(row)
+  if (!st.ok && !confirm(`The two language versions are not in sync (${st.text}). Save anyway?`)) return
+  btn.disabled = true
+  const res = editingNews ? await supabase.from('news').update(row).eq('id', editingNews.id) : await supabase.from('news').insert(row)
+  if (res.error) { btn.disabled = false; return notify(res.error.message, 'err') }
+  editingNews = null; notify('Announcement saved (both languages).')
+}
+
+async function removeNews(n) {
+  if (!confirm('Delete this announcement? Both the Chinese and English versions will be removed.')) return
+  const { error } = await supabase.from('news').delete().eq('id', n.id)
+  error ? notify(error.message, 'err') : notify('Announcement deleted (both languages).')
 }
 
 /* ---------- faculty CRUD ---------- */

@@ -7,7 +7,7 @@
 <title>Fu Jen Catholic University International MBA (imMBA)</title>
 <style>
 :root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light;
---g:#0f4c5c;--g2:#1b6b7f;--tx:#14262b;--mut:#5a6f75;--w:#fff;--b:#f2f8f8;--b2:#d6ebec;--bd:#cfe2e4}
+--g:#0f4c5c;--g2:#1b6b7f;--acc:#ff9f68;--dark:#082a33;--tx:#14262b;--mut:#5a6f75;--w:#fff;--b:#f2f8f8;--b2:#d6ebec;--bd:#cfe2e4}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:200px}
 body{margin:0;background:var(--w);color:var(--tx);font:16px/1.65 system-ui,-apple-system,"Segoe UI","Noto Sans TC",sans-serif}
@@ -69,6 +69,19 @@ h3{font-family:"Palatino Linotype",Palatino,"Book Antiqua",serif;font-size:clamp
 .list a{display:flex;justify-content:space-between;gap:12px;padding:12px 16px;color:var(--tx);text-decoration:none}
 .list a:hover{color:var(--g)}
 .list time{color:var(--mut);font-size:13px;white-space:nowrap}
+/* announcement cards */
+.ncards{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:16px;margin:18px 0 14px}
+.ncard{display:flex;flex-direction:column;background:var(--w);border:1px solid var(--bd);border-radius:12px;padding:18px;box-shadow:0 2px 8px #14262b0f;cursor:pointer;transition:transform .2s,box-shadow .2s,border-color .2s}
+.ncard:hover,.ncard:focus-within{transform:translateY(-6px);box-shadow:0 14px 30px #14262b2e;border-color:var(--g)}
+.ncard time{font-size:13px;color:var(--mut);font-weight:600}
+.ncard .top{display:inline-block;background:var(--acc);color:var(--dark);font-size:11px;font-weight:800;border-radius:999px;padding:1px 9px;margin-left:8px;letter-spacing:.04em}
+.ncard h4{margin:6px 0 8px;font:700 1.05rem/1.35 "Palatino Linotype",Palatino,serif;color:var(--g)}
+.ncard p{margin:0 0 14px;color:var(--mut);font-size:14px;flex:1}
+.ncard a{align-self:flex-start;font-weight:700;font-size:14px;text-decoration:none;border-bottom:2px solid var(--acc)}
+.ncard a::after{content:" ↗"}
+.more{margin-top:6px}
+.src{font-size:13px;color:var(--mut);margin:0}
+.brand a.lg{display:flex;border-radius:12px}.brand a.lg:hover svg{filter:drop-shadow(0 2px 6px #0f4c5c66)}
 footer{background:#082a33;color:#cfe6e8;text-align:center;padding:26px 20px;font-size:14px}
 footer a{color:#fff}
 @media(max-width:700px){.navrow{flex-direction:column}.act{width:100%}.hero svg.bg{width:340px}}
@@ -98,7 +111,7 @@ footer a{color:#fff}
     <button class="cm" id="cm" aria-expanded="true">Collapse main menu</button>
   </div>
   <!-- 2. Branding header -->
-  <div class="brand"><svg role="img" aria-label="imMBA logo"><use href="#logo"/></svg>
+  <div class="brand"><a class="lg" href="/admin.html" title="Back office (administrators)"><svg role="img" aria-label="imMBA logo – open back office"><use href="#logo"/></svg></a>
     <h1 data-zh="輔仁大學國際經營管理碩士班（imMBA）">Fu Jen Catholic University International MBA (imMBA)</h1></div>
   <!-- 3. Navigation bar + 4. Action area -->
   <div class="navrow" id="navrow">
@@ -137,7 +150,7 @@ var S=[
 ["exchange","Overseas Exchange","海外交換","Study abroad at international partner schools.","前往國際合作學校交換學習。",O+"subedit.php?EID=25"],
 ["marketplace","Marketplace","書籍教材市集","Buy, sell or swap books and course materials with other students.","學生交流書籍與教材的平台。",""],
 ["events","Events","活動集錦","Info sessions and program activities.","說明會與各項活動。","",[2,4,3]],
-["announcements","Announcements","公告","Latest notices for applicants and students.","給申請者與學生的最新公告。",O+"news.php",[0,1,2]],
+["announcements","Announcements","公告","Latest notices for applicants and students.","給申請者與學生的最新公告。",O+"news.php"],
 ["downloads","Downloads","表格下載","Forms and program documents.","表格與課程文件。",O+"download.php"],
 ["college","College of Management","輔大管理學院","The college that hosts the imMBA.","imMBA 所屬的管理學院。","https://www.management.fju.edu.tw/index_en.php"]];
 var N=[["Spring 2027, apply NOW!! (Sep 14 - Oct 14) - This track is open to international students only","2026/08/19",187],
@@ -157,6 +170,7 @@ S.forEach(function(x){
  s+='<section id="'+x[0]+'"><div class="wrap"><h3 data-zh="'+x[2]+'">'+x[1]+'</h3><p class="d" data-zh="'+x[4]+'">'+x[3]+'</p>';
  if(sb){s+='<div class="subs">'+sb.map(function(y){return '<div class="sub" id="'+y[0]+'"><h4 data-zh="'+y[2]+'">'+y[1]+'</h4><p data-zh="'+y[4]+'">'+y[3]+'</p><a href="'+y[5]+'" target="_blank" rel="noopener" data-zh="前往官方頁面 ↗">View on official site ↗</a></div>'}).join("")+'</div>'}
  if(x[6]){s+='<ul class="list">'+x[6].map(function(i){var n=N[i];return '<li><a href="'+O+'news-detail.php?NID='+n[2]+'" target="_blank" rel="noopener"><span>'+n[0]+'</span><time>'+n[1]+'</time></a></li>'}).join("")+'</ul>'}
+ if(x[0]=='announcements'){s+='<div id="news-grid" class="ncards"><p class="d">Loading announcements…</p></div><p class="src"><span data-zh="資料來源：">Source:</span> <a href="'+x[5]+'" target="_blank" rel="noopener" data-zh="輔大 imMBA 官方公告 ↗">Fu Jen imMBA official announcements ↗</a></p>';x[5]=''}
  if(x[5]&&!sb){s+='<a href="'+x[5]+'"'+(x[5].charAt(0)=="/"?'':' target="_blank" rel="noopener"')+' data-zh="前往官方頁面 ↗">View on official site ↗</a>'}
  s+='</div></section>'});
 document.getElementById("menu").innerHTML=m;document.getElementById("secs").innerHTML=s;
@@ -177,5 +191,6 @@ window.addEventListener("scroll",function(){var y=window.scrollY+220,c=null;
 links.forEach(function(a){var e=document.querySelector(a.getAttribute("href"));if(e&&e.offsetTop<=y)c=a});
 links.forEach(function(a){a.classList.toggle("on",a===c)})});
 </script>
+<script type="module" src="/src/news.js"></script>
 </body>
 </html>
