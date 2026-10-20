@@ -18,8 +18,8 @@ function card(f) {
   const line = (label, v) => (v ? `<p><b>${label}:</b> ${esc(v)}</p>` : '')
   const site = safeUrl(f.website)
   return `<article class="card">${photo}<div>
-    <h4>${esc(name)}${alt ? ` <small style="color:var(--mut);font-weight:400">${esc(alt)}</small>` : ''}</h4><div class="t">${esc(ffpick(f, 'title'))}</div>
-    ${line(t('Department', '系所'), ffpick(f, 'department'))}${line(t('Education', '學歷'), ffpick(f, 'education'))}${tags(ffpick(f, 'research_fields'))}
+    <h4>${esc(name)}${alt ? ` <small style="color:var(--mut);font-weight:400">${esc(alt)}</small>` : ''}</h4><div class="t">${esc(fpick(f, 'title'))}</div>
+    ${line(t('Department', '系所'), fpick(f, 'department'))}${line(t('Education', '學歷'), fpick(f, 'education'))}${tags(fpick(f, 'research_fields'))}
     ${line(t('Phone', '電話'), f.phone)}
     ${f.email ? `<p><b>Email:</b> <a href="mailto:${esc(f.email)}">${esc(f.email)}</a></p>` : ''}
     ${site ? `<p><a href="${esc(site)}" target="_blank" rel="noopener">${t('Personal website', '個人網站')} ↗</a></p>` : ''}
