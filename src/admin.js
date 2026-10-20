@@ -1,8 +1,8 @@
 import { supabase, configured, esc, safeUrl } from './supabase.js'
 import { translate } from './translate.js'
 import { toast, autoReveal, skeletonList } from './ui.js'
-import { themeButton } from './theme.js'
 import { mountAdminI18n } from './admin-i18n.js'
+import { mountChrome } from './chrome.js'
 import { loadDashboard } from './admin-dashboard.js'
 import { loadPages, loadDownloads, loadListings } from './admin-content.js'
 
@@ -27,7 +27,7 @@ function shortcuts() {
 }
 
 async function boot() {
-  document.getElementById('themeslot')?.replaceWith(themeButton())
+  mountChrome({ trackPath: false, assistant: false }) // same header as the public site
   mountAdminI18n()
   shortcuts()
   if (!configured) {

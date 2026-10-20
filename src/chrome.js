@@ -42,7 +42,7 @@ function scrollSpy() {
   links.forEach((a) => a.classList.toggle('on', a === cur))
 }
 
-export function mountChrome({ trackPath, skeleton = 'cards' } = {}) {
+export function mountChrome({ trackPath, skeleton = 'cards', assistant = true } = {}) {
   initLang()
   const host = document.getElementById('chrome')
   const foot = document.getElementById('site-footer')
@@ -107,7 +107,8 @@ export function mountChrome({ trackPath, skeleton = 'cards' } = {}) {
   }
   document.getElementById('hdr')?.classList.toggle('compact', scrollY > 70)
 
-  mountScrollUi(); mountPalette(); mountAssistant()
+  mountScrollUi(); mountPalette()
+  if (assistant) mountAssistant()
   if (app) {
     new MutationObserver(() => autoReveal(app)).observe(app, { childList: true })
     autoReveal(document)

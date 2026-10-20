@@ -14,9 +14,8 @@
 <script>try{var d=document.documentElement,t=localStorage.getItem("theme");if(!t&&matchMedia("(prefers-color-scheme: dark)").matches)t="dark";if(t)d.dataset.theme=t;d.classList.add("js")}catch(e){}</script>
 </head>
 <body>
-<div class="bar"><b>Leopoldo Martinez · F15381071</b><span>Student project · Back office</span></div>
-<div class="top"><h1 style="display:flex;align-items:center;gap:12px"><img src="/favicon.svg" alt="" width="40" height="40" style="border-radius:10px;box-shadow:0 4px 10px #082a3340">imMBA Back Office</h1>
-  <div><a class="btn o sm" href="/faculty.html">View Faculty page</a> <span id="themeslot"></span> <button class="lang" id="langbtn" type="button" title="Language">中文</button> <span id="who"></span></div></div>
+<div id="chrome"></div>
+<div class="wrap" style="padding-bottom:0"><div class="spread adminbar" style="margin-top:22px"><h2 style="margin:0;font:700 1.6rem 'Palatino Linotype',Palatino,serif;color:var(--g)">imMBA Back Office</h2><span id="who"></span></div></div>
 <div class="wrap" id="app"><div class="msg">Loading…</div></div>
 <script type="module" src="/src/admin.js"></script>
 </body>
