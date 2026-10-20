@@ -15,9 +15,14 @@ async function boot() {
     app.innerHTML = '<div class="msg err">Supabase is not connected: set <code>VITE_SUPABASE_URL</code> and <code>VITE_SUPABASE_ANON_KEY</code>.</div>'
     return
   }
+  let lastUser
   supabase.auth.onAuthStateChange((event, s) => {
+    const prev = lastUser
     session = s
+    lastUser = s?.user?.id
     if (event === 'PASSWORD_RECOVERY') return renderNewPassword()
+    // token refreshes / tab refocus re-emit SIGNED_IN for the same user: ignore, or open forms get wiped
+    if (event === 'TOKEN_REFRESHED' || (event === 'SIGNED_IN' && prev === lastUser && profile)) return
     if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'INITIAL_SESSION') refresh()
   })
 }
