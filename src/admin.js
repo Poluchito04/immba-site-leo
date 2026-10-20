@@ -146,7 +146,7 @@ async function loadNews() {
   const { data, error } = await supabase.from('news').select('*').order('pinned', { ascending: false }).order('news_date', { ascending: false }).order('sort_order')
   if (error) { pane.innerHTML = `<div class="msg err">${esc(error.message)} — did you run supabase/news.sql?</div>`; return }
   news = data
-  pane.innerHTML = `<div class="box"><div class="spread"><h3 style="margin:0">News & events (${news.length})</h3><button class="btn" id="addn">+ Add item</button></div>
+  pane.innerHTML = `<div class="box"><div class="spread"><h3 style="margin:0">News & events (${news.length})</h3><div class="acts"><button class="btn o" id="restn" title="Put back the original list of announcements">Restore default announcements</button><button class="btn" id="addn">+ Add item</button></div></div>
     <div id="nform"></div><div class="scroll"><table><thead><tr><th>Date</th><th>Type</th><th>English title</th><th>中文標題</th><th>Sync</th><th>Status</th><th></th></tr></thead><tbody>
     ${news.map((n) => { const st = syncState(n); return `<tr><td style="white-space:nowrap">${esc(n.news_date)}</td><td><span class="pill ${n.kind === 'event' ? 'super_admin' : ''}">${esc(n.kind || 'news')}</span></td><td>${n.pinned ? '<span class="pill">PINNED</span> ' : ''}${esc(n.title_en || '—')}</td><td>${esc(n.title_zh || '—')}</td>
       <td><span class="pill ${st.ok ? '' : 'pending'}" title="${esc(st.text)}">${st.ok ? 'EN ⇄ 中文 ✓' : 'Out of sync'}</span></td>
@@ -154,6 +154,11 @@ async function loadNews() {
       <td><div class="acts"><button class="btn o sm" data-nedit="${n.id}">Edit</button><button class="btn danger sm" data-ndel="${n.id}">Delete</button></div></td></tr>` }).join('')}
     </tbody></table></div></div>`
   document.getElementById('addn').onclick = () => showNewsForm(null)
+  document.getElementById('restn').onclick = async () => {
+    if (!confirm('Restore the default announcement list? Every change you made to announcements and events will be replaced by the original list.')) return
+    const { data, error } = await supabase.rpc('restore_default_news')
+    error ? notify(error.message, 'err') : notify(`Default announcements restored (${data}).`)
+  }
   pane.querySelectorAll('[data-nedit]').forEach((b) => (b.onclick = () => showNewsForm(news.find((n) => n.id === b.dataset.nedit))))
   pane.querySelectorAll('[data-ndel]').forEach((b) => (b.onclick = () => removeNews(news.find((n) => n.id === b.dataset.ndel))))
 }

@@ -8,7 +8,7 @@ const D = {
   'Your email is verified, but a super administrator still has to approve your account before you can use the back office.': '您的電子郵件已驗證，但仍需超級管理員核准後才能使用後台。',
   'imMBA Back Office': 'imMBA 後台管理', 'View Faculty page': '查看師資頁面',
   'Dashboard': '儀表板', 'News & events': '公告與活動', 'Faculty': '師資', 'Pages': '頁面', 'Documents': '文件', 'Marketplace': '市集', 'Administrators': '管理員',
-  '+ Add item': '+ 新增項目', '+ Add faculty': '+ 新增教師', '+ Add page': '+ 新增頁面', '+ Add document': '+ 新增文件',
+  '+ Add item': '+ 新增項目', 'Restore default announcements': '還原預設公告', 'Put back the original list of announcements': '還原為原始公告清單', '+ Add faculty': '+ 新增教師', '+ Add page': '+ 新增頁面', '+ Add document': '+ 新增文件',
   'Date': '日期', 'Date *': '日期 *', 'Type': '類型', 'English title': '英文標題', '中文標題': '中文標題', 'Sync': '同步', 'Status': '狀態', 'Order': '排序', 'Name': '姓名', 'Title': '職稱',
   'Edit': '編輯', 'Delete': '刪除', 'Cancel': '取消', 'Approve': '核准', 'Reject': '拒絕', 'View': '檢視', 'Remove access': '移除權限',
   'PINNED': '置頂', 'published': '已發布', 'draft': '草稿', 'hidden': '已隱藏', 'pending': '待核准', 'approved': '已核准', 'rejected': '已拒絕', 'admin': '管理員', 'super_admin': '超級管理員',
@@ -41,6 +41,7 @@ const D = {
 const R = [
   [/^Faculty members \((\d+)\)$/, (m) => `教師 (${m[1]})`], [/^News & events \((\d+)\)$/, (m) => `公告與活動 (${m[1]})`], [/^Content pages \((\d+)\)$/, (m) => `內容頁面 (${m[1]})`],
   [/^Documents \((\d+)\)$/, (m) => `文件 (${m[1]})`], [/^Marketplace listings \((\d+)\)$/, (m) => `市集商品 (${m[1]})`],
+  [/^Default announcements restored \((\d+)\)\.$/, (m) => `已還原預設公告（${m[1]} 則）。`],
   [/^Edit (.+)$/, (m) => `編輯 ${m[1]}`], [/^(.+) saved\.$/, (m) => `${m[1]} 已儲存。`], [/^(.+) deleted\.$/, (m) => `${m[1]} 已刪除。`], [/^Listing (approved|rejected)\.$/, (m) => `商品已${m[1] === 'approved' ? '核准' : '拒絕'}。`],
   [/^(\d+) administrators? waiting for approval$/, (m) => `${m[1]} 位管理員等待核准`], [/^(\d+) marketplace listings? to review$/, (m) => `${m[1]} 則市集商品待審核`],
   [/^(\d+) announcement\(s\) missing a language$/, (m) => `${m[1]} 則公告缺少一種語言`], [/^(\d+) draft announcement\(s\) not published$/, (m) => `${m[1]} 則草稿公告尚未發布`],
