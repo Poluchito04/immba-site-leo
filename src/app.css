@@ -105,3 +105,4 @@ footer{background:var(--dark);color:#cfe6e8;text-align:center;padding:24px 20px;
 .pn small{display:block;color:var(--mut);font-size:12px;text-transform:uppercase;letter-spacing:.06em}.pn b{color:var(--g)}.pn .nx{text-align:right}
 
 @media(max-width:800px){.layout{padding-top:20px}.side{display:none}}
+td.grip{cursor:grab;color:var(--mut);width:22px;user-select:none;font-size:18px;letter-spacing:-3px}td.grip:active{cursor:grabbing}tr.dragging{opacity:.4}tr.dragover td{border-top:3px solid var(--acc)}

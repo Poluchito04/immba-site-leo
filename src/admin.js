@@ -235,8 +235,8 @@ async function loadFaculty() {
   faculty = data
   pane.innerHTML = `<div class="box"><div class="spread"><h3 style="margin:0">Faculty members (${faculty.length})</h3>
     <button class="btn" id="add">+ Add faculty</button></div>
-    <div id="form"></div><div class="scroll"><table><thead><tr><th></th><th>Name</th><th>中文</th><th>Title</th><th>Type</th><th>Order</th><th></th></tr></thead><tbody>
-    ${faculty.map((f, i) => `<tr><td>${safeUrl(f.image_url) ? `<img class="thumb" src="${esc(f.image_url)}" alt="">` : '<div class="thumb"></div>'}</td>
+    <div id="form"></div><div class="scroll"><table><thead><tr><th></th><th></th><th>Name</th><th>中文</th><th>Title</th><th>Type</th><th>Order</th><th></th></tr></thead><tbody>
+    ${faculty.map((f, i) => `<tr data-row="${f.id}"><td class="grip" draggable="true" title="Drag to reorder" aria-label="Drag to reorder">⋮⋮</td><td>${safeUrl(f.image_url) ? `<img class="thumb" src="${esc(f.image_url)}" alt="">` : '<div class="thumb"></div>'}</td>
       <td><b>${esc(f.name)}</b></td><td>${esc(f.name_zh || '—')}</td><td>${esc(f.title)}</td><td><span class="pill">${esc(f.category)}</span></td>
       <td><div class="acts"><button class="btn o sm" data-up="${f.id}" ${i === 0 ? 'disabled' : ''} aria-label="Move up">↑</button>
         <button class="btn o sm" data-down="${f.id}" ${i === faculty.length - 1 ? 'disabled' : ''} aria-label="Move down">↓</button></div></td>
@@ -246,6 +246,16 @@ async function loadFaculty() {
   pane.querySelectorAll('[data-edit]').forEach((b) => (b.onclick = () => showForm(faculty.find((f) => f.id === b.dataset.edit))))
   pane.querySelectorAll('[data-del]').forEach((b) => (b.onclick = () => remove(faculty.find((f) => f.id === b.dataset.del))))
   pane.querySelectorAll('[data-up]').forEach((b) => (b.onclick = () => move(b.dataset.up, -1)))
+  let dragId = null
+  pane.querySelectorAll('td.grip').forEach((g) => {
+    const tr = g.closest('tr')
+    g.addEventListener('dragstart', (e) => { dragId = tr.dataset.row; tr.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', dragId); e.dataTransfer.setDragImage(tr, 20, 20) })
+    g.addEventListener('dragend', () => { tr.classList.remove('dragging'); pane.querySelectorAll('.dragover').forEach((x) => x.classList.remove('dragover')) })
+  })
+  pane.querySelectorAll('tbody tr[data-row]').forEach((tr) => {
+    tr.addEventListener('dragover', (e) => { if (!dragId) return; e.preventDefault(); e.dataTransfer.dropEffect = 'move'; pane.querySelectorAll('.dragover').forEach((x) => x.classList.remove('dragover')); if (tr.dataset.row !== dragId) tr.classList.add('dragover') })
+    tr.addEventListener('drop', (e) => { e.preventDefault(); const id = dragId; dragId = null; if (id && id !== tr.dataset.row) reorderTo(id, tr.dataset.row) })
+  })
   pane.querySelectorAll('[data-down]').forEach((b) => (b.onclick = () => move(b.dataset.down, 1)))
 }
 
@@ -313,6 +323,18 @@ async function remove(f) {
   if (error) return notify(error.message, 'err')
   const p = photoPath(f.image_url); if (p) await supabase.storage.from(BUCKET).remove([p])
   notify(f.name + ' deleted.')
+}
+
+async function reorderTo(dragId, targetId) {
+  const list = faculty.filter((f) => f.id !== dragId)
+  const moving = faculty.find((f) => f.id === dragId)
+  const at = list.findIndex((f) => f.id === targetId)
+  const from = faculty.findIndex((f) => f.id === dragId), to = faculty.findIndex((f) => f.id === targetId)
+  list.splice(from < to ? at + 1 : at, 0, moving) // dropping below moves after the target, above moves before it
+  const changed = list.map((f, k) => ({ f, order: k + 1 })).filter(({ f, order }) => f.sort_order !== order)
+  const results = await Promise.all(changed.map(({ f, order }) => supabase.from('faculty').update({ sort_order: order }).eq('id', f.id)))
+  const err = results.find((r) => r.error)
+  err ? notify(err.error.message, 'err') : notify(moving.name + ' moved.')
 }
 
 async function move(id, dir) {
