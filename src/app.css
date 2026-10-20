@@ -103,3 +103,5 @@ footer{background:var(--dark);color:#cfe6e8;text-align:center;padding:24px 20px;
 .pn a{display:block;border:1px solid var(--bd);border-radius:12px;padding:14px 18px;text-decoration:none;color:var(--tx);transition:transform .2s var(--ease),border-color .2s,box-shadow .2s}
 .pn a:hover{transform:translateY(-3px);border-color:var(--g);box-shadow:0 10px 22px #14262b1f}
 .pn small{display:block;color:var(--mut);font-size:12px;text-transform:uppercase;letter-spacing:.06em}.pn b{color:var(--g)}.pn .nx{text-align:right}
+
+@media(max-width:800px){.layout{padding-top:20px}.side{display:none}}
