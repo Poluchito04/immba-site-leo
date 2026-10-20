@@ -142,3 +142,5 @@ html[data-theme=dark] .sk::after{background:linear-gradient(90deg,transparent,#f
 .fcontact{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:14px;padding-top:14px;border-top:1px dashed var(--bd);font-size:14px;color:var(--mut)}
 .fcontact a{font-weight:600}
 @media(max-width:720px){.fcard{grid-template-columns:1fr;padding:20px;gap:18px}.fcard img,.fcard .ph{width:100%;max-width:240px;height:300px}.frow{grid-template-columns:1fr;gap:2px}}
+#aschips .tag{display:inline-block;border:1px solid var(--bd);background:var(--b);color:var(--tx);border-radius:999px;padding:5px 12px;margin:0 6px 6px 0;font:inherit;font-size:13px;cursor:pointer;transition:background .15s,color .15s,border-color .15s}
+#aschips .tag:hover{background:var(--b2);color:var(--g);border-color:var(--g)}
