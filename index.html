@@ -13,37 +13,10 @@
 html{scroll-behavior:smooth;scroll-padding-top:200px}
 body{margin:0;background:var(--w);color:var(--tx);font:16px/1.65 system-ui,-apple-system,"Segoe UI","Noto Sans TC",sans-serif}
 a{color:var(--g);text-underline-offset:3px}
-header{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--w);box-shadow:0 1px 0 var(--bd)}
-/* 1 Top notice bar */
-.notice{background:#082a33;color:#cfe6e8;font-size:13px;padding:7px 20px;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;text-align:center}
-.who{font-weight:700;color:#ff9f68}
-.notice a{font-weight:700;color:#fff}
-.sep{opacity:.35}
-.cm{border:1px solid #8ec3c9;background:var(--w);color:var(--tx);border-radius:999px;font-size:12px;padding:3px 12px;cursor:pointer;font-family:inherit}
-.cm:hover{background:var(--b)}
-/* 2 Branding */
-.brand{max-width:1200px;margin:auto;padding:10px 20px;display:flex;align-items:center;gap:14px}
-.brand svg{width:58px;height:58px;flex:none;filter:drop-shadow(0 4px 10px #082a3340);border-radius:14px}
-.brand h1{font-family:"Palatino Linotype",Palatino,"Book Antiqua",serif;font-size:clamp(1rem,2.4vw,1.35rem);margin:0;color:var(--g);font-weight:650}
-/* 3 Navigation + 4 Action */
-.navrow{max-width:1200px;margin:auto;padding:2px 20px 10px;display:flex;align-items:flex-start;gap:14px}
-.navrow[hidden]{display:none}
-nav{flex:1}
-nav ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:2px 4px}
-nav a{display:block;padding:6px 10px;font-size:13.5px;color:var(--tx);text-decoration:none;border-radius:0;border-bottom:2px solid transparent}
-nav a:hover,nav a.on{background:transparent;color:var(--g);border-bottom-color:#ff9f68}
-nav li{position:relative}
-nav li.has>a::after{content:" ▾";font-size:10px;opacity:.7}
-.dd{display:none;position:absolute;top:100%;left:0;min-width:240px;background:var(--w);border:1px solid var(--bd);border-radius:10px;padding:6px;box-shadow:0 12px 28px #14262b22;z-index:40}
-nav li:hover>.dd,nav li:focus-within>.dd,nav li.open>.dd{display:block}
-.dd a{padding:9px 12px;font-size:14px;white-space:nowrap}
 .subs{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:18px}
 .sub{background:var(--w);border:1px solid var(--bd);border-top:4px solid #ff9f68;border-radius:12px;padding:22px;box-shadow:0 2px 8px #14262b0f}
 .sub h4{margin:0 0 4px;color:var(--g)}
 .sub p{margin:0 0 8px;color:var(--mut);font-size:.95rem}
-.act{display:flex;gap:8px;align-items:center}
-.lang{border:1px solid var(--bd);background:var(--w);color:var(--mut);border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer;font-family:inherit}
-.lang:hover{background:var(--b)}
 .btn{display:inline-block;background:var(--g);color:#fff;padding:9px 22px;border-radius:999px;font-weight:600;font-size:14px;text-decoration:none;border:1.5px solid var(--g);white-space:nowrap}
 .btn:hover{background:var(--g2);border-color:var(--g2)}
 .btn.o{background:var(--w);color:var(--g)}
@@ -83,23 +56,12 @@ h3{font-family:"Palatino Linotype",Palatino,"Book Antiqua",serif;font-size:clamp
 .more{margin-top:6px}
 a.rm{display:inline-block;font-weight:700;text-decoration:none;border-bottom:2px solid var(--acc)}a.rm:hover{color:var(--g2)}
 .src{font-size:13px;color:var(--mut);margin:0}
-.brand a.lg{display:flex;border-radius:12px}.brand a.lg:hover svg{filter:drop-shadow(0 2px 6px #0f4c5c66)}
 footer{background:#082a33;color:#cfe6e8;text-align:center;padding:26px 20px;font-size:14px}
 footer a{color:#fff}
-@media(max-width:700px){.navrow{flex-direction:column}.act{width:100%}.hero svg.bg{width:340px}}
+@media(max-width:700px){.hero svg.bg{width:340px}}
 
 /* ===== polish layer ===== */
 html{scroll-padding-top:110px}
-header{transition:box-shadow .3s}
-.notice{max-height:90px;transition:max-height .35s var(--ease),padding .35s var(--ease),opacity .25s}
-header.compact{box-shadow:0 8px 24px #14262b22}
-header.compact .notice{max-height:0;padding-top:0;padding-bottom:0;opacity:0;overflow:hidden}
-.brand{transition:padding .3s var(--ease)}.brand svg{transition:width .3s var(--ease),height .3s var(--ease)}
-header.compact .brand{padding-top:4px;padding-bottom:4px}header.compact .brand svg{width:38px;height:38px}header.compact .brand h1{font-size:1rem}
-.brand a.lg{transition:transform .25s var(--ease)}.brand a.lg:hover{transform:rotate(-4deg) scale(1.06)}
-.burger{display:none;margin-left:auto}
-.act{align-items:center;flex-wrap:wrap}
-nav a{transition:background .2s,color .2s}
 .hero{background-size:220% 220%;animation:drift 22s ease-in-out infinite}
 @keyframes drift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
 .hero svg.bg{animation:spin 140s linear infinite;transform-origin:50% 50%}
@@ -132,31 +94,6 @@ nav a{transition:background .2s,color .2s}
 .sub{transition:transform .3s var(--ease),box-shadow .3s var(--ease),border-color .3s}
 .sub:hover{transform:translateY(-5px);box-shadow:0 16px 32px #14262b22;border-color:var(--g)}
 .list li,.ncard{transition:transform .25s var(--ease),box-shadow .25s var(--ease),border-color .25s}
-html[data-theme=dark] header{background:var(--w)}
-html[data-theme=dark] .cm{background:var(--b);color:var(--tx)}
-html[data-theme=dark] .lang{background:var(--b)}
-html[data-theme=dark] .dd{background:var(--b)}
-html[data-theme=dark] section:nth-of-type(even){background:var(--b)}
-@media(max-width:860px){
-  .burger{display:inline-grid}.cm{display:none}
-  .navrow{display:none;flex-direction:column;padding-bottom:16px}
-  header.open .navrow{display:flex;animation:rise .35s var(--ease) both}
-  nav{width:100%}nav ul{flex-direction:column;gap:0}nav a{padding:12px 10px;font-size:15px;border-bottom:1px solid var(--bd);border-radius:0}
-  .dd{position:static;box-shadow:none;border:0;border-left:3px solid var(--acc);border-radius:0;padding:0 0 0 10px;margin:2px 0 8px}
-  .act{width:100%}.hero{padding-top:70px}
-  header.open{max-height:100vh;overflow:auto}
-}
-
-@media(min-width:861px){
-  header{display:grid;grid-template-columns:1fr auto;column-gap:16px;padding:0 max(20px,calc(50% - 600px))}
-  header .notice{grid-column:1/-1;margin:0 calc(-1 * max(20px,calc(50% - 600px)))}
-  header .brand{max-width:none;margin:0;padding:10px 0}
-  header .navrow:not([hidden]){display:contents}
-  header nav{grid-column:1/-1;grid-row:3;padding-bottom:8px}
-  header nav ul{gap:2px 2px}
-  header .act{grid-column:2;grid-row:2;align-self:center}
-  header.compact .act{grid-row:2}
-}
 </style>
 <meta name="description" content="Fu Jen Catholic University International MBA (imMBA): an AACSB-accredited, English-taught MBA in Taipei. Student project, unofficial site.">
 <meta name="theme-color" content="#0f4c5c">
@@ -185,31 +122,7 @@ html[data-theme=dark] section:nth-of-type(even){background:var(--b)}
 </defs>
 </svg>
 
-<a class="skip" href="#main" data-zh="跳到主要內容">Skip to content</a>
-<header id="hdr">
-  <!-- 1. Top notice bar -->
-  <div class="notice">
-    <span class="who">Leopoldo Martinez · F15381071</span><span class="sep">|</span>
-    <span data-zh="課堂作業 · 非官方網站">Student project · Unofficial site</span><span class="sep">|</span>
-    <a href="https://www.management.fju.edu.tw/esubweb/immbaengindex/" target="_blank" rel="noopener" data-zh="imMBA 官方網站 ↗">Official imMBA website ↗</a>
-    <button class="cm" id="cm" aria-expanded="true">Collapse main menu</button>
-  </div>
-  <!-- 2. Branding header -->
-  <div class="brand"><a class="lg" href="/admin.html" title="Back office (administrators)"><svg role="img" aria-label="imMBA logo – open back office"><use href="#logo"/></svg></a>
-    <h1 data-zh="輔仁大學國際經營管理碩士班（imMBA）">Fu Jen Catholic University International MBA (imMBA)</h1>
-    <button class="iconbtn burger" id="burger" aria-expanded="false" aria-controls="navrow" aria-label="Menu"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div>
-  <!-- 3. Navigation bar + 4. Action area -->
-  <div class="navrow" id="navrow">
-    <nav><ul id="menu"></ul></nav>
-    <div class="act">
-      <button class="srch" type="button" data-open-search aria-label="Search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><span data-zh="搜尋">Search</span><kbd>⌘K</kbd></button>
-      <span id="themeslot"></span>
-      <a class="lang" style="text-decoration:none;display:inline-block" href="/project.html" data-zh="專案說明">About this project</a>
-      <button class="lang" id="lang" title="Switch language">中文</button>
-      <a class="btn" href="https://www.management.fju.edu.tw/esubweb/immbaengindex/enroll.php?IID=3" target="_blank" rel="noopener" data-zh="立即報名">Start your application</a>
-    </div>
-  </div>
-</header>
+<div id="chrome"></div>
 
 <!-- 5. Hero section -->
 <div class="hero" id="top">
@@ -243,65 +156,27 @@ html[data-theme=dark] section:nth-of-type(even){background:var(--b)}
 </div></div>
 
 <main id="main" tabindex="-1"><div id="secs"></div></main>
-<footer>Unofficial student project · Content © College of Management, Fu Jen Catholic University · <a href="#top">↑</a></footer>
+<div id="site-footer"></div>
 
 <script>
 var O="https://www.management.fju.edu.tw/esubweb/immbaengindex/";
 var S=[
-["about","About","關於","An English-taught international MBA that blends a global outlook with practical learning, preparing managers who thrive across cultures.","以英語授課的國際 MBA，結合國際視野與實務學習，培養能跨文化發揮的管理人才。",O+"profile.php?IID=2"],
-["admissions","Admissions","招生資訊","Check eligibility, prepare your documents and apply online.","了解申請資格、準備文件並線上報名。",O+"enroll.php?IID=3"],
-["faculty","Faculty","師資介紹","Meet the teaching team behind the program.","認識本班的教師團隊。",""],
-["curriculum","Curriculum","課程資訊","Core management courses, electives and graduation requirements.","管理核心課程、選修課與畢業要求。",O+"class.php?CID=1"],
-["guide","imMBA Guide","imMBA 全攻略","A practical guide for new and current students.","給新生與在學生的實用指南。","/page.html?p=guide"],
-["graduation","Graduation","畢業與離校","Graduation requirements and procedures.","畢業要求與離校流程。","/page.html?p=graduation"],
-["dual","Dual Degree","雙聯學位","Earn degrees from partner universities.","與合作大學取得雙學位。","/page.html?p=dual-degree"],
-["exchange","Overseas Exchange","海外交換","Study abroad at international partner schools.","前往國際合作學校交換學習。","/page.html?p=exchange"],
-["marketplace","Marketplace","書籍教材市集","Buy, sell or swap books and course materials with other students.","學生交流書籍與教材的平台。","/marketplace.html"],
-["events","Events","活動集錦","Info sessions and program activities.","說明會與各項活動。",""],
-["announcements","Announcements","公告","Latest notices for applicants and students.","給申請者與學生的最新公告。",O+"news.php"],
-["downloads","Downloads","表格下載","Forms and program documents.","表格與課程文件。","/downloads.html"],
-["college","College of Management","輔大管理學院","The college that hosts the imMBA.","imMBA 所屬的管理學院。","https://www.management.fju.edu.tw/index_en.php"]];
-var N=[["Spring 2027, apply NOW!! (Sep 14 - Oct 14) - This track is open to international students only","2026/08/19",187],
-["College of Management Career Platform – Job Openings","2025/01/30",398],
-["【9/29 Admissions Info Session Recap｜Local Student Applications Open Tomorrow!】","2026/09/29",424],
-["【Two Years, More Than One Master's Degree.】","2026/09/22",423],
-["【International Students: Get to Know Fu Jen imMBA at Our Info Session!】","2026/09/15",422]];
-var SUB={
-about:[["overview","Overview and Ranking","概況與排名","Program overview, accreditation and rankings.","課程概況、認證與排名。","/page.html?p=overview"],
-["environment","Our Learning Environment","學習環境","Campus, classrooms and student life.","校園、教室與學生生活。","/page.html?p=environment"]],
-admissions:[["apply","Apply for Fu Jen imMBA","申請輔仁 imMBA","Requirements, documents and how to apply.","申請資格、文件與報名方式。","/page.html?p=admissions"]],
-curriculum:[["requirements","Curriculum and Requirements","課程與修業規定","Courses, electives and program requirements.","課程、選修與修業規定。","/page.html?p=curriculum"]]};
-function L(u){return u.charAt(0)=="/"?'<a class="rm" href="'+u+'" data-zh="閱讀更多 →">Read more →</a>':'<a href="'+u+'" target="_blank" rel="noopener" data-zh="前往官方頁面 ↗">View on official site ↗</a>'}
-var DIRECT={about:"/page.html?p=overview",admissions:"/page.html?p=admissions",curriculum:"/page.html?p=curriculum",guide:"/page.html?p=guide",graduation:"/page.html?p=graduation",dual:"/page.html?p=dual-degree",exchange:"/page.html?p=exchange",marketplace:"/marketplace.html",downloads:"/downloads.html",college:"https://www.management.fju.edu.tw/index_en.php"};
-var HOME={faculty:1,events:1,announcements:1};
-var m="",s="";
+["faculty","Faculty","師資介紹","Meet the teaching team behind the program.","認識本班的教師團隊。"],
+["events","Events","活動集錦","Info sessions and program activities.","說明會與各項活動。"],
+["announcements","Announcements","公告","Latest notices for applicants and students.","給申請者與學生的最新公告。"]];
+var s="";
 S.forEach(function(x){
- var sb=SUB[x[0]],h=DIRECT[x[0]]||"#"+x[0],ext=h.indexOf("http")==0;
- m+='<li'+(sb?' class="has"':'')+'><a href="'+h+'"'+(ext?' target="_blank" rel="noopener"':'')+' data-zh="'+x[2]+(ext?' ↗':'')+'">'+x[1]+(ext?' ↗':'')+'</a>'+(sb?'<div class="dd">'+sb.map(function(y){return '<a href="'+y[5]+'" data-zh="'+y[2]+'">'+y[1]+'</a>'}).join("")+'</div>':'')+'</li>';
- if(!HOME[x[0]])return;
  s+='<section id="'+x[0]+'"><div class="wrap"><h3 data-zh="'+x[2]+'">'+x[1]+'</h3><p class="d" data-zh="'+x[4]+'">'+x[3]+'</p>';
- if(x[0]=='announcements'){s+='<div id="news-grid" class="ncards"><p class="d">Loading announcements…</p></div><p class="src"><span data-zh="資料來源：">Source:</span> <a href="'+x[5]+'" target="_blank" rel="noopener" data-zh="輔大 imMBA 官方公告 ↗">Fu Jen imMBA official announcements ↗</a></p>'}
- if(x[0]=='faculty'){s+='<div id="faculty-list" class="fgrid"><p class="d">Loading faculty…</p></div><p class="src"><span data-zh="資料來源：">Source:</span> <a href="'+O+'teacher.php" target="_blank" rel="noopener" data-zh="輔大 imMBA 官方師資頁 ↗">Fu Jen imMBA official faculty page ↗</a></p>'}
- if(x[0]=='events'){s+='<div id="events-grid" class="ncards"><p class="d">Loading events…</p></div>'}
+ if(x[0]=='announcements')s+='<div id="news-grid" class="ncards"><p class="d">Loading announcements…</p></div><p class="src"><span data-zh="資料來源：">Source:</span> <a href="'+O+'news.php" target="_blank" rel="noopener" data-zh="輔大 imMBA 官方公告 ↗">Fu Jen imMBA official announcements ↗</a></p>';
+ if(x[0]=='faculty')s+='<div id="faculty-list" class="fgrid"><p class="d">Loading faculty…</p></div><p class="src"><span data-zh="資料來源：">Source:</span> <a href="'+O+'teacher.php" target="_blank" rel="noopener" data-zh="輔大 imMBA 官方師資頁 ↗">Fu Jen imMBA official faculty page ↗</a></p>';
+ if(x[0]=='events')s+='<div id="events-grid" class="ncards"><p class="d">Loading events…</p></div>';
  s+='</div></section>'});
-document.getElementById("menu").innerHTML=m;document.getElementById("secs").innerHTML=s;
-var zh=false,els=[].slice.call(document.querySelectorAll("[data-zh]"));
+document.getElementById("secs").innerHTML=s;
+/* language: content marked data-zh swaps with the shared language switch in the header */
+var els=[].slice.call(document.querySelectorAll("[data-zh]"));
 els.forEach(function(e){e._en=e.innerHTML});
-var lang=document.getElementById("lang"),cm=document.getElementById("cm"),row=document.getElementById("navrow");
-function setCm(){var o=!row.hidden;cm.setAttribute("aria-expanded",o);cm.textContent=zh?(o?"收合主選單":"展開主選單"):(o?"Collapse main menu":"Expand main menu")}
-lang.onclick=function(){zh=!zh;try{localStorage.setItem("lang",zh?"zh":"en")}catch(e){}els.forEach(function(e){e.innerHTML=zh?e.getAttribute("data-zh"):e._en});
-document.documentElement.lang=zh?"zh-Hant":"en";lang.textContent=zh?"EN":"中文";setCm()};
-try{if(localStorage.getItem("lang")=="zh")lang.onclick()}catch(e){}
-cm.onclick=function(){row.hidden=!row.hidden;setCm()};setCm();
-document.querySelectorAll("#menu li.has>a").forEach(function(a){a.addEventListener("click",function(e){
- if(!matchMedia("(hover:none)").matches)return;var li=a.parentNode,o=li.classList.contains("open");
- document.querySelectorAll("#menu li.open").forEach(function(x){x.classList.remove("open")});
- if(!o){e.preventDefault();li.classList.add("open")}})});
-document.addEventListener("click",function(e){if(!e.target.closest("#menu"))document.querySelectorAll("#menu li.open").forEach(function(x){x.classList.remove("open")})});
-var links=[].slice.call(document.querySelectorAll("#menu>li>a"));
-window.addEventListener("scroll",function(){var y=window.scrollY+220,c=null;
-links.forEach(function(a){var h=a.getAttribute("href");if(h.charAt(0)!="#")return;var e=document.querySelector(h);if(e&&e.offsetTop<=y)c=a});
-links.forEach(function(a){a.classList.toggle("on",a===c)})});
+function applyLang(){var zh=false;try{zh=localStorage.getItem("lang")=="zh"}catch(e){}els.forEach(function(e){e.innerHTML=zh?e.getAttribute("data-zh"):e._en});document.documentElement.lang=zh?"zh-Hant":"en"}
+window.addEventListener("langchange",applyLang);applyLang();
 </script>
 <script type="module" src="/src/news.js"></script>
 <script type="module" src="/src/home-ui.js"></script>

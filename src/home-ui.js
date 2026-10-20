@@ -1,29 +1,12 @@
-import { mountScrollUi, autoReveal } from './ui.js'
-import { mountPalette } from './palette.js'
-import { themeButton } from './theme.js'
+import { autoReveal } from './ui.js'
+import { mountChrome } from './chrome.js'
 import { supabase, configured, esc } from './supabase.js'
 import { facultyCard } from './facultycard.js'
-import { mountAssistant } from './assistant.js'
 
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches
 const isZh = () => document.documentElement.lang.startsWith('zh')
 
-mountScrollUi(); mountPalette(); mountAssistant()
-document.getElementById('themeslot')?.replaceWith(themeButton())
-
-/* compact sticky header */
-const hdr = document.getElementById('hdr')
-let tick = false
-const onScroll = () => { if (tick) return; tick = true; requestAnimationFrame(() => { hdr.classList.toggle('compact', scrollY > 70); tick = false }) }
-addEventListener('scroll', onScroll, { passive: true }); onScroll()
-
-/* mobile menu */
-const burger = document.getElementById('burger')
-burger?.addEventListener('click', () => { const o = hdr.classList.toggle('open'); burger.setAttribute('aria-expanded', o) })
-document.getElementById('menu')?.addEventListener('click', (e) => {
-  const a = e.target.closest('a')
-  if (a && !a.parentElement.classList.contains('has') && hdr.classList.contains('open')) { hdr.classList.remove('open'); burger.setAttribute('aria-expanded', 'false') }
-})
+mountChrome({ trackPath: false }) // the shared header, identical on every page
 
 /* count-up statistics */
 function countUp(el) {
