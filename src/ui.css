@@ -184,7 +184,11 @@ html[data-theme=dark] .hdr .lang{background:var(--b)}
 html[data-theme=dark] .hdr .dd{background:var(--b)}
 @media(max-width:860px){
   .hdr .burger{display:inline-grid}.hdr .cm{display:none}.hdr .not-m{display:none}.hdr .only-m{display:block}
-  .hdr .brand{flex-wrap:wrap;row-gap:8px}.hdr .act{margin-left:auto}
+  .hdr .brand{flex-wrap:wrap;row-gap:6px;padding:8px 14px}
+  .hdr .brand img{width:44px;height:44px}.hdr.compact .brand img{width:34px;height:34px}
+  .hdr .ttl{flex:1 1 0;min-width:0}.hdr .ttl h1{font-size:.92rem;line-height:1.25}
+  .hdr .act{flex:1 1 100%;margin-left:0;justify-content:flex-end}
+  .hdr .notice{font-size:12px;padding:5px 12px;gap:6px 10px}
   .hdr .navrow{display:none;padding-bottom:16px}
   .hdr.open .navrow{display:block;animation:rise .35s var(--ease) both}
   .hdr nav ul{flex-direction:column;gap:0}.hdr nav a{padding:12px 10px;font-size:15px;border-bottom:1px solid var(--bd)}
