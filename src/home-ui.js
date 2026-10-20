@@ -1,11 +1,12 @@
 import { mountScrollUi, autoReveal } from './ui.js'
 import { mountPalette } from './palette.js'
 import { themeButton } from './theme.js'
+import { mountAssistant } from './assistant.js'
 
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches
 const isZh = () => document.documentElement.lang.startsWith('zh')
 
-mountScrollUi(); mountPalette()
+mountScrollUi(); mountPalette(); mountAssistant()
 document.getElementById('themeslot')?.replaceWith(themeButton())
 
 /* compact sticky header */

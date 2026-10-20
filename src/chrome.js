@@ -3,6 +3,7 @@ import { track } from './track.js'
 import { themeButton } from './theme.js'
 import { autoReveal, mountScrollUi, skeletonCards, skeletonList } from './ui.js'
 import { mountPalette, searchButtonHtml } from './palette.js'
+import { mountAssistant } from './assistant.js'
 
 const NAV = [
   ['/', 'Home', '首頁'],
@@ -34,7 +35,7 @@ export function mountChrome({ trackPath, skeleton = 'cards' } = {}) {
   }
   window.addEventListener('langchange', draw)
   draw()
-  mountScrollUi(); mountPalette()
+  mountScrollUi(); mountPalette(); mountAssistant()
   if (app) {
     new MutationObserver(() => autoReveal(app)).observe(app, { childList: true })
     autoReveal(document)
