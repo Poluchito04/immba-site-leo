@@ -129,7 +129,7 @@ var O="https://www.management.fju.edu.tw/esubweb/immbaengindex/";
 var S=[
 ["about","About","關於","An English-taught international MBA that blends a global outlook with practical learning, preparing managers who thrive across cultures.","以英語授課的國際 MBA，結合國際視野與實務學習，培養能跨文化發揮的管理人才。",O+"profile.php?IID=2"],
 ["admissions","Admissions","招生資訊","Check eligibility, prepare your documents and apply online.","了解申請資格、準備文件並線上報名。",O+"enroll.php?IID=3"],
-["faculty","Faculty","師資介紹","Meet the teaching team behind the program.","認識本班的教師團隊。",O+"teacher.php"],
+["faculty","Faculty","師資介紹","Meet the teaching team behind the program.","認識本班的教師團隊。","/faculty.html"],
 ["curriculum","Curriculum","課程資訊","Core management courses, electives and graduation requirements.","管理核心課程、選修課與畢業要求。",O+"class.php?CID=1"],
 ["guide","imMBA Guide","imMBA 全攻略","A practical guide for new and current students.","給新生與在學生的實用指南。",O+"subedit.php?EID=35"],
 ["graduation","Graduation","畢業與離校","Graduation requirements and procedures.","畢業要求與離校流程。",O+"subedit.php?EID=16"],
@@ -157,7 +157,7 @@ S.forEach(function(x){
  s+='<section id="'+x[0]+'"><div class="wrap"><h3 data-zh="'+x[2]+'">'+x[1]+'</h3><p class="d" data-zh="'+x[4]+'">'+x[3]+'</p>';
  if(sb){s+='<div class="subs">'+sb.map(function(y){return '<div class="sub" id="'+y[0]+'"><h4 data-zh="'+y[2]+'">'+y[1]+'</h4><p data-zh="'+y[4]+'">'+y[3]+'</p><a href="'+y[5]+'" target="_blank" rel="noopener" data-zh="前往官方頁面 ↗">View on official site ↗</a></div>'}).join("")+'</div>'}
  if(x[6]){s+='<ul class="list">'+x[6].map(function(i){var n=N[i];return '<li><a href="'+O+'news-detail.php?NID='+n[2]+'" target="_blank" rel="noopener"><span>'+n[0]+'</span><time>'+n[1]+'</time></a></li>'}).join("")+'</ul>'}
- if(x[5]&&!sb){s+='<a href="'+x[5]+'" target="_blank" rel="noopener" data-zh="前往官方頁面 ↗">View on official site ↗</a>'}
+ if(x[5]&&!sb){s+='<a href="'+x[5]+'"'+(x[5].charAt(0)=="/"?'':' target="_blank" rel="noopener"')+' data-zh="前往官方頁面 ↗">View on official site ↗</a>'}
  s+='</div></section>'});
 document.getElementById("menu").innerHTML=m;document.getElementById("secs").innerHTML=s;
 var zh=false,els=[].slice.call(document.querySelectorAll("[data-zh]"));
