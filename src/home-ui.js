@@ -34,7 +34,11 @@ function countUp(el) {
   }
   requestAnimationFrame(step)
 }
-const cio = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { countUp(e.target); cio.unobserve(e.target) } }), { threshold: 0.6 })
+const finish = (el) => { el.textContent = (el.dataset.prefix || '') + el.dataset.count + (el.dataset.suffix || '') }
+const cio = new IntersectionObserver((es) => es.forEach((e) => {
+  if (e.isIntersecting) { countUp(e.target); cio.unobserve(e.target) }
+  else if (e.boundingClientRect.top < 0) { finish(e.target); cio.unobserve(e.target) } // already scrolled past
+}), { threshold: 0.3 })
 document.querySelectorAll('[data-count]').forEach((el) => { el.textContent = (el.dataset.prefix || '') + '0' + (el.dataset.suffix || ''); cio.observe(el) })
 
 /* admissions countdown (first Fall 2027 round closes 4 Dec 2026 23:59 Taiwan time, per the official announcement) */
