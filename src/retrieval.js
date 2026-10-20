@@ -33,10 +33,9 @@ const clean = (s) => s.replace(/\[([^\]]+)\]\((?:https?:\/\/|\/)[^)]*\)/g, '$1')
 /** Split a markdown-ish body into passages of reasonable size. */
 export function passages(body) {
   const out = []
-  for (const block of clean(body || '').split(/\n{2,}/)) {
-    const b = block.trim()
-    if (b.length < 35) continue
-    if (b.length <= 520) { out.push(b); continue }
+  let carry = ''
+  const emit = (b) => {
+    if (b.length <= 520) { out.push(b); return }
     let cur = ''
     for (const s of b.split(/(?<=[.!?。！？])\s*/)) {
       if ((cur + s).length > 480 && cur) { out.push(cur.trim()); cur = '' }
@@ -44,6 +43,13 @@ export function passages(body) {
     }
     if (cur.trim().length >= 35) out.push(cur.trim())
   }
+  for (const block of clean(body || '').split(/\n{2,}/)) {
+    const b = block.trim()
+    if (!b) continue
+    if (b.length < 80) { carry += (carry ? '\n' : '') + b; continue } // keep short headings with the paragraph they introduce
+    emit((carry ? carry + '\n' : '') + b); carry = ''
+  }
+  if (carry.length >= 35) emit(carry)
   return out
 }
 
