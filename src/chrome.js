@@ -26,8 +26,8 @@ export function mountChrome({ trackPath, skeleton = 'cards' } = {}) {
       <div class="bar"><b>Leopoldo Martinez · F15381071</b><span>${t('Student project · Unofficial site', '學生專案 · 非官方網站')}</span>
       <a href="https://www.management.fju.edu.tw/esubweb/immbaengindex/" target="_blank" rel="noopener">${t('Official imMBA website', 'imMBA 官方網站')} ↗</a></div>
       <header class="top"><a class="brandlink" href="/" aria-label="imMBA home"><img src="/favicon.svg" alt="" width="44" height="44"><h1>${t('Fu Jen Catholic University International MBA (imMBA)', '輔仁大學國際經營管理碩士班（imMBA）')}</h1></a>
-      <nav class="topnav" aria-label="Main">${NAV.map(([h, en, zh]) => `<a href="${h}" ${here === h.replace(/\/$/, '') || (h === '/' && here === '') ? 'aria-current="page" class="on"' : ''}>${t(en, zh)}</a>`).join('')}
-      <span class="tools">${searchButtonHtml(t('Search', '搜尋'))}<span id="themeslot"></span><button class="lang" id="langbtn" title="Switch language">${isZh() ? 'EN' : '中文'}</button></span></nav></header>`
+      <nav class="topnav" aria-label="Main">${NAV.map(([h, en, zh]) => `<a href="${h}" ${here === h.replace(/\/$/, '') || (h === '/' && here === '') ? 'aria-current="page" class="on"' : ''}>${t(en, zh)}</a>`).join('')}</nav>
+      <span class="tools">${searchButtonHtml(t('Search', '搜尋'))}<span id="themeslot"></span><button class="lang" id="langbtn" title="Switch language">${isZh() ? 'EN' : '中文'}</button></span></header>`
     document.getElementById('themeslot').replaceWith(themeButton())
     document.getElementById('langbtn').onclick = () => setLang(isZh() ? 'en' : 'zh')
     if (foot) foot.innerHTML = `<footer>${t('Unofficial student project · Content © College of Management, Fu Jen Catholic University', '非官方學生專案 · 內容 © 輔仁大學管理學院')} · <a href="/admin.html">${t('Back office', '後台')}</a> · <a href="/project.html">${t('Project docs', '專案文件')}</a></footer>`

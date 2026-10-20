@@ -51,8 +51,8 @@ td .thumb{width:40px;height:50px;border-radius:6px;object-fit:cover;background:v
 .top{flex-wrap:wrap;position:sticky;top:0;z-index:60;background:color-mix(in srgb,var(--w) 88%,transparent);backdrop-filter:saturate(1.4) blur(12px);view-transition-name:site-header;max-width:none;padding:12px max(20px,calc(50% - 540px));border-bottom:1px solid var(--bd)}
 .brandlink{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit}
 .brandlink img{border-radius:11px;box-shadow:0 4px 10px #082a3340}
-.topnav{display:flex;gap:4px;align-items:center;flex-wrap:wrap}.tools{display:flex;gap:8px;align-items:center;margin-left:8px}
-@media(max-width:860px){.topnav{overflow-x:auto;flex-wrap:nowrap;width:100%;padding-bottom:4px;scrollbar-width:none}.topnav::-webkit-scrollbar{display:none}.topnav a{white-space:nowrap}.tools{margin-left:auto}.brandlink h1{font-size:1rem}}
+.topnav{display:flex;gap:4px;align-items:center;flex-wrap:wrap}.tools{display:flex;gap:8px;align-items:center;order:3}.topnav{order:2}.brandlink{flex:1 1 auto}
+@media(max-width:860px){.topnav{overflow-x:auto;flex-wrap:nowrap;width:100%;padding-bottom:4px;scrollbar-width:none}.topnav::-webkit-scrollbar{display:none}.topnav a{white-space:nowrap}.tools{order:2;margin-left:auto}.topnav{order:3}.brandlink h1{font-size:1rem}}
 .topnav a{padding:6px 10px;font-size:14px;color:var(--tx);text-decoration:none;border-bottom:2px solid transparent}
 .topnav a:hover,.topnav a.on{color:var(--g);border-bottom-color:var(--acc)}
 .lang{border:1px solid var(--bd);background:var(--w);color:var(--mut);border-radius:8px;padding:6px 12px;font:inherit;font-size:13px;cursor:pointer}

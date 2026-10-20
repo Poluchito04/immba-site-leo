@@ -165,6 +165,15 @@ To turn a static, partly Chinese-only, hand-edited website into a bilingual, dat
 - Missing translations fall back to the other language and are flagged for administrators.
 - Auto-translate gives a first draft that a human must review.
 
+## 15b. Design and UX decisions
+- **Visual system:** one palette (deep teal, coral accent) with serif headings and a light and a dark theme. The theme follows the device setting and can be switched with the button; the choice is remembered.
+- **Motion with purpose:** content reveals as it scrolls into view, statistics count up once, cards lift on hover, the hero gradient drifts slowly and pages cross-fade when navigating. Everything switches off for people who prefer reduced motion.
+- **Fast to use:** global search (press Ctrl/Cmd+K or /) across pages, faculty, news, documents and listings, in the current language; sticky compact header; back-to-top button and reading progress bar; skeleton placeholders instead of blank screens; toast messages instead of banners.
+- **Orientation:** admissions deadline countdown in the hero (source: the official announcement), key facts strip, four "why imMBA" cards, previous/next links between content pages, breadcrumbs, faculty search with clickable research tags.
+- **Mobile first:** hamburger menu with full-width drawer, tools always visible, horizontally scrollable navigation on content pages.
+- **Accessibility:** skip link, visible keyboard focus, labelled controls, semantic landmarks, sufficient contrast in both themes.
+- **Back office ergonomics:** Ctrl/Cmd+S saves the open form, Esc closes it, dashboard first, needs-attention shortcuts that jump to the right tab.
+
 ## 16. Test and verification log
 - **20 Oct 2026, production:** created, edited, reordered, deleted faculty and news from the admin; verified photo upload and deletion in Storage; verified drafts are invisible to the public; verified an anonymous visitor cannot insert, delete, upload or read profiles; verified pending, admin and super admin permissions with a role simulation that rolls back.
 - **Known limits:** automated tests not yet written (planned for the testing week); marketplace has no spam protection beyond a honeypot and database limits.
@@ -185,6 +194,7 @@ To turn a static, partly Chinese-only, hand-edited website into a bilingual, dat
 - **Decision:** keep content in the database, not in code, so staff never need a developer.
 - **Decision:** moderate marketplace listings before publishing to avoid spam and abuse.
 - **Decision:** link photos and documents to the official site and cite the source.
+- **20 Oct 2026 (evening):** design and UX pass: dark mode, global search, scroll animations, countdown, mobile menu, skeleton loaders, toasts, faculty search.
 
 ## 19. Final reflection (to be written by the student)
 Write this yourself at the end of the course. Suggested prompts:
