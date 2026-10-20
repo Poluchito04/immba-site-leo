@@ -1,5 +1,5 @@
 import { supabase, configured, esc, safeUrl } from './supabase.js'
-import { isZh, pick } from './i18n.js'
+import { isZh, pick, fpick } from './i18n.js'
 
 let data = null, items = [], sel = 0, loading = null
 const ICON = '<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>'
@@ -56,7 +56,7 @@ function search(q) {
   const out = []
   const push = (g, ic, list) => list.sort((a, b) => b.sc - a.sc).slice(0, 6).forEach((r) => out.push({ g, ic, ...r }))
   push('pages', '📖', data.pages.map((p) => ({ sc: score(q, pick(p, 'title'), pick(p, 'body')), t: pick(p, 'title'), s: snippet(pick(p, 'body'), q), href: '/page.html?p=' + p.slug })).filter((r) => r.sc))
-  push('faculty', '👩‍🏫', data.faculty.map((f) => ({ sc: score(q, f.name + ' ' + (f.name_zh || ''), [f.title, f.title_zh, f.research_fields, f.research_fields_zh].join(' ')), t: isZh() && f.name_zh ? f.name_zh : f.name, s: pick(f, 'title'), href: '/faculty.html?q=' + encodeURIComponent(f.name) })).filter((r) => r.sc))
+  push('faculty', '👩‍🏫', data.faculty.map((f) => ({ sc: score(q, f.name + ' ' + (f.name_zh || ''), [f.title, f.title_zh, f.research_fields, f.research_fields_zh].join(' ')), t: isZh() && f.name_zh ? f.name_zh : f.name, s: fpick(f, 'title'), href: '/faculty.html?q=' + encodeURIComponent(f.name) })).filter((r) => r.sc))
   push('news', '📰', data.news.map((n) => ({ sc: score(q, pick(n, 'title')), t: pick(n, 'title'), s: n.news_date + (n.kind === 'event' ? ' · event' : ''), href: safeUrl(isZh() ? n.link_url_zh || n.link_url : n.link_url || n.link_url_zh) || '/#announcements', ext: true })).filter((r) => r.sc))
   push('downloads', '📎', data.downloads.map((d) => ({ sc: score(q, pick(d, 'title')), t: pick(d, 'title'), s: d.file_type, href: safeUrl(d.file_url), ext: true })).filter((r) => r.sc))
   push('marketplace', '🛒', data.listings.map((l) => ({ sc: score(q, l.title), t: l.title, s: 'Marketplace', href: '/marketplace.html' })).filter((r) => r.sc))

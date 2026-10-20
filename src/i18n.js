@@ -9,3 +9,5 @@ export function initLang() { document.documentElement.lang = isZh() ? 'zh-Hant' 
 /** pick(row,'title') -> row.title_zh / row.title_en, falling back to the other language */
 export const pick = (o, k) => (isZh() ? o[k + '_zh'] || o[k + '_en'] : o[k + '_en'] || o[k + '_zh']) || ''
 export const t = (en, zh) => (isZh() ? zh : en)
+/** faculty-style rows: English lives in the plain column (title), Chinese in title_zh */
+export const fpick = (o, k) => (isZh() ? o[k + '_zh'] || o[k] : o[k] || o[k + '_zh']) || ''
