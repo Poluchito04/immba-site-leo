@@ -6,8 +6,4 @@ const key = import.meta.env.VITE_SUPABASE_ANON_KEY
 export const configured = Boolean(url && key && !url.includes('your-project'))
 export const supabase = configured ? createClient(url, key) : null
 
-export const esc = (s) =>
-  String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))
-
-// only allow http(s) links coming from the database
-export const safeUrl = (u) => (/^https?:\/\//i.test(u || '') ? u : '')
+export { esc, safeUrl } from './util.js'

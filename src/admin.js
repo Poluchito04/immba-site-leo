@@ -1,10 +1,13 @@
 import { supabase, configured, esc, safeUrl } from './supabase.js'
+import { translate } from './translate.js'
+import { loadDashboard } from './admin-dashboard.js'
+import { loadPages, loadDownloads, loadListings } from './admin-content.js'
 
 const app = document.getElementById('app')
 const who = document.getElementById('who')
 const BUCKET = 'faculty-photos'
-const FIELDS = ['name', 'title', 'education', 'research_fields', 'department', 'phone', 'email', 'website', 'category']
-let session = null, profile = null, faculty = [], news = [], editingNews = null, tab = 'news', editing = null, flash = null
+const FIELDS = ['name', 'title', 'education', 'research_fields', 'department', 'phone', 'email', 'website', 'category', 'name_zh', 'title_zh', 'education_zh', 'research_fields_zh', 'department_zh']
+let session = null, profile = null, faculty = [], news = [], editingNews = null, tab = 'dashboard', editing = null, flash = null
 
 const notify = (text, type = 'ok') => { flash = { text, type }; render() }
 const flashHtml = () => { if (!flash) return ''; const h = `<div class="msg ${flash.type}">${esc(flash.text)}</div>`; flash = null; return h }
@@ -102,10 +105,13 @@ function renderNewPassword() {
 function renderDashboard() {
   const isSuper = profile.role === 'super_admin'
   if (tab === 'approvals' && !isSuper) tab = 'faculty'
-  app.innerHTML = `${flashHtml()}<div class="tabs"><button data-t="news" class="${tab === 'news' ? 'on' : ''}">News</button><button data-t="faculty" class="${tab === 'faculty' ? 'on' : ''}">Faculty</button>
+  app.innerHTML = `${flashHtml()}<div class="tabs">${[['dashboard', 'Dashboard'], ['news', 'News & events'], ['faculty', 'Faculty'], ['pages', 'Pages'], ['downloads', 'Documents'], ['marketplace', 'Marketplace']].map(([k, l]) => `<button data-t="${k}" class="${tab === k ? 'on' : ''}">${l}</button>`).join('')}
     ${isSuper ? `<button data-t="approvals" class="${tab === 'approvals' ? 'on' : ''}">Administrators</button>` : ''}</div><div id="pane"></div>`
   app.querySelectorAll('[data-t]').forEach((b) => (b.onclick = () => { tab = b.dataset.t; editing = null; renderDashboard() }))
-  tab === 'faculty' ? loadFaculty() : tab === 'news' ? loadNews() : loadApprovals()
+  const pane = document.getElementById('pane')
+  const ctx = { supabase, notify, goto: (t) => { tab = t; renderDashboard() } }
+  const views = { dashboard: () => loadDashboard(pane, ctx), news: loadNews, faculty: loadFaculty, pages: () => loadPages(pane, ctx), downloads: () => loadDownloads(pane, ctx), marketplace: () => loadListings(pane, ctx), approvals: loadApprovals }
+  ;(views[tab] || loadFaculty)()
 }
 
 
@@ -117,31 +123,14 @@ const syncState = (n) => {
   return miss.length ? { ok: false, text: 'Missing: ' + miss.map((k) => ({ title_zh: '中文 title', title_en: 'English title', content_zh: '中文 content', content_en: 'English content' }[k])).join(', ') } : { ok: true, text: 'Both languages complete' }
 }
 
-async function translate(text, from, to) {
-  const chunks = []
-  for (const para of text.split(/\n/)) {
-    if (!para.trim()) { chunks.push(''); continue }
-    for (let i = 0; i < para.length; i += 450) chunks.push(para.slice(i, i + 450))
-  }
-  const out = []
-  for (const c of chunks) {
-    if (!c) { out.push(''); continue }
-    const r = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(c)}&langpair=${from}|${to}`)
-    const j = await r.json()
-    if (!j.responseData || j.responseStatus >= 400 && j.responseStatus !== '200') throw new Error(j.responseDetails || 'Translation service unavailable')
-    out.push(j.responseData.translatedText)
-  }
-  return out.join('\n')
-}
-
 async function loadNews() {
   const pane = document.getElementById('pane')
   const { data, error } = await supabase.from('news').select('*').order('pinned', { ascending: false }).order('news_date', { ascending: false }).order('sort_order')
   if (error) { pane.innerHTML = `<div class="msg err">${esc(error.message)} — did you run supabase/news.sql?</div>`; return }
   news = data
-  pane.innerHTML = `<div class="box"><div class="spread"><h3 style="margin:0">Announcements (${news.length})</h3><button class="btn" id="addn">+ Add announcement</button></div>
-    <div id="nform"></div><div class="scroll"><table><thead><tr><th>Date</th><th>English title</th><th>中文標題</th><th>Sync</th><th>Status</th><th></th></tr></thead><tbody>
-    ${news.map((n) => { const st = syncState(n); return `<tr><td style="white-space:nowrap">${esc(n.news_date)}</td><td>${n.pinned ? '<span class="pill">PINNED</span> ' : ''}${esc(n.title_en || '—')}</td><td>${esc(n.title_zh || '—')}</td>
+  pane.innerHTML = `<div class="box"><div class="spread"><h3 style="margin:0">News & events (${news.length})</h3><button class="btn" id="addn">+ Add item</button></div>
+    <div id="nform"></div><div class="scroll"><table><thead><tr><th>Date</th><th>Type</th><th>English title</th><th>中文標題</th><th>Sync</th><th>Status</th><th></th></tr></thead><tbody>
+    ${news.map((n) => { const st = syncState(n); return `<tr><td style="white-space:nowrap">${esc(n.news_date)}</td><td><span class="pill ${n.kind === 'event' ? 'super_admin' : ''}">${esc(n.kind || 'news')}</span></td><td>${n.pinned ? '<span class="pill">PINNED</span> ' : ''}${esc(n.title_en || '—')}</td><td>${esc(n.title_zh || '—')}</td>
       <td><span class="pill ${st.ok ? '' : 'pending'}" title="${esc(st.text)}">${st.ok ? 'EN ⇄ 中文 ✓' : 'Out of sync'}</span></td>
       <td><span class="pill ${n.published ? '' : 'rejected'}">${n.published ? 'published' : 'draft'}</span></td>
       <td><div class="acts"><button class="btn o sm" data-nedit="${n.id}">Edit</button><button class="btn danger sm" data-ndel="${n.id}">Delete</button></div></td></tr>` }).join('')}
@@ -158,6 +147,7 @@ function showNewsForm(n) {
   host.innerHTML = `<form id="nf" style="border-top:1px solid var(--bd);margin-top:18px;padding-top:6px"><h4 style="margin:12px 0 0">${n ? 'Edit announcement' : 'New announcement'} <small style="color:var(--mut);font-weight:400">— one record, both languages</small></h4>
     <div class="row2"><div><label>Date *</label><input type="date" name="news_date" required value="${v('news_date') || new Date().toISOString().slice(0, 10)}"></div>
     <div><label>Display order (lower first, same date)</label><input type="number" name="sort_order" value="${n?.sort_order ?? 0}"></div>
+    <div><label>Type</label><select name="kind"><option value="news" ${n?.kind === 'event' ? '' : 'selected'}>News / announcement</option><option value="event" ${n?.kind === 'event' ? 'selected' : ''}>Event</option></select></div>
     <div><label>Link URL (English)</label><input type="url" name="link_url" value="${v('link_url')}" placeholder="https://…"></div>
     <div><label>Link URL (中文, optional)</label><input type="url" name="link_url_zh" value="${v('link_url_zh')}" placeholder="https://…"></div></div>
     <p style="margin:12px 0 0"><label style="display:inline;margin-right:18px"><input type="checkbox" name="published" style="width:auto" ${n?.published === false ? '' : 'checked'}> Published</label>
@@ -197,7 +187,7 @@ async function saveNews(e) {
   const f = e.target, btn = f.querySelector('[type=submit]')
   const val = (k) => f[k].value.trim() || null
   const row = { news_date: f.news_date.value, sort_order: parseInt(f.sort_order.value, 10) || 0, link_url: val('link_url'), link_url_zh: val('link_url_zh'),
-    published: f.published.checked, pinned: f.pinned.checked, title_en: val('title_en'), title_zh: val('title_zh'), content_en: val('content_en'), content_zh: val('content_zh') }
+    kind: f.kind.value, published: f.published.checked, pinned: f.pinned.checked, title_en: val('title_en'), title_zh: val('title_zh'), content_en: val('content_en'), content_zh: val('content_zh') }
   for (const k of ['link_url', 'link_url_zh']) if (row[k] && !safeUrl(row[k])) return notify('Links must start with http:// or https://', 'err')
   if (!row.title_en && !row.title_zh) return notify('Add a title in at least one language.', 'err')
   const st = syncState(row)
@@ -222,9 +212,9 @@ async function loadFaculty() {
   faculty = data
   pane.innerHTML = `<div class="box"><div class="spread"><h3 style="margin:0">Faculty members (${faculty.length})</h3>
     <button class="btn" id="add">+ Add faculty</button></div>
-    <div id="form"></div><div class="scroll"><table><thead><tr><th></th><th>Name</th><th>Title</th><th>Type</th><th>Order</th><th></th></tr></thead><tbody>
+    <div id="form"></div><div class="scroll"><table><thead><tr><th></th><th>Name</th><th>中文</th><th>Title</th><th>Type</th><th>Order</th><th></th></tr></thead><tbody>
     ${faculty.map((f, i) => `<tr><td>${safeUrl(f.image_url) ? `<img class="thumb" src="${esc(f.image_url)}" alt="">` : '<div class="thumb"></div>'}</td>
-      <td><b>${esc(f.name)}</b></td><td>${esc(f.title)}</td><td><span class="pill">${esc(f.category)}</span></td>
+      <td><b>${esc(f.name)}</b></td><td>${esc(f.name_zh || '—')}</td><td>${esc(f.title)}</td><td><span class="pill">${esc(f.category)}</span></td>
       <td><div class="acts"><button class="btn o sm" data-up="${f.id}" ${i === 0 ? 'disabled' : ''} aria-label="Move up">↑</button>
         <button class="btn o sm" data-down="${f.id}" ${i === faculty.length - 1 ? 'disabled' : ''} aria-label="Move down">↓</button></div></td>
       <td><div class="acts"><button class="btn o sm" data-edit="${f.id}">Edit</button><button class="btn danger sm" data-del="${f.id}">Delete</button></div></td></tr>`).join('')}
@@ -247,6 +237,9 @@ function showForm(f) {
     <div><label>Type</label><select name="category"><option value="full-time">Full-time</option><option value="adjunct">Adjunct</option></select></div>
     <div><label>Email</label><input type="email" name="email" value="${v('email')}"></div>
     <div><label>Phone</label><input name="phone" value="${v('phone')}"></div></div>
+    <h4 style="margin:18px 0 0">中文 (Chinese version)</h4><div class="row2"><div><label>中文姓名</label><input name="name_zh" value="${v('name_zh')}"></div><div><label>中文職稱</label><input name="title_zh" value="${v('title_zh')}"></div>
+    <div><label>中文系所</label><input name="department_zh" value="${v('department_zh')}"></div><div><label>中文學歷</label><input name="education_zh" value="${v('education_zh')}"></div></div>
+    <label>中文研究領域</label><input name="research_fields_zh" value="${v('research_fields_zh')}">
     <label>Education</label><input name="education" value="${v('education')}">
     <label>Research fields</label><input name="research_fields" value="${v('research_fields')}">
     <label>Personal website (https://…)</label><input type="url" name="website" value="${v('website')}">

@@ -1,0 +1,195 @@
+## 0. About this document
+This is the product documentation for the **imMBA program website**, built for the course *AI-Assisted Digital Product Development* (Fu Jen Catholic University). It follows the course sequence: opportunity assessment, vision, OKRs, customer profile, value map, PRD, MVP and user stories.
+
+**Honesty note.** Everything marked *hypothesis* comes from analysis (AI-assisted brainstorming plus the public official website) and has **not** been validated with real people yet. Section 7 is a template for the classmate interviews that still have to be done and recorded with real answers.
+
+## 1. Opportunity assessment
+- **Business objective:** help the imMBA program attract and convert qualified applicants (local and international) and cut the effort needed to keep its website accurate.
+- **Key results (how success is measured):** see section 3 (OKRs).
+- **Customer problem:** prospective and current students need current, trustworthy, bilingual information (admissions dates, curriculum, faculty, documents) in one place. Today information is spread across many pages, some pages are empty in one language, and staff can only update content by editing pages manually.
+- **Target market:** (1) prospective international students, (2) prospective local students, (3) current students, (4) program staff and faculty who maintain the content.
+
+## 2. Product vision and strategy
+- **Vision (2-5 years):** the imMBA website is the single front door to the program: always up to date, fully bilingual, and so easy to maintain that program staff update it in minutes without a developer.
+- **Strategy:** (1) put all content in a cloud database instead of hard-coded pages, (2) give staff a safe back office with roles and approvals, (3) measure what visitors use and what is out of date, (4) later add AI assistance (admissions FAQ, translation drafts) with human review.
+
+## 3. Product objectives (OKRs)
+- **O1 - Prospective students find answers fast.**
+  - KR1: every main section (About, Admissions, Curriculum, Faculty, Downloads) reachable in at most 2 clicks from the home page.
+  - KR2: 100% of public pages available in English and Chinese.
+  - KR3: admissions information and documents visible without leaving the site.
+- **O2 - Staff keep content fresh with little effort.**
+  - KR1: publishing a news item in both languages takes under 3 minutes.
+  - KR2: 0 announcements published with only one language without a warning.
+  - KR3: new administrators need approval from a super administrator before they can edit.
+- **O3 - The team can see how the site is doing.**
+  - KR1: dashboard shows visits, content counts, drafts and items needing attention.
+  - KR2: every content change is recorded (who, what, when).
+
+## 4. Stakeholders
+- Prospective international student
+- Prospective local student
+- Current imMBA student (also buyer/seller in the marketplace)
+- Faculty member (appears on the Faculty page)
+- Program staff / administrator (edits content)
+- Program director / super administrator (approves administrators, owns quality)
+- Partner universities and visitors (read-only)
+
+## 5. Customer profile (jobs, pains, gains)
+*All items are hypotheses to verify in section 7.*
+
+### Prospective international student
+- **Jobs:** decide if imMBA fits; check requirements and deadlines; apply; understand life in Taipei.
+- **Pains:** information only in Chinese; unclear deadlines per intake; documents hard to find; unsure about dual degree options.
+- **Gains:** clear English admissions page; downloadable brochure; visible faculty and partners; confidence the site is current.
+
+### Prospective local student
+- **Jobs:** compare MBA programs; understand the two admission channels; prepare the application.
+- **Pains:** dates scattered across posts; unclear difference between channels.
+- **Gains:** one page explaining both channels with dates and documents.
+
+### Current student
+- **Jobs:** follow announcements and events; find forms (graduation, dual degree); buy or sell course books.
+- **Pains:** notices buried in a long list; forms hard to find; no trusted place for book exchange.
+- **Gains:** card-style announcements, searchable downloads, a moderated marketplace.
+
+### Program staff / administrator
+- **Jobs:** publish news in two languages; update faculty; keep documents current.
+- **Pains:** editing hard-coded pages; keeping two languages in sync; no history of changes.
+- **Gains:** one back office, bilingual forms with translation help and sync check, audit log.
+
+### Program director / super administrator
+- **Jobs:** control who can edit; keep quality.
+- **Pains:** no visibility of what changed or what is outdated.
+- **Gains:** approvals, dashboard, activity log.
+
+## 6. Value map
+- **Products and services:** public site (home, pages, faculty, news, events, downloads, marketplace), bilingual switch, back office, dashboard, moderated marketplace.
+- **Pain relievers:** Chinese/English everywhere; database instead of hard-coded pages; approval workflow; sync warnings; audit log.
+- **Gain creators:** card UI with clear link types; document library with file types; moderated listings; reports.
+- **Check:** do the products support all jobs? Admissions and documents (yes), faculty (yes), news and events (yes), marketplace (yes). Open gap: application submission itself stays on the official site.
+
+## 7. Verification plan: interviews (TO BE COMPLETED WITH REAL DATA)
+Interview at least 3 classmates. Record the real answers here. Do not invent answers.
+- **Interviewee 1** (name/role, date): ______
+- **Interviewee 2** (name/role, date): ______
+- **Interviewee 3** (name/role, date): ______
+- **Questions:**
+  - What do you look for first on a program website?
+  - What was hard to find or understand?
+  - Did you miss anything in your language?
+  - Would you use a student book marketplace? What would stop you?
+- **What we learned / what changes in the product:** ______
+
+## 8. Product Requirements Document (PRD-lite)
+### Why should we build the product?
+To turn a static, partly Chinese-only, hand-edited website into a bilingual, database-driven product that serves applicants and is cheap for staff to keep current.
+
+### What should the product do?
+- **Public site:** home with 5 sections (notice bar, branding, navigation, action area, hero); content pages (About, Admissions, Curriculum, Guide, Graduation, Dual Degree, Exchange); faculty; announcements and events as cards; downloads; marketplace; language switch.
+- **Back office:** login, roles, approvals; manage news/events, faculty (with photos), pages, downloads, marketplace listings; dashboard.
+- **Constraints:** free tiers only (Vercel, Supabase, GitHub); no payment handling; content sourced from the official site must cite it; personal data limited to what the official site already publishes.
+- **Scope (in):** everything above. **Scope (out):** online application form, payments, real-time chat.
+
+### How do we measure success?
+- Visits per page and language (page_views table).
+- Share of news with both languages complete (dashboard).
+- Number of content changes per week and time to publish (audit log).
+- Open items: pending administrators, pending listings, drafts.
+- Qualitative: interview feedback (section 7).
+
+## 9. MVP (midterm demo) and next steps
+- **MVP:** public home with navigation and bilingual switch; news cards; faculty page; content pages; login with roles; news and faculty management; deployed on Vercel with Supabase.
+- **Delivered beyond MVP:** downloads, marketplace with moderation, dashboard, audit log, page-view analytics.
+- **Next:** AI features (week 13), testing and hardening (week 11), responsible-AI review (week 15), user feedback round.
+
+## 10. User story map
+- **Activity: Explore the program**
+  - Task: read about the program, then story: *As a prospective student I want to read the program overview in my language so that I can decide if it fits me.*
+  - Task: see faculty, then story: *As a prospective student I want to see who teaches so that I trust the program.*
+- **Activity: Apply**
+  - Task: find admissions information, then story: *As an international student I want one admissions page in English so that I know dates and documents.*
+  - Task: get documents, then story: *As an applicant I want to download the brochure so that I can prepare my application.*
+- **Activity: Stay informed**
+  - Task: read announcements, then story: *As a student I want announcements as cards with dates so that I can scan what is new.*
+- **Activity: Trade materials**
+  - Task: post a listing, then story: *As a student I want to post a book for sale so that classmates can find it.*
+- **Activity: Manage content**
+  - Task: publish bilingual news, then story: *As an administrator I want to enter Chinese and English in one record so that both stay in sync.*
+  - Task: control access, then story: *As a super administrator I want to approve new administrators so that only trusted people edit.*
+  - Task: monitor, then story: *As a super administrator I want a dashboard so that I see what needs attention.*
+
+### Acceptance criteria (examples)
+- **Story: bilingual news.**
+  - Scenario 1 - Given an administrator on the News form, When they fill English and press auto-translate, Then the Chinese fields are filled and remain editable.
+  - Scenario 2 - Given a news record missing the Chinese title, When they save, Then the system warns that the versions are out of sync and asks for confirmation.
+- **Story: approve administrators.**
+  - Scenario 1 - Given a newly registered user with role pending, When they log in, Then they see a waiting screen and cannot edit anything.
+  - Scenario 2 - Given a super administrator, When they approve the user, Then the user gets role admin and can edit content.
+- **Story: marketplace.**
+  - Scenario 1 - Given a visitor submits a listing, When it is saved, Then it is hidden until an administrator approves it.
+  - Scenario 2 - Given a rejected listing, When anyone browses the marketplace, Then it never appears.
+
+## 11. Information architecture
+- Home: notice bar, branding, navigation, action area, hero, then sections for each menu item.
+- Navigation: About (Overview and Ranking; Our Learning Environment), Admissions (Apply), Curriculum (Curriculum and Requirements), Faculty, Guide, Graduation, Dual Degree, Overseas Exchange, Marketplace, Events, Announcements, Downloads, College of Management.
+- Link types: internal links look like normal menu items; external links carry the arrow icon and open a new tab; documents show the file type (PDF, XLS, DOC); action links are buttons that start with a verb.
+
+## 12. Roles and permissions
+- **Visitor:** read published content; submit a marketplace listing (stays pending).
+- **Pending:** registered and verified but cannot enter the back office.
+- **Admin:** create, edit and delete news, events, faculty, pages, downloads; moderate listings; see the dashboard.
+- **Super admin:** everything an admin can do, plus approve or reject administrators.
+- Rules are enforced in the database with Row Level Security, not only in the interface.
+
+## 13. Database design
+- **faculty:** names, titles, education, research, contact, photo, category, order (English and Chinese fields).
+- **news:** one record per announcement or event with title and content in both languages, dates, links, pinned, published, kind (news or event), order.
+- **pages:** slug, section, bilingual title and body, source links, published, updated_at.
+- **downloads:** bilingual title, file URL, file type, category, order, published.
+- **listings:** marketplace item with price, category, seller, contact, status (pending, approved, rejected).
+- **profiles:** one row per login user with role (pending, admin, super_admin, rejected).
+- **audit_log:** who changed what and when (filled by database triggers).
+- **page_views:** path, language, timestamp (no personal data).
+- **Storage:** public bucket for faculty photos; only admins can write.
+
+## 14. Dashboard and reports
+- KPI cards: faculty, published news, events, pages, downloads, approved listings, plus open items.
+- Reports: bilingual completeness (news, faculty, pages), visits in the last 14 days and top pages, announcements per month, listing status.
+- Needs attention: pending administrators, pending listings, news out of sync, drafts, faculty without Chinese data.
+- Recent activity from the audit log.
+
+## 15. Dual-language approach
+- One record holds both languages (shared fields: date, link, order, status).
+- The language switch is saved in the browser and applies to every page.
+- Missing translations fall back to the other language and are flagged for administrators.
+- Auto-translate gives a first draft that a human must review.
+
+## 16. Test and verification log
+- **20 Oct 2026, production:** created, edited, reordered, deleted faculty and news from the admin; verified photo upload and deletion in Storage; verified drafts are invisible to the public; verified an anonymous visitor cannot insert, delete, upload or read profiles; verified pending, admin and super admin permissions with a role simulation that rolls back.
+- **Known limits:** automated tests not yet written (planned for the testing week); marketplace has no spam protection beyond a honeypot and database limits.
+
+## 17. AI usage and responsible use
+- Claude Code was used as the AI coding agent (agreed with the instructor), with GitHub and Vercel for versioning and deployment.
+- AI generated drafts of code, SQL and documentation; the student reviewed behaviour, tested in production and decides what ships.
+- Auto-translation is a draft only; humans approve text before publishing.
+- Privacy: only information already public on the official website (names, emails, phone extensions) is shown; analytics store no personal data; secrets are never committed.
+- Planned AI feature (week 13): an admissions FAQ assistant that answers only from published pages, cites the page, and says when it does not know.
+
+## 18. Change and decision log
+- **6 Oct 2026:** first version of the site (home with 5 sections, navigation with dropdowns, hero, language switch). Published with GitHub and Vercel.
+- **20 Oct 2026:** restyled the site and changed copy and branding.
+- **20 Oct 2026:** connected Supabase (database, storage, auth); faculty CRUD with reorder and photos; login with pending, admin, super admin.
+- **20 Oct 2026:** announcements as cards with hover effects; bilingual news management with auto-translate, preview and sync check.
+- **20 Oct 2026:** content pages, downloads, moderated marketplace, dashboard, audit log, analytics, full bilingual public site, new logo, this document.
+- **Decision:** keep content in the database, not in code, so staff never need a developer.
+- **Decision:** moderate marketplace listings before publishing to avoid spam and abuse.
+- **Decision:** link photos and documents to the official site and cite the source.
+
+## 19. Final reflection (to be written by the student)
+Write this yourself at the end of the course. Suggested prompts:
+- What did you build, and what would you change first with more time?
+- Where did the AI help most, and where did you have to correct it?
+- What did the interviews change in the product?
+- What risks (privacy, quality, dependence on AI) did you find and how did you handle them?
+- What did you learn about turning a business problem into requirements?
