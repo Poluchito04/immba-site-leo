@@ -177,6 +177,7 @@ function showNewsForm(n) {
     <p style="margin:12px 0 0"><label style="display:inline;margin-right:18px"><input type="checkbox" name="published" style="width:auto" ${n?.published === false ? '' : 'checked'}> Published</label>
     <label style="display:inline"><input type="checkbox" name="pinned" style="width:auto" ${n?.pinned ? 'checked' : ''}> Pinned to top</label></p>
     <div class="row2"><div><label>English title</label><input name="title_en" value="${v('title_en')}"></div><div><label>中文標題</label><input name="title_zh" value="${v('title_zh')}"></div>
+    <div style="grid-column:1/-1"><label>Image (optional, JPG/PNG/WebP, max 2 MB)</label><input type="file" name="image" accept="image/jpeg,image/png,image/webp">${n?.image_url ? '<p style="font-size:13px;color:var(--mut)">Current image kept unless you choose a new one.</p>' : ''}</div>
     <div><label>English content</label><textarea name="content_en" rows="7">${v('content_en')}</textarea></div><div><label>中文內容</label><textarea name="content_zh" rows="7">${v('content_zh')}</textarea></div></div>
     <p class="acts"><button class="btn o" type="button" id="t-en2zh">Auto-translate English → 中文</button><button class="btn o" type="button" id="t-zh2en">Auto-translate 中文 → English</button><span id="tstat" style="font-size:13px;color:var(--mut);align-self:center"></span></p>
     <div id="npreview"></div>
@@ -216,7 +217,15 @@ async function saveNews(e) {
   if (!row.title_en && !row.title_zh) return notify('Add a title in at least one language.', 'err')
   const st = syncState(row)
   if (!st.ok && !confirm(`The two language versions are not in sync (${st.text}). Save anyway?`)) return
+  const file = f.image?.files?.[0]
+  if (file && (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 2 * 1024 * 1024)) return notify('Image must be JPG, PNG or WebP and at most 2 MB.', 'err')
   btn.disabled = true
+  if (file) {
+    const path = `${crypto.randomUUID()}.${file.type.split('/')[1].replace('jpeg', 'jpg')}`
+    const up = await supabase.storage.from('news-images').upload(path, file, { contentType: file.type })
+    if (up.error) { btn.disabled = false; return notify(up.error.message, 'err') }
+    row.image_url = supabase.storage.from('news-images').getPublicUrl(path).data.publicUrl
+  }
   const res = editingNews ? await supabase.from('news').update(row).eq('id', editingNews.id) : await supabase.from('news').insert(row)
   if (res.error) { btn.disabled = false; return notify(res.error.message, 'err') }
   editingNews = null; notify('Announcement saved (both languages).')
