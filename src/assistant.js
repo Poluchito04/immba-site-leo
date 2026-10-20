@@ -24,16 +24,16 @@ async function load() {
       }
       for (const f of faculty.data || []) {
         const en = `${f.name}${f.title ? ', ' + f.title : ''}.${f.research_fields ? ' Research: ' + f.research_fields + '.' : ''}${f.education ? ' Education: ' + f.education + '.' : ''}${f.email ? ' Email: ' + f.email : ''}`
-        docs.push({ title: 'Faculty ' + f.name, url: '/faculty.html?q=' + encodeURIComponent(f.name), lang: 'en', kind: 'fact', text: en })
-        if (f.name_zh) docs.push({ title: '師資 ' + f.name_zh, url: '/faculty.html?q=' + encodeURIComponent(f.name), lang: 'zh', kind: 'fact', text: `${f.name_zh}${f.title_zh ? '，' + f.title_zh : ''}。${f.research_fields_zh ? '研究領域：' + f.research_fields_zh + '。' : ''}${f.education_zh ? '學歷：' + f.education_zh + '。' : ''}` })
+        docs.push({ title: 'Faculty ' + f.name, url: '/faculty.html?q=' + encodeURIComponent(f.name), lang: 'en', kind: 'fact', group: 'faculty', text: en })
+        if (f.name_zh) docs.push({ title: '師資 ' + f.name_zh, url: '/faculty.html?q=' + encodeURIComponent(f.name), lang: 'zh', kind: 'fact', group: 'faculty', text: `${f.name_zh}${f.title_zh ? '，' + f.title_zh : ''}。${f.research_fields_zh ? '研究領域：' + f.research_fields_zh + '。' : ''}${f.education_zh ? '學歷：' + f.education_zh + '。' : ''}` })
       }
       for (const n of news.data || []) {
-        if (n.title_en) docs.push({ title: n.title_en, url: safeUrl(n.link_url) || '/#announcements', lang: 'en', text: `${n.news_date}. ${n.title_en}\n\n${n.content_en || ''}`, ext: true })
-        if (n.title_zh) docs.push({ title: n.title_zh, url: safeUrl(n.link_url_zh) || '/#announcements', lang: 'zh', text: `${n.news_date}。${n.title_zh}\n\n${n.content_zh || ''}`, ext: true })
+        if (n.title_en) docs.push({ title: n.title_en, url: safeUrl(n.link_url) || '/#announcements', lang: 'en', group: 'news', text: `${n.news_date}. ${n.title_en}\n\n${n.content_en || ''}`, ext: true })
+        if (n.title_zh) docs.push({ title: n.title_zh, url: safeUrl(n.link_url_zh) || '/#announcements', lang: 'zh', group: 'news', text: `${n.news_date}。${n.title_zh}\n\n${n.content_zh || ''}`, ext: true })
       }
       for (const d of dls.data || []) {
-        if (d.title_en) docs.push({ title: d.title_en, url: d.file_url, lang: 'en', kind: 'fact', text: `Document (${d.file_type}): ${d.title_en}`, ext: true })
-        if (d.title_zh) docs.push({ title: d.title_zh, url: d.file_url, lang: 'zh', kind: 'fact', text: `文件（${d.file_type}）：${d.title_zh}`, ext: true })
+        if (d.title_en) docs.push({ title: d.title_en, url: d.file_url, lang: 'en', kind: 'fact', group: 'doc', text: `Document (${d.file_type}): ${d.title_en}`, ext: true })
+        if (d.title_zh) docs.push({ title: d.title_zh, url: d.file_url, lang: 'zh', kind: 'fact', group: 'doc', text: `文件（${d.file_type}）：${d.title_zh}`, ext: true })
       }
     }
     return (index = buildIndex(docs))

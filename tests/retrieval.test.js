@@ -6,7 +6,7 @@ const docs = [
   { title: 'Dual Degree', url: '/page.html?p=dual-degree', lang: 'en', text: 'Students complete the first year at Fu Jen and the second year at a partner school such as the University of Michigan-Flint, Kedge Business School or IQS School of Management.\n\nTuition fees depend on the agreement with each partner.' },
   { title: 'Admissions', url: '/page.html?p=admissions', lang: 'en', text: 'The Fall application has two rounds: mid-October to early December and early March to mid-May. International students apply through the English admissions page.' },
   { title: '跨國雙碩士', url: '/page.html?p=dual-degree', lang: 'zh', text: '碩二可選擇到美國、法國、西班牙等名校留學一年，取得跨國雙碩士學位，享有優惠學費。' },
-  { title: 'Faculty', url: '/faculty.html', lang: 'en', kind: 'fact', text: 'Yaonan Lin, Professor. Research: Marketing Management.' },
+  { title: 'Faculty', url: '/faculty.html', lang: 'en', kind: 'fact', group: 'faculty', text: 'Yaonan Lin, Professor. Research: Marketing Management.' },
 ]
 const idx = buildIndex(docs)
 
@@ -41,4 +41,24 @@ test('admits when it does not know', () => {
   const r = search(idx, 'What is the cafeteria menu on Friday?', { lang: 'en' })
   assert.equal(r.confident, false)
   assert.equal(r.hits.length, 0)
+})
+
+test('deadline questions find the application periods via synonyms', () => {
+  const r = search(idx, 'What is the application deadline for Fall?', { lang: 'en' })
+  assert.ok(r.confident)
+  assert.equal(r.hits[0].it.url, '/page.html?p=admissions')
+})
+
+test('Chinese particles do not dilute the question', () => {
+  const r = search(idx, '雙碩士的學費怎麼算？', { lang: 'zh' })
+  assert.ok(r.confident)
+})
+
+test('documents rank low unless the user asks for a file', () => {
+  const d = buildIndex([
+    { title: 'Admissions', url: '/page.html?p=admissions', lang: 'en', text: 'Applicants submit an online application and upload the required documents before the deadline.' },
+    { title: 'Brochure', url: 'https://x/brochure.pdf', lang: 'en', kind: 'fact', group: 'doc', text: 'Document (PDF): Admissions application brochure' },
+  ])
+  assert.equal(search(d, 'how do I submit my application', { lang: 'en' }).hits[0].it.url, '/page.html?p=admissions')
+  assert.equal(search(d, 'download the application brochure pdf', { lang: 'en' }).hits[0].it.url, 'https://x/brochure.pdf')
 })

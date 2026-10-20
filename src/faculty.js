@@ -1,30 +1,13 @@
-import { supabase, configured, esc, safeUrl } from './supabase.js'
+import { supabase, configured, esc } from './supabase.js'
 import { mountChrome } from './chrome.js'
-import { isZh, t, fpick } from './i18n.js'
+import { t } from './i18n.js'
+import { facultyCard } from './facultycard.js'
 
 mountChrome()
 const app = document.getElementById('app')
 let rows = [], q = new URLSearchParams(location.search).get('q') || '', cat = 'all'
 
-const tags = (v) => (v ? `<p>${v.split(/[,，、;；]\s*/).filter(Boolean).slice(0, 6).map((x) => `<button class="tag" data-tag="${esc(x.trim())}">${esc(x.trim())}</button>`).join('')}</p>` : '')
 const hay = (f) => [f.name, f.name_zh, f.title, f.title_zh, f.research_fields, f.research_fields_zh, f.department, f.education].join(' ').toLowerCase()
-
-function card(f) {
-  const name = isZh() && f.name_zh ? f.name_zh : f.name
-  const alt = isZh() && f.name_zh ? f.name : f.name_zh
-  const photo = safeUrl(f.image_url)
-    ? `<img src="${esc(safeUrl(f.image_url))}" alt="${esc(name)}" loading="lazy" onload="this.classList.add('ld')">`
-    : `<div class="ph">${esc(name.trim().charAt(0).toUpperCase())}</div>`
-  const line = (label, v) => (v ? `<p><b>${label}:</b> ${esc(v)}</p>` : '')
-  const site = safeUrl(f.website)
-  return `<article class="card">${photo}<div>
-    <h4>${esc(name)}${alt ? ` <small style="color:var(--mut);font-weight:400">${esc(alt)}</small>` : ''}</h4><div class="t">${esc(fpick(f, 'title'))}</div>
-    ${line(t('Department', '系所'), fpick(f, 'department'))}${line(t('Education', '學歷'), fpick(f, 'education'))}${tags(fpick(f, 'research_fields'))}
-    ${line(t('Phone', '電話'), f.phone)}
-    ${f.email ? `<p><b>Email:</b> <a href="mailto:${esc(f.email)}">${esc(f.email)}</a></p>` : ''}
-    ${site ? `<p><a href="${esc(site)}" target="_blank" rel="noopener">${t('Personal website', '個人網站')} ↗</a></p>` : ''}
-  </div></article>`
-}
 
 function render() {
   document.title = t('Faculty · imMBA', '師資 · imMBA')
@@ -35,7 +18,7 @@ function render() {
   const list = rows.filter((f) => (cat === 'all' || f.category === cat) && hay(f).includes(q.trim().toLowerCase()))
   const group = (c, title) => {
     const l = list.filter((f) => f.category === c)
-    return l.length ? `<h3 class="sec">${title}</h3><div class="grid">${l.map(card).join('')}</div>` : ''
+    return l.length ? `<h3 class="sec">${title}</h3><div class="fgrid">${l.map(facultyCard).join('')}</div>` : ''
   }
   const chips = [['all', 'All', '全部'], ['full-time', 'Full-time', '專任'], ['adjunct', 'Adjunct', '兼任']].map(([k, en, zh]) => `<button data-c="${k}" class="${cat === k ? 'on' : ''}">${t(en, zh)}</button>`).join('')
   const results = (group('full-time', t('Full-time faculty', '專任師資')) + group('adjunct', t('Adjunct faculty', '兼任師資'))) || `<div class="msg">${t('No faculty match your search.', '沒有符合的教師。')} <a href="#" id="clr">${t('Clear search', '清除搜尋')}</a></div>`

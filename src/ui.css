@@ -123,3 +123,22 @@ html[data-theme=dark] .sk::after{background:linear-gradient(90deg,transparent,#f
 #asform input{flex:1}
 .asnote{margin:0;padding:0 14px 12px;font-size:11px;color:var(--mut);line-height:1.4}
 @media(max-width:520px){#aspanel{right:8px;bottom:8px;max-height:calc(100vh - 16px)}#asfab span{display:none}#asfab{padding:13px}}
+
+/* faculty: one full-width card per professor */
+.fgrid{display:grid;grid-template-columns:1fr;gap:22px;margin:18px 0}
+.fcard{display:grid;grid-template-columns:200px 1fr;gap:28px;background:var(--w);border:1px solid var(--bd);border-left:6px solid var(--acc);border-radius:18px;padding:26px;box-shadow:0 2px 10px #14262b10;transition:transform .3s var(--ease),box-shadow .3s var(--ease),border-color .3s}
+.fcard:hover{transform:translateY(-4px);box-shadow:0 18px 40px #14262b24;border-left-color:var(--g)}
+.fcard img,.fcard .ph{width:200px;height:250px;border-radius:14px;object-fit:cover;background:var(--b2);display:grid;place-items:center;font:700 3.2rem "Palatino Linotype",serif;color:var(--g)}
+.fcard img{opacity:0;transition:opacity .5s}.fcard img.ld{opacity:1}
+.fbody h4{margin:0;font:700 clamp(1.4rem,3vw,1.9rem)/1.2 "Palatino Linotype",Palatino,serif;color:var(--g)}
+.fbody h4 small{font:400 1rem system-ui,sans-serif;color:var(--mut);margin-left:6px}
+.ftitle{margin:6px 0 16px;color:var(--acc);filter:brightness(.82);font-weight:700;font-size:1.02rem}
+.frow{display:grid;grid-template-columns:110px 1fr;gap:10px;margin:0 0 10px;font-size:15px}
+.frow>span{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);padding-top:3px}
+.frow p{margin:0}
+.ftags{display:flex;flex-wrap:wrap;gap:4px}
+.ftags .tag{display:inline-block;border:1px solid var(--bd);background:var(--b);color:var(--tx);border-radius:999px;padding:3px 12px;font:inherit;font-size:13px;cursor:pointer;transition:background .15s,color .15s,border-color .15s}
+.ftags .tag:hover{background:var(--b2);color:var(--g);border-color:var(--g)}
+.fcontact{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:14px;padding-top:14px;border-top:1px dashed var(--bd);font-size:14px;color:var(--mut)}
+.fcontact a{font-weight:600}
+@media(max-width:720px){.fcard{grid-template-columns:1fr;padding:20px;gap:18px}.fcard img,.fcard .ph{width:100%;max-width:240px;height:300px}.frow{grid-template-columns:1fr;gap:2px}}

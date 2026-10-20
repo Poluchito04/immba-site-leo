@@ -17,7 +17,7 @@ export function reveal(root = document) {
 
 /** mark likely-animated elements; call again after dynamic renders */
 export function autoReveal(root = document) {
-  root.querySelectorAll('section h3, section .d, .sub, .ncard, .lcard, .card, .docs li, .kpi, .panel, .why, .stat, .prose > *, .page-h > div').forEach((el) => el.classList.add('rv'))
+  root.querySelectorAll('section h3, section .d, .sub, .ncard, .lcard, .card, .fcard, .docs li, .kpi, .panel, .why, .stat, .prose > *, .page-h > div').forEach((el) => el.classList.add('rv'))
   reveal(root)
 }
 
