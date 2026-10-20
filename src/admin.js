@@ -1,5 +1,7 @@
 import { supabase, configured, esc, safeUrl } from './supabase.js'
 import { translate } from './translate.js'
+import { toast, autoReveal, skeletonList } from './ui.js'
+import { themeButton } from './theme.js'
 import { loadDashboard } from './admin-dashboard.js'
 import { loadPages, loadDownloads, loadListings } from './admin-content.js'
 
@@ -9,11 +11,23 @@ const BUCKET = 'faculty-photos'
 const FIELDS = ['name', 'title', 'education', 'research_fields', 'department', 'phone', 'email', 'website', 'category', 'name_zh', 'title_zh', 'education_zh', 'research_fields_zh', 'department_zh']
 let session = null, profile = null, faculty = [], news = [], editingNews = null, tab = 'dashboard', editing = null, flash = null
 
-const notify = (text, type = 'ok') => { flash = { text, type }; render() }
+const notify = (text, type = 'ok') => { toast(text, type, type === 'err' ? 6000 : 3200); render() }
 const flashHtml = () => { if (!flash) return ''; const h = `<div class="msg ${flash.type}">${esc(flash.text)}</div>`; flash = null; return h }
 
 /* ---------- boot ---------- */
+function shortcuts() {
+  // Ctrl/Cmd+S saves the open form, Esc closes it
+  addEventListener('keydown', (e) => {
+    const form = document.querySelector('#ff, #nf, #pf, #df')
+    if (!form) return
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') { e.preventDefault(); form.requestSubmit() }
+    else if (e.key === 'Escape' && !document.getElementById('pal')?.classList.contains('open')) form.querySelector('#cancel, #ncancel, #pc, #dc')?.click()
+  })
+}
+
 async function boot() {
+  document.getElementById('themeslot')?.replaceWith(themeButton())
+  shortcuts()
   if (!configured) {
     app.innerHTML = '<div class="msg err">Supabase is not connected: set <code>VITE_SUPABASE_URL</code> and <code>VITE_SUPABASE_ANON_KEY</code>.</div>'
     return
@@ -109,6 +123,8 @@ function renderDashboard() {
     ${isSuper ? `<button data-t="approvals" class="${tab === 'approvals' ? 'on' : ''}">Administrators</button>` : ''}</div><div id="pane"></div>`
   app.querySelectorAll('[data-t]').forEach((b) => (b.onclick = () => { tab = b.dataset.t; editing = null; renderDashboard() }))
   const pane = document.getElementById('pane')
+  pane.innerHTML = skeletonList(6)
+  new MutationObserver(() => autoReveal(pane)).observe(pane, { childList: true })
   const ctx = { supabase, notify, goto: (t) => { tab = t; renderDashboard() } }
   const views = { dashboard: () => loadDashboard(pane, ctx), news: loadNews, faculty: loadFaculty, pages: () => loadPages(pane, ctx), downloads: () => loadDownloads(pane, ctx), marketplace: () => loadListings(pane, ctx), approvals: loadApprovals }
   ;(views[tab] || loadFaculty)()

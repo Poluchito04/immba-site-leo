@@ -2,7 +2,7 @@ import { supabase, configured, esc, safeUrl } from './supabase.js'
 import { mountChrome } from './chrome.js'
 import { t, pick } from './i18n.js'
 
-mountChrome()
+mountChrome({ skeleton: 'list' })
 const app = document.getElementById('app')
 const CATS = [['admissions', 'Admissions', '招生'], ['curriculum', 'Curriculum', '課程'], ['graduation', 'Graduation', '畢業'], ['dual', 'Dual degree', '雙碩士'], ['other', 'Other', '其他']]
 let rows = [], cat = 'all', q = ''

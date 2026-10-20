@@ -87,7 +87,71 @@ a.rm{display:inline-block;font-weight:700;text-decoration:none;border-bottom:2px
 footer{background:#082a33;color:#cfe6e8;text-align:center;padding:26px 20px;font-size:14px}
 footer a{color:#fff}
 @media(max-width:700px){.navrow{flex-direction:column}.act{width:100%}.hero svg.bg{width:340px}}
+
+/* ===== polish layer ===== */
+html{scroll-padding-top:110px}
+header{transition:box-shadow .3s}
+.notice{max-height:90px;transition:max-height .35s var(--ease),padding .35s var(--ease),opacity .25s}
+header.compact{box-shadow:0 8px 24px #14262b22}
+header.compact .notice{max-height:0;padding-top:0;padding-bottom:0;opacity:0;overflow:hidden}
+.brand{transition:padding .3s var(--ease)}.brand svg{transition:width .3s var(--ease),height .3s var(--ease)}
+header.compact .brand{padding-top:4px;padding-bottom:4px}header.compact .brand svg{width:38px;height:38px}header.compact .brand h1{font-size:1rem}
+.brand a.lg{transition:transform .25s var(--ease)}.brand a.lg:hover{transform:rotate(-4deg) scale(1.06)}
+.burger{display:none;margin-left:auto}
+.act{align-items:center;flex-wrap:wrap}
+nav a{transition:background .2s,color .2s}
+.hero{background-size:220% 220%;animation:drift 22s ease-in-out infinite}
+@keyframes drift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.hero svg.bg{animation:spin 140s linear infinite;transform-origin:50% 50%}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hero>*:not(.bg){animation:rise .9s var(--ease) both}
+.hero>*:nth-child(2){animation-delay:.04s}.hero>*:nth-child(3){animation-delay:.12s}.hero>*:nth-child(4){animation-delay:.22s}.hero>*:nth-child(5){animation-delay:.32s}.hero>*:nth-child(6){animation-delay:.4s}.hero>*:nth-child(7){animation-delay:.5s}.hero>*:nth-child(8){animation-delay:.6s}
+@keyframes rise{from{opacity:0;transform:translateY(26px)}}
+.deadline{display:inline-flex;align-items:center;gap:10px;background:#ffffff1c;border:1px solid #ffffff3a;color:#fff;border-radius:999px;padding:6px 16px;font-size:14px;font-weight:600;text-decoration:none;margin:0 0 22px;backdrop-filter:blur(6px);transition:background .2s,transform .2s var(--ease)}
+.deadline:hover{background:#ffffff30;transform:translateY(-2px)}
+.deadline[hidden]{display:none}
+.deadline i{width:9px;height:9px;border-radius:50%;background:#ff9f68;box-shadow:0 0 0 0 #ff9f68aa;animation:pulse 2s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 10px #ff9f6800}100%{box-shadow:0 0 0 0 #ff9f6800}}
+.hero .pill{margin-right:10px}
+.stats{background:var(--b);border-bottom:1px solid var(--bd)}
+.stats .wrap{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.stat{padding:30px 14px;text-align:center}
+.stat b{display:block;font:700 clamp(2rem,5vw,3rem)/1 "Palatino Linotype",Palatino,serif;color:var(--g);letter-spacing:-1px}
+.stat span{display:block;margin-top:8px;font-size:13.5px;color:var(--mut);line-height:1.4}
+@media(max-width:700px){.stats .wrap{grid-template-columns:1fr 1fr}.stat{padding:22px 10px}}
+.whyband{padding:64px 0 24px}
+.whygrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;margin-top:22px}
+.why{background:var(--w);border:1px solid var(--bd);border-radius:16px;padding:22px;transition:transform .3s var(--ease),box-shadow .3s var(--ease),border-color .3s;position:relative;overflow:hidden}
+.why::before{content:"";position:absolute;inset:0 0 auto 0;height:4px;background:linear-gradient(90deg,var(--g2),var(--acc));transform:scaleX(0);transform-origin:left;transition:transform .4s var(--ease)}
+.why:hover{transform:translateY(-6px);box-shadow:0 18px 38px #14262b26;border-color:var(--g)}.why:hover::before{transform:scaleX(1)}
+.why .ico{width:46px;height:46px;border-radius:13px;background:var(--b2);display:grid;place-items:center;margin-bottom:14px;color:var(--g)}
+.why .ico svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.why h4{margin:0 0 6px;font:700 1.1rem "Palatino Linotype",Palatino,serif;color:var(--g)}
+.why p{margin:0 0 12px;color:var(--mut);font-size:14.5px}
+.why a.rm{font-size:14px}
+.sub{transition:transform .3s var(--ease),box-shadow .3s var(--ease),border-color .3s}
+.sub:hover{transform:translateY(-5px);box-shadow:0 16px 32px #14262b22;border-color:var(--g)}
+.list li,.ncard{transition:transform .25s var(--ease),box-shadow .25s var(--ease),border-color .25s}
+html[data-theme=dark] header{background:var(--w)}
+html[data-theme=dark] .cm{background:var(--b);color:var(--tx)}
+html[data-theme=dark] .lang{background:var(--b)}
+html[data-theme=dark] .dd{background:var(--b)}
+html[data-theme=dark] section:nth-of-type(even){background:var(--b)}
+@media(max-width:860px){
+  .burger{display:inline-grid}.cm{display:none}
+  .navrow{display:none;flex-direction:column;padding-bottom:16px}
+  header.open .navrow{display:flex;animation:rise .35s var(--ease) both}
+  nav{width:100%}nav ul{flex-direction:column;gap:0}nav a{padding:12px 10px;font-size:15px;border-bottom:1px solid var(--bd);border-radius:0}
+  .dd{position:static;box-shadow:none;border:0;border-left:3px solid var(--acc);border-radius:0;padding:0 0 0 10px;margin:2px 0 8px}
+  .act{width:100%}.hero{padding-top:70px}
+  header.open{max-height:100vh;overflow:auto}
+}
 </style>
+<meta name="description" content="Fu Jen Catholic University International MBA (imMBA): an AACSB-accredited, English-taught MBA in Taipei. Student project, unofficial site.">
+<meta name="theme-color" content="#0f4c5c">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="stylesheet" href="/src/ui.css">
+<script>try{var d=document.documentElement,t=localStorage.getItem("theme");if(!t&&matchMedia("(prefers-color-scheme: dark)").matches)t="dark";if(t)d.dataset.theme=t;d.classList.add("js")}catch(e){}</script>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -110,7 +174,8 @@ footer a{color:#fff}
 </defs>
 </svg>
 
-<header>
+<a class="skip" href="#main" data-zh="跳到主要內容">Skip to content</a>
+<header id="hdr">
   <!-- 1. Top notice bar -->
   <div class="notice">
     <span class="who">Leopoldo Martinez · F15381071</span><span class="sep">|</span>
@@ -120,11 +185,14 @@ footer a{color:#fff}
   </div>
   <!-- 2. Branding header -->
   <div class="brand"><a class="lg" href="/admin.html" title="Back office (administrators)"><svg role="img" aria-label="imMBA logo – open back office"><use href="#logo"/></svg></a>
-    <h1 data-zh="輔仁大學國際經營管理碩士班（imMBA）">Fu Jen Catholic University International MBA (imMBA)</h1></div>
+    <h1 data-zh="輔仁大學國際經營管理碩士班（imMBA）">Fu Jen Catholic University International MBA (imMBA)</h1>
+    <button class="iconbtn burger" id="burger" aria-expanded="false" aria-controls="navrow" aria-label="Menu"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div>
   <!-- 3. Navigation bar + 4. Action area -->
   <div class="navrow" id="navrow">
     <nav><ul id="menu"></ul></nav>
     <div class="act">
+      <button class="srch" type="button" data-open-search aria-label="Search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><span data-zh="搜尋">Search</span><kbd>⌘K</kbd></button>
+      <span id="themeslot"></span>
       <a class="lang" style="text-decoration:none;display:inline-block" href="/project.html" data-zh="專案說明">About this project</a>
       <button class="lang" id="lang" title="Switch language">中文</button>
       <a class="btn" href="https://www.management.fju.edu.tw/esubweb/immbaengindex/enroll.php?IID=3" target="_blank" rel="noopener" data-zh="立即報名">Start your application</a>
@@ -135,6 +203,7 @@ footer a{color:#fff}
 <!-- 5. Hero section -->
 <div class="hero" id="top">
   <svg class="bg" viewBox="0 0 200 200" fill="none" stroke="#8ec3c9" stroke-width="1" aria-hidden="true"><circle cx="100" cy="100" r="90"/><ellipse cx="100" cy="100" rx="40" ry="90"/><ellipse cx="100" cy="100" rx="75" ry="90"/><path d="M100 10v180M10 100h180M22 60h156M22 140h156"/></svg>
+  <a class="deadline" id="deadline" href="/page.html?p=admissions" hidden><i></i><span id="dl-text"></span></a>
   <span class="pill" data-zh="輔仁大學 · AACSB 認證">Fu Jen · Taipei · AACSB</span>
   <h2 data-zh="學管理，<em>走向世界</em><br>從 imMBA 開始">Learn management. <em>Go global.</em><br>Start at imMBA</h2>
   <p data-zh="輔仁大學國際經營管理碩士班，以 AACSB 認證的卓越品質，培育全球管理人才。">Two years, one degree taught entirely in English, and classmates from around the world — in the heart of Taipei.</p>
@@ -143,7 +212,26 @@ footer a{color:#fff}
   <div class="facts"><span data-zh="英語授課">Fully English-taught</span><span data-zh="雙聯學位與海外交換">Dual degree · exchange abroad</span><span data-zh="國際化學習社群">Multicultural cohort</span></div>
 </div>
 
-<div id="secs"></div>
+
+<div class="stats" aria-label="Key facts"><div class="wrap">
+  <div class="stat"><b data-count="30" data-suffix="+">30+</b><span data-zh="學生來自超過 30 個國家">students from more than 30 countries</span></div>
+  <div class="stat"><b data-count="3" data-prefix="Top ">Top 3</b><span data-zh="台灣國際管理類排名（Eduniversal 2025）">in Taiwan for International Management (Eduniversal 2025)</span></div>
+  <div class="stat"><b>1:1</b><span data-zh="本地生與國際學生合班上課">local and international students share every class</span></div>
+  <div class="stat"><b data-count="3">3</b><span data-zh="跨國雙碩士合作學校：UM-Flint、Kedge、IQS">dual-master partner schools: UM-Flint, Kedge, IQS</span></div>
+</div></div>
+
+<div class="whyband"><div class="wrap">
+  <h3 data-zh="為什麼選擇 imMBA？">Why imMBA?</h3>
+  <p class="d" data-zh="四個理由，讓你的管理職涯從台北走向世界。">Four reasons to start your management career in Taipei.</p>
+  <div class="whygrid">
+    <article class="why"><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 3l8 4v5c0 4.5-3.2 8-8 9-4.8-1-8-4.5-8-9V7z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></div><h4 data-zh="AACSB 國際認證">AACSB-accredited</h4><p data-zh="全球僅約 5% 的商學院通過 AACSB 認證。">Only about 5% of business schools worldwide hold this accreditation.</p><a class="rm" href="/page.html?p=overview" data-zh="了解更多 →">Learn more →</a></article>
+    <article class="why"><div class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 3.5 5.5 3.5 9S14.500 18.500 12 21c-2.500-2.500-3.500-5.500-3.500-9S9.500 5.500 12 3z"/></svg></div><h4 data-zh="全英語授課">Fully English-taught</h4><p data-zh="與來自世界各地的同學一起上課，取得 MBA 學位。">Study with classmates from around the world and earn an MBA degree.</p><a class="rm" href="/page.html?p=guide" data-zh="入學指南 →">Read the guide →</a></article>
+    <article class="why"><div class="ico"><svg viewBox="0 0 24 24"><path d="M2 8l10-4 10 4-10 4z"/><path d="M6 10.500V15c0 1.500 2.700 3 6 3s6-1.500 6-3v-4.500"/><path d="M22 8v6"/></svg></div><h4 data-zh="雙碩士與海外交換">Dual degrees &amp; exchange</h4><p data-zh="碩二赴美、法、西名校，或免學費交換。">Year two in the US, France or Spain, or a tuition-free exchange.</p><a class="rm" href="/page.html?p=dual-degree" data-zh="雙碩士資訊 →">Dual degree details →</a></article>
+    <article class="why"><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 21s7-6.200 7-11.500A7 7 0 0 0 5 9.500C5 14.800 12 21 12 21z"/><circle cx="12" cy="9.500" r="2.500"/></svg></div><h4 data-zh="位於台北">In the heart of Taipei</h4><p data-zh="雙捷運線交會，現代化教室位於國璽樓 10–12 樓。">Two MRT lines meet at Fu Jen; modern classrooms on floors 10–12.</p><a class="rm" href="/page.html?p=environment" data-zh="學習環境 →">Learning environment →</a></article>
+  </div>
+</div></div>
+
+<main id="main" tabindex="-1"><div id="secs"></div></main>
 <footer>Unofficial student project · Content © College of Management, Fu Jen Catholic University · <a href="#top">↑</a></footer>
 
 <script>
@@ -204,5 +292,6 @@ links.forEach(function(a){var e=document.querySelector(a.getAttribute("href"));i
 links.forEach(function(a){a.classList.toggle("on",a===c)})});
 </script>
 <script type="module" src="/src/news.js"></script>
+<script type="module" src="/src/home-ui.js"></script>
 </body>
 </html>

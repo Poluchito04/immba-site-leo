@@ -1,0 +1,9 @@
+{
+  "name": "imMBA – Fu Jen International MBA (student project)",
+  "short_name": "imMBA",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0d1b20",
+  "theme_color": "#0f4c5c",
+  "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

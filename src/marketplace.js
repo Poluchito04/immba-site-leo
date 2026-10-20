@@ -1,6 +1,7 @@
 import { supabase, configured, esc } from './supabase.js'
 import { mountChrome } from './chrome.js'
 import { t } from './i18n.js'
+import { toast } from './ui.js'
 
 mountChrome()
 const app = document.getElementById('app')
@@ -46,7 +47,7 @@ function showForm() {
     })
     btn.disabled = false
     if (error) { host.insertAdjacentHTML('afterbegin', `<div class="msg err">${esc(error.message)}</div>`); return }
-    flash = t('Thanks! Your listing was submitted and will appear once an administrator approves it.', '感謝！您的商品已送出，管理員審核通過後即會顯示。')
+    toast(t('Thanks! Your listing was submitted and will appear once an administrator approves it.', '感謝！您的商品已送出，管理員審核通過後即會顯示。'), 'ok', 5000)
     open = false; render()
   }
 }

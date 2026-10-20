@@ -29,6 +29,7 @@ function render() {
     ${missingNote ? `<div class="msg">${esc(missingNote)}</div>` : ''}
     <div class="prose">${renderMd(pick(cur, 'body')) || `<p>${t('Content coming soon.', '內容即將推出。')}</p>`}</div>
     ${related.length ? `<h3 class="sec">${t('Related documents', '相關文件')}</h3><ul class="docs">${related.map((d) => `<li><span class="ft ${esc(d.file_type)}">${esc(d.file_type)}</span><a href="${esc(safeUrl(d.file_url))}" target="_blank" rel="noopener">${esc(pick(d, 'title'))}</a></li>`).join('')}</ul>` : ''}
+    ${(() => { const i = pages.findIndex((p) => p.slug === slug), pv = pages[i - 1], nx = pages[i + 1]; return `<nav class="pn" aria-label="Pages">${pv ? `<a href="/page.html?p=${esc(pv.slug)}"><small>← ${t('Previous', '上一頁')}</small><b>${esc(pick(pv, 'title'))}</b></a>` : '<span></span>'}${nx ? `<a class="nx" href="/page.html?p=${esc(nx.slug)}"><small>${t('Next', '下一頁')} →</small><b>${esc(pick(nx, 'title'))}</b></a>` : '<span></span>'}</nav>` })()}
     ${safeUrl(src) ? `<p style="margin-top:28px;font-size:13px;color:var(--mut)">${t('Source:', '資料來源：')} <a href="${esc(safeUrl(src))}" target="_blank" rel="noopener">${t('official imMBA website', '輔大 imMBA 官方網站')} ↗</a></p>` : ''}
   </article></div>`
 }
