@@ -4,7 +4,7 @@ import { toast, autoReveal, skeletonList } from './ui.js'
 import { mountAdminI18n } from './admin-i18n.js'
 import { mountChrome } from './chrome.js'
 import { loadDashboard } from './admin-dashboard.js'
-import { loadPages, loadDownloads, loadListings } from './admin-content.js'
+import { loadPages, loadDownloads, loadListings, loadInquiries } from './admin-content.js'
 
 const app = document.getElementById('app')
 const who = document.getElementById('who')
@@ -61,6 +61,7 @@ function render() {
   if (!session) return renderAuth()
   if (!profile) return (app.innerHTML = flashHtml() + '<div class="msg err">Your profile could not be loaded. Run supabase/schema.sql and log in again.</div>')
   if (profile.role === 'pending') return (app.innerHTML = '<div class="box auth"><h3>Waiting for approval</h3><p>Your email is verified, but a super administrator still has to approve your account before you can use the back office.</p></div>')
+  if (profile.role === 'member') return (app.innerHTML = '<div class="box auth"><h3>Member account</h3><p>This is a visitor account. It can follow its inquiries in <a href="/account.html">My account</a>, but it has no access to the back office.</p></div>')
   if (profile.role === 'rejected') return (app.innerHTML = '<div class="box auth"><h3>Access denied</h3><p>Your administrator request was not approved.</p></div>')
   renderDashboard()
 }
@@ -121,14 +122,14 @@ function renderNewPassword() {
 function renderDashboard() {
   const isSuper = profile.role === 'super_admin'
   if (tab === 'approvals' && !isSuper) tab = 'faculty'
-  app.innerHTML = `${flashHtml()}<div class="tabs">${[['dashboard', 'Dashboard'], ['news', 'News & events'], ['faculty', 'Faculty'], ['pages', 'Pages'], ['downloads', 'Documents'], ['marketplace', 'Marketplace']].map(([k, l]) => `<button data-t="${k}" class="${tab === k ? 'on' : ''}">${l}</button>`).join('')}
+  app.innerHTML = `${flashHtml()}<div class="tabs">${[['dashboard', 'Dashboard'], ['news', 'News & events'], ['faculty', 'Faculty'], ['pages', 'Pages'], ['downloads', 'Documents'], ['marketplace', 'Marketplace'], ['inquiries', 'Inquiries']].map(([k, l]) => `<button data-t="${k}" class="${tab === k ? 'on' : ''}">${l}</button>`).join('')}
     ${isSuper ? `<button data-t="approvals" class="${tab === 'approvals' ? 'on' : ''}">Administrators</button>` : ''}</div><div id="pane"></div>`
   app.querySelectorAll('[data-t]').forEach((b) => (b.onclick = () => { tab = b.dataset.t; editing = null; renderDashboard() }))
   const pane = document.getElementById('pane')
   pane.innerHTML = skeletonList(6)
   new MutationObserver(() => autoReveal(pane)).observe(pane, { childList: true })
   const ctx = { supabase, notify, goto: (t) => { tab = t; renderDashboard() } }
-  const views = { dashboard: () => loadDashboard(pane, ctx), news: loadNews, faculty: loadFaculty, pages: () => loadPages(pane, ctx), downloads: () => loadDownloads(pane, ctx), marketplace: () => loadListings(pane, ctx), approvals: loadApprovals }
+  const views = { dashboard: () => loadDashboard(pane, ctx), news: loadNews, faculty: loadFaculty, pages: () => loadPages(pane, ctx), downloads: () => loadDownloads(pane, ctx), marketplace: () => loadListings(pane, ctx), inquiries: () => loadInquiries(pane, ctx), approvals: loadApprovals }
   ;(views[tab] || loadFaculty)()
 }
 
@@ -267,7 +268,7 @@ function showForm(f) {
     <div class="row2"><div><label>Name *</label><input name="name" required value="${v('name')}"></div>
     <div><label>Title</label><input name="title" value="${v('title')}" placeholder="Associate Professor"></div>
     <div><label>Department / position</label><input name="department" value="${v('department')}"></div>
-    <div><label>Type</label><select name="category"><option value="full-time">Full-time</option><option value="adjunct">Adjunct</option></select></div>
+    <div><label>Type</label><select name="category"><option value="full-time">Full-time</option><option value="visiting">Visiting</option><option value="adjunct">Adjunct</option></select></div>
     <div><label>Email</label><input type="email" name="email" value="${v('email')}"></div>
     <div><label>Phone</label><input name="phone" value="${v('phone')}"></div></div>
     <h4 style="margin:18px 0 0">中文 (Chinese version)</h4><div class="row2"><div><label>中文姓名</label><input name="name_zh" value="${v('name_zh')}"></div><div><label>中文職稱</label><input name="title_zh" value="${v('title_zh')}"></div>
@@ -352,7 +353,7 @@ async function loadApprovals() {
   const pane = document.getElementById('pane')
   const { data, error } = await supabase.from('profiles').select('*').order('created_at', { ascending: false })
   if (error) { pane.innerHTML = `<div class="msg err">${esc(error.message)}</div>`; return }
-  const order = { pending: 0, admin: 1, super_admin: 2, rejected: 3 }
+  const order = { pending: 0, admin: 1, super_admin: 2, member: 3, rejected: 4 }
   data.sort((a, b) => order[a.role] - order[b.role])
   pane.innerHTML = `<div class="box"><h3 style="margin-top:0">Administrators</h3><div class="scroll"><table><thead><tr><th>Email</th><th>Status</th><th></th></tr></thead><tbody>
     ${data.map((p) => `<tr><td>${esc(p.email)}</td><td><span class="pill ${p.role}">${esc(p.role)}</span></td><td>

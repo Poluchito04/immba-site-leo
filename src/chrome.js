@@ -23,6 +23,7 @@ const MENU = [
   ['Events', '活動集錦', '#events'],
   ['Announcements', '公告', '#announcements'],
   ['Downloads', '表格下載', '/downloads.html'],
+  ['Contact', '聯絡我們', '/contact.html'],
   ['College of Management', '輔大管理學院', COLLEGE, null, true],
 ]
 
@@ -65,7 +66,7 @@ export function mountChrome({ trackPath, skeleton = 'cards', assistant = true } 
         <button class="cm" id="cm" type="button" aria-expanded="${!hidden}">${hidden ? t('Expand main menu', '展開主選單') : t('Collapse main menu', '收合主選單')}</button></div>
       <div class="brand"><a class="lg" href="/admin.html" title="${t('Back office (administrators)', '後台（管理員）')}"><img src="/favicon.svg" alt="${t('imMBA logo – open back office', 'imMBA 標誌 – 開啟後台')}" width="58" height="58"></a>
         <a class="ttl" href="/"><h1>${t('Fu Jen Catholic University International MBA (imMBA)', '輔仁大學國際經營管理碩士班（imMBA）')}</h1></a>
-        <div class="act">${searchButtonHtml(t('Search', '搜尋'))}<span id="themeslot"></span>
+        <div class="act">${searchButtonHtml(t('Search', '搜尋'))}<a class="iconbtn" href="/account.html" title="${t('My account', '我的帳號')}" aria-label="${t('My account', '我的帳號')}"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4.500-6 8-6s7 2 8 6"/></svg></a><span id="themeslot"></span>
           <a class="lang not-m" href="/project.html">${t('About this project', '專案說明')}</a>
           <button class="lang" id="langbtn" type="button" title="Switch language">${isZh() ? 'EN' : '中文'}</button>
           <a class="btn not-m" href="${CTA}" target="_blank" rel="noopener">${t('Start your application', '立即報名')}</a>

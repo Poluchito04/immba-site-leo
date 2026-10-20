@@ -36,9 +36,10 @@ const D = {
   'Announcement saved (both languages).': '公告已儲存（雙語）。', 'Announcement deleted (both languages).': '公告已刪除（雙語）。',
   'Photo must be JPG, PNG or WebP.': '照片必須是 JPG、PNG 或 WebP。', 'Photo is larger than 2 MB.': '照片超過 2 MB。', 'Add a title.': '請輸入標題。', 'Add a title in at least one language.': '請至少以一種語言輸入標題。',
   'Links must start with http:// or https://': '連結必須以 http:// 或 https:// 開頭', 'The website must start with http:// or https://': '網站必須以 http:// 或 https:// 開頭', 'The file URL must start with http:// or https://': '檔案網址必須以 http:// 或 https:// 開頭',
-  'Download': '下載', 'Light': '淺色', 'Dark': '深色',
+  'Inquiries': '諮詢', 'Inquiries by topic': '各主題諮詢數', 'New inquiries': '新諮詢', 'Registered members': '註冊會員', 'Content items': '內容項目', 'Visiting': '客座', 'To handle': '待處理', 'Answered': '已回覆', 'Closed': '已結案', 'All': '全部', 'New': '新', 'In progress': '處理中', 'Save': '儲存', 'Internal / reply note (visible to the member)': '內部 / 回覆備註（會員可見）', 'No inquiries yet.': '尚無諮詢。', 'Member account': '會員帳號', 'member': '會員', 'new': '新', 'in_progress': '處理中', 'answered': '已回覆', 'closed': '已結案', 'Inquiry updated.': '諮詢已更新。', 'Inquiry deleted.': '諮詢已刪除。', 'Download': '下載', 'Light': '淺色', 'Dark': '深色',
 }
 const R = [
+  [/^Inquiries \((\d+)\)$/, (m) => `諮詢 (${m[1]})`], [/^To handle \((\d+)\)$/, (m) => `待處理 (${m[1]})`], [/^(\d+)% answered or closed\.$/, (m) => `${m[1]}% 已回覆或結案。`], [/^(\d+) new inquir(?:y|ies) to answer$/, (m) => `${m[1]} 則新諮詢待回覆`],
   [/^Faculty members \((\d+)\)$/, (m) => `教師 (${m[1]})`], [/^News & events \((\d+)\)$/, (m) => `公告與活動 (${m[1]})`], [/^Content pages \((\d+)\)$/, (m) => `內容頁面 (${m[1]})`],
   [/^Documents \((\d+)\)$/, (m) => `文件 (${m[1]})`], [/^Marketplace listings \((\d+)\)$/, (m) => `市集商品 (${m[1]})`],
   [/^Default announcements restored \((\d+)\)\.$/, (m) => `已還原預設公告（${m[1]} 則）。`],

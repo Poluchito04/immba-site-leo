@@ -20,8 +20,8 @@ function render() {
     const l = list.filter((f) => f.category === c)
     return l.length ? `<h3 class="sec">${title}</h3><div class="fgrid">${l.map(facultyCard).join('')}</div>` : ''
   }
-  const chips = [['all', 'All', '全部'], ['full-time', 'Full-time', '專任'], ['adjunct', 'Adjunct', '兼任']].map(([k, en, zh]) => `<button data-c="${k}" class="${cat === k ? 'on' : ''}">${t(en, zh)}</button>`).join('')
-  const results = (group('full-time', t('Full-time faculty', '專任師資')) + group('adjunct', t('Adjunct faculty', '兼任師資'))) || `<div class="msg">${t('No faculty match your search.', '沒有符合的教師。')} <a href="#" id="clr">${t('Clear search', '清除搜尋')}</a></div>`
+  const chips = [['all', 'All', '全部'], ['full-time', 'Full-time', '專任'], ['visiting', 'Visiting', '客座'], ['adjunct', 'Adjunct', '兼任']].map(([k, en, zh]) => `<button data-c="${k}" class="${cat === k ? 'on' : ''}">${t(en, zh)}</button>`).join('')
+  const results = (group('full-time', t('Full-time faculty', '專任師資')) + group('visiting', t('Visiting faculty', '客座師資')) + group('adjunct', t('Adjunct faculty', '兼任師資'))) || `<div class="msg">${t('No faculty match your search.', '沒有符合的教師。')} <a href="#" id="clr">${t('Clear search', '清除搜尋')}</a></div>`
   const src = `<p class="src" style="margin-top:28px;font-size:13px;color:var(--mut)">${t('Source:', '資料來源：')} <a href="https://www.management.fju.edu.tw/esubweb/immbaengindex/teacher.php" target="_blank" rel="noopener">${t('official imMBA faculty page', '輔大 imMBA 官方師資頁')} ↗</a></p>`
   if (!hasInput) {
     app.innerHTML = `<div class="toolbar"><input id="fq" type="search" placeholder="${t('Search by name, field, title…', '依姓名、領域、職稱搜尋…')}" value="${esc(q)}" aria-label="${t('Search faculty', '搜尋師資')}"><div class="chips" id="fchips" style="margin:0">${chips}</div><span class="count" id="fcount"></span></div><div id="fres"></div>${src}`

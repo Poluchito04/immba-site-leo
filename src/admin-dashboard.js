@@ -15,7 +15,7 @@ export async function loadDashboard(pane, { supabase, goto }) {
   pane.innerHTML = '<div class="box">Loading dashboard…</div>'
   const since = new Date(Date.now() - 14 * DAY).toISOString()
   const q = (t, cols = '*') => supabase.from(t).select(cols)
-  const [fac, news, pages, dls, lst, prof, log, views] = await Promise.all([
+  const [fac, news, pages, dls, lst, prof, log, views, inq] = await Promise.all([
     q('faculty', 'id,name,name_zh,title_zh,education_zh,research_fields_zh'),
     q('news', 'id,news_date,published,kind,title_en,title_zh,content_en,content_zh'),
     q('pages', 'id,slug,body_en,body_zh,published'),
@@ -24,10 +24,16 @@ export async function loadDashboard(pane, { supabase, goto }) {
     q('profiles', 'id,role'),
     supabase.from('audit_log').select('*').order('created_at', { ascending: false }).limit(12),
     supabase.from('page_views').select('path,lang,created_at').gte('created_at', since).limit(5000),
+    q('inquiries', 'id,status,topic,created_at'),
   ])
-  const err = [fac, news, pages, dls, lst, prof, log, views].find((r) => r.error)
+  const err = [fac, news, pages, dls, lst, prof, log, views, inq].find((r) => r.error)
   if (err) { pane.innerHTML = `<div class="msg err">${esc(err.error.message)} — did you run supabase/v2.sql?</div>`; return }
-  const F = fac.data, N = news.data, P = pages.data, D = dls.data, L = lst.data, U = prof.data, V = views.data
+  const F = fac.data, N = news.data, P = pages.data, D = dls.data, L = lst.data, U = prof.data, V = views.data, I = inq.data
+  const members = U.filter((u) => u.role === 'member').length
+  const newInq = I.filter((x) => x.status === 'new').length
+  const topics = ['admissions', 'curriculum', 'dual-degree', 'exchange', 'faculty', 'other']
+  const perTopic = topics.map((tp) => I.filter((x) => x.topic === tp).length)
+  const answeredPct = I.length ? Math.round((I.filter((x) => x.status === 'answered' || x.status === 'closed').length / I.length) * 100) : 0
 
   // KPIs
   const newsOnly = N.filter((n) => n.kind !== 'event'), events = N.filter((n) => n.kind === 'event')
@@ -56,6 +62,7 @@ export async function loadDashboard(pane, { supabase, goto }) {
 
   // needs attention
   const att = []
+  if (newInq) att.push([`${newInq} new inquir${newInq > 1 ? 'ies' : 'y'} to answer`, 'inquiries'])
   if (pendingAdmins) att.push([`${pendingAdmins} administrator${pendingAdmins > 1 ? 's' : ''} waiting for approval`, 'approvals'])
   if (pendingListings) att.push([`${pendingListings} marketplace listing${pendingListings > 1 ? 's' : ''} to review`, 'marketplace'])
   if (N.length - newsBoth.length) att.push([`${N.length - newsBoth.length} announcement(s) missing a language`, 'news'])
@@ -65,10 +72,11 @@ export async function loadDashboard(pane, { supabase, goto }) {
 
   pane.innerHTML = `<div class="kpis">
     ${kpi(F.length, 'Faculty')}${kpi(newsOnly.filter((n) => n.published).length, 'Published news')}${kpi(events.length, 'Events')}${kpi(P.length, 'Pages')}${kpi(D.length, 'Documents')}
-    ${kpi(L.filter((l) => l.status === 'approved').length, 'Live listings')}${kpi(pendingAdmins, 'Admins to approve', true)}${kpi(pendingListings, 'Listings to review', true)}${kpi(V.length, 'Visits (14 days)')}</div>
+    ${kpi(L.filter((l) => l.status === 'approved').length, 'Live listings')}${kpi(pendingAdmins, 'Admins to approve', true)}${kpi(pendingListings, 'Listings to review', true)}${kpi(V.length, 'Visits (14 days)')}${kpi(I.length, 'Inquiries')}${kpi(newInq, 'New inquiries', true)}${kpi(members, 'Registered members')}${kpi(D.length + P.length + N.length + F.length, 'Content items')}</div>
     <div class="cols">
       <div class="panel"><h4>Visits, last 14 days</h4>${bars(perDay, dayLabels)}<p style="font-size:13px;color:var(--mut);margin:12px 0 0">${V.length ? `${zhShare}% of visits in Chinese.` : 'No visits recorded yet.'}</p></div>
       <div class="panel"><h4>Announcements per month</h4>${bars(perMonth, months.map((m) => m.label))}</div>
+      <div class="panel"><h4>Inquiries by topic</h4>${bars(perTopic, topics.map((x) => x.replace('dual-degree', 'dual').slice(0, 6)))}<p style="font-size:13px;color:var(--mut);margin:12px 0 0">${I.length ? `${answeredPct}% answered or closed.` : 'No inquiries yet.'}</p></div>
       <div class="panel"><h4>Bilingual completeness</h4>${meter('News & events (title + content in both languages)', newsBoth.length, N.length)}${meter('Faculty with Chinese name and title', facZh.length, F.length)}${meter('Pages with both languages', pagesBoth.length, P.length)}</div>
       <div class="panel"><h4>Needs attention</h4>${att.length ? `<ul class="todo">${att.map(([t, tab]) => `<li><span>${esc(t)}</span><a href="#" data-goto="${tab}">Open →</a></li>`).join('')}</ul>` : '<p style="color:var(--ok);margin:0">✓ Everything is up to date.</p>'}</div>
       <div class="panel"><h4>Most visited pages</h4>${top.length ? `<ul class="todo">${top.map(([p, n]) => `<li><span>${esc(p)}</span><b>${n}</b></li>`).join('')}</ul>` : '<p style="color:var(--mut);margin:0">Waiting for visits.</p>'}</div>
@@ -79,7 +87,7 @@ export async function loadDashboard(pane, { supabase, goto }) {
   document.getElementById('csv').onclick = () => {
     const rows = [['metric', 'value'], ['faculty', F.length], ['news_published', newsOnly.filter((n) => n.published).length], ['news_drafts', drafts], ['events', events.length], ['pages', P.length],
       ['documents', D.length], ['listings_approved', L.filter((l) => l.status === 'approved').length], ['listings_pending', pendingListings], ['admins_pending', pendingAdmins],
-      ['visits_14d', V.length], ['visits_zh_pct', zhShare], ['news_bilingual_pct', pct(newsBoth.length, N.length)], ['faculty_zh_pct', pct(facZh.length, F.length)], ['pages_bilingual_pct', pct(pagesBoth.length, P.length)],
+      ['visits_14d', V.length], ['inquiries', I.length], ['inquiries_new', newInq], ['inquiries_answered_pct', answeredPct], ['members', members], ['visits_zh_pct', zhShare], ['news_bilingual_pct', pct(newsBoth.length, N.length)], ['faculty_zh_pct', pct(facZh.length, F.length)], ['pages_bilingual_pct', pct(pagesBoth.length, P.length)],
       ...perDay.map((v, i) => ['visits_' + dayKey(days[i]), v]), ...top.map(([p, n]) => ['top_' + p, n])]
     const csv = rows.map((r) => r.join(',')).join('\n')
     const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); a.download = `immba-report-${dayKey(new Date())}.csv`; a.click()

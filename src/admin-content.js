@@ -119,3 +119,35 @@ export async function loadListings(pane, ctx) {
   pane.querySelectorAll('[data-s]').forEach((b) => (b.onclick = async () => { const r = await supabase.from('listings').update({ status: b.dataset.s }).eq('id', b.dataset.id); r.error ? notify(r.error.message, 'err') : notify('Listing ' + b.dataset.s + '.') }))
   pane.querySelectorAll('[data-del]').forEach((b) => (b.onclick = async () => { if (!confirm('Delete this listing?')) return; const r = await supabase.from('listings').delete().eq('id', b.dataset.del); r.error ? notify(r.error.message, 'err') : notify('Listing deleted.') }))
 }
+
+/* -------------------------------- Inquiries -------------------------------- */
+const STATUSES = [['new', 'New'], ['in_progress', 'In progress'], ['answered', 'Answered'], ['closed', 'Closed']]
+let inqFilter = 'open'
+
+export async function loadInquiries(pane, ctx) {
+  const { supabase, notify } = ctx
+  const { data, error } = await supabase.from('inquiries').select('*').order('created_at', { ascending: false })
+  if (error) { pane.innerHTML = `<div class="msg err">${esc(error.message)} — did you run supabase/v3.sql?</div>`; return }
+  const list = data.filter((q) => inqFilter === 'all' || (inqFilter === 'open' ? q.status !== 'closed' && q.status !== 'answered' : q.status === inqFilter))
+  const count = (s) => data.filter((q) => q.status === s).length
+  pane.innerHTML = `<div class="box"><div class="spread"><h3 style="margin:0">Inquiries (${data.length})</h3>
+    <div class="chips" style="margin:0">${[['open', `To handle (${count('new') + count('in_progress')})`], ['answered', 'Answered'], ['closed', 'Closed'], ['all', 'All']].map(([k, l]) => `<button data-f="${k}" class="${inqFilter === k ? 'on' : ''}">${l}</button>`).join('')}</div></div>
+    ${list.length ? list.map((q) => `<article class="lcard" style="margin-top:14px" data-q="${q.id}"><div class="spread"><div><b>${esc(q.name)}</b> · <a href="mailto:${esc(q.email)}?subject=${encodeURIComponent('Re: your imMBA inquiry')}">${esc(q.email)}</a><br><small>${esc(new Date(q.created_at).toLocaleString())} · ${esc(q.topic)} · ${esc(q.lang.toUpperCase())}${q.user_id ? ' · member' : ''}</small></div>
+      <span class="pill ${q.status === 'new' ? 'pending' : q.status === 'closed' ? 'rejected' : ''}">${esc(q.status)}</span></div>
+      <p style="white-space:pre-line;color:var(--tx);font-size:15px;margin:10px 0">${esc(q.message)}</p>
+      <div class="row2"><div><label>Status</label><select data-st>${STATUSES.map(([k, l]) => `<option value="${k}" ${q.status === k ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
+      <div><label>Internal / reply note (visible to the member)</label><input data-note maxlength="1000" value="${esc(q.admin_note || '')}"></div></div>
+      <p class="acts"><button class="btn sm" data-save>Save</button><button class="btn danger sm" data-del>Delete</button></p></article>`).join('') : '<div class="msg" style="margin-top:14px">No inquiries here. 🎉</div>'}</div>`
+  pane.querySelectorAll('[data-f]').forEach((b) => (b.onclick = () => { inqFilter = b.dataset.f; loadInquiries(pane, ctx) }))
+  pane.querySelectorAll('[data-q]').forEach((card) => {
+    const id = card.dataset.q
+    card.querySelector('[data-save]').onclick = async () => {
+      const r = await supabase.from('inquiries').update({ status: card.querySelector('[data-st]').value, admin_note: card.querySelector('[data-note]').value.trim() || null }).eq('id', id)
+      r.error ? notify(r.error.message, 'err') : notify('Inquiry updated.')
+    }
+    card.querySelector('[data-del]').onclick = async () => {
+      if (!confirm('Delete this inquiry permanently?')) return
+      const r = await supabase.from('inquiries').delete().eq('id', id); r.error ? notify(r.error.message, 'err') : notify('Inquiry deleted.')
+    }
+  })
+}

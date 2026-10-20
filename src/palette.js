@@ -10,6 +10,8 @@ const QUICK = () => [
   { g: 'go', ic: '👩‍🏫', t: tr('Faculty', '師資介紹'), s: '/faculty.html', href: '/faculty.html' },
   { g: 'go', ic: '📄', t: tr('Downloads', '表格下載'), s: '/downloads.html', href: '/downloads.html' },
   { g: 'go', ic: '📚', t: tr('Student marketplace', '書籍教材市集'), s: '/marketplace.html', href: '/marketplace.html' },
+  { g: 'go', ic: '✉️', t: tr('Contact us', '聯絡我們'), s: '/contact.html', href: '/contact.html' },
+  { g: 'go', ic: '👤', t: tr('My account', '我的帳號'), s: '/account.html', href: '/account.html' },
   { g: 'go', ic: '🧭', t: tr('About this project', '專案說明'), s: '/project.html', href: '/project.html' },
   { g: 'go', ic: '🔐', t: tr('Back office', '後台'), s: '/admin.html', href: '/admin.html' },
 ]

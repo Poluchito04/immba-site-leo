@@ -69,6 +69,15 @@ This is the product documentation for the **imMBA program website**, built for t
 - **Gain creators:** card UI with clear link types; document library with file types; moderated listings; reports.
 - **Check:** do the products support all jobs? Admissions and documents (yes), faculty (yes), news and events (yes), marketplace (yes). Open gap: application submission itself stays on the official site.
 
+### Fit assessment (does the site address each customer need?)
+- **Find the right program quickly** - Yes: overview, key facts, search and assistant. Priority: high.
+- **Understand admission requirements and dates** - Yes: admissions page in both languages, countdown, documents. Priority: high.
+- **Know the faculty and their research** - Yes: full list with research tags, searchable. Priority: medium.
+- **Ask a question and follow the answer** - Yes: inquiry form with member accounts and status tracking. Priority: high.
+- **Stay informed about news and events** - Yes: announcement cards, events. Priority: medium.
+- **Apply online** - Partly: the application itself stays on the official site (linked everywhere). Priority: high, accepted gap.
+- **Staff keep content current without a developer** - Yes: back office with roles. Priority: high.
+
 ## 7. Verification plan: interviews (TO BE COMPLETED WITH REAL DATA)
 Interview at least 3 classmates. Record the real answers here. Do not invent answers.
 - **Interviewee 1** (name/role, date): ______
@@ -103,6 +112,13 @@ To turn a static, partly Chinese-only, hand-edited website into a bilingual, dat
 - **Delivered beyond MVP:** downloads, marketplace with moderation, dashboard, audit log, page-view analytics.
 - **Next:** AI features (week 13), testing and hardening (week 11), responsible-AI review (week 15), user feedback round.
 
+## 9b. Course "Final Project Requirements" coverage
+- **1. Users (browse, submit inquiry/form, register):** public pages; contact form; member registration and login.
+- **2. Front-end (responsive, key sections, forms and interactions):** responsive site in two languages; forms for inquiries and marketplace.
+- **3. Database (user data, inquiries, content, media files):** profiles, inquiries, faculty, news, pages, downloads, listings, audit log, page views; storage bucket for photos.
+- **4. Admin dashboard (view and manage inquiries, manage content, basic analytics):** Inquiries tab; content tabs; dashboard with counts and charts.
+- **5. Reports / insights (summary of inquiries and users, simple charts, decision support):** dashboard panels for inquiries by topic, answered rate, members, visits, bilingual completeness; CSV report.
+
 ## 10. User story map
 - **Activity: Explore the program**
   - Task: read about the program, then story: *As a prospective student I want to read the program overview in my language so that I can decide if it fits me.*
@@ -114,6 +130,9 @@ To turn a static, partly Chinese-only, hand-edited website into a bilingual, dat
   - Task: read announcements, then story: *As a student I want announcements as cards with dates so that I can scan what is new.*
 - **Activity: Trade materials**
   - Task: post a listing, then story: *As a student I want to post a book for sale so that classmates can find it.*
+- **Activity: Ask the program**
+  - Task: send an inquiry, then story: *As a prospective student I want to send a question from the site so that the team can answer me by email.*
+  - Task: follow it, then story: *As a member I want to see the status of my inquiries so that I know if I was answered.*
 - **Activity: Manage content**
   - Task: publish bilingual news, then story: *As an administrator I want to enter Chinese and English in one record so that both stay in sync.*
   - Task: control access, then story: *As a super administrator I want to approve new administrators so that only trusted people edit.*
@@ -136,7 +155,8 @@ To turn a static, partly Chinese-only, hand-edited website into a bilingual, dat
 - Link types: internal links look like normal menu items; external links carry the arrow icon and open a new tab; documents show the file type (PDF, XLS, DOC); action links are buttons that start with a verb.
 
 ## 12. Roles and permissions
-- **Visitor:** read published content; submit a marketplace listing (stays pending).
+- **Visitor:** read published content; submit a marketplace listing (stays pending); send an inquiry.
+- **Member:** a registered visitor. Follows the status of their own inquiries; never gets any editing right.
 - **Pending:** registered and verified but cannot enter the back office.
 - **Admin:** create, edit and delete news, events, faculty, pages, downloads; moderate listings; see the dashboard.
 - **Super admin:** everything an admin can do, plus approve or reject administrators.
@@ -148,7 +168,8 @@ To turn a static, partly Chinese-only, hand-edited website into a bilingual, dat
 - **pages:** slug, section, bilingual title and body, source links, published, updated_at.
 - **downloads:** bilingual title, file URL, file type, category, order, published.
 - **listings:** marketplace item with price, category, seller, contact, status (pending, approved, rejected).
-- **profiles:** one row per login user with role (pending, admin, super_admin, rejected).
+- **inquiries:** visitor questions with topic, language, status (new, in progress, answered, closed) and an optional note shown to the member.
+- **profiles:** one row per login user with role (member, pending, admin, super_admin, rejected).
 - **audit_log:** who changed what and when (filled by database triggers).
 - **page_views:** path, language, timestamp (no personal data).
 - **Storage:** public bucket for faculty photos; only admins can write.
