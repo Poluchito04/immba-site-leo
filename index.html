@@ -146,6 +146,17 @@ html[data-theme=dark] section:nth-of-type(even){background:var(--b)}
   .act{width:100%}.hero{padding-top:70px}
   header.open{max-height:100vh;overflow:auto}
 }
+
+@media(min-width:861px){
+  header{display:grid;grid-template-columns:1fr auto;column-gap:16px;padding:0 max(20px,calc(50% - 600px))}
+  header .notice{grid-column:1/-1;margin:0 calc(-1 * max(20px,calc(50% - 600px)))}
+  header .brand{max-width:none;margin:0;padding:10px 0}
+  header .navrow:not([hidden]){display:contents}
+  header nav{grid-column:1/-1;grid-row:3;padding-bottom:8px}
+  header nav ul{gap:2px 2px}
+  header .act{grid-column:2;grid-row:2;align-self:center}
+  header.compact .act{grid-row:2}
+}
 </style>
 <meta name="description" content="Fu Jen Catholic University International MBA (imMBA): an AACSB-accredited, English-taught MBA in Taipei. Student project, unofficial site.">
 <meta name="theme-color" content="#0f4c5c">
