@@ -114,7 +114,7 @@ const NEWS_TXT = ['title_zh', 'title_en', 'content_zh', 'content_en']
 const filled = (v) => Boolean((v || '').trim())
 const syncState = (n) => {
   const miss = NEWS_TXT.filter((k) => !filled(n[k]))
-  return miss.length ? { ok: false, text: 'Missing: ' + miss.map((k) => k.replace('_', ' ').replace('zh', '中文').replace('en', 'English')).join(', ') } : { ok: true, text: 'Both languages complete' }
+  return miss.length ? { ok: false, text: 'Missing: ' + miss.map((k) => ({ title_zh: '中文 title', title_en: 'English title', content_zh: '中文 content', content_en: 'English content' }[k])).join(', ') } : { ok: true, text: 'Both languages complete' }
 }
 
 async function translate(text, from, to) {
