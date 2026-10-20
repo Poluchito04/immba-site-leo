@@ -50,7 +50,7 @@ const R = [
   [/^Delete the page "(.+)"\? Both languages will be removed\.$/, (m) => `刪除頁面「${m[1]}」？兩種語言都會被移除。`],
 ]
 const ATTRS = ['placeholder', 'title', 'aria-label']
-const SKIP = 'SCRIPT,STYLE,TEXTAREA,CODE,PRE,INPUT'
+const SKIP = new Set(['SCRIPT', 'STYLE', 'TEXTAREA', 'CODE', 'PRE', 'INPUT'])
 const orig = new WeakMap(), origAttr = new WeakMap()
 
 function look(s) {
@@ -62,9 +62,9 @@ function look(s) {
 }
 function walk(root, zh) {
   if (root.nodeType === 3) { text(root, zh); return }
-  if (root.nodeType !== 1 || SKIP.includes(root.tagName)) return
+  if (root.nodeType !== 1 || SKIP.has(root.tagName)) return
   attrs(root, zh)
-  const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT, { acceptNode: (n) => (n.nodeType === 1 && SKIP.includes(n.tagName) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT) })
+  const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT, { acceptNode: (n) => (n.nodeType === 1 && SKIP.has(n.tagName) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT) })
   let n
   while ((n = w.nextNode())) n.nodeType === 3 ? text(n, zh) : attrs(n, zh)
 }
