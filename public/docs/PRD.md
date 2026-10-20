@@ -195,6 +195,18 @@ To turn a static, partly Chinese-only, hand-edited website into a bilingual, dat
 - **Accessibility:** skip link, visible keyboard focus, labelled controls, semantic landmarks, sufficient contrast in both themes.
 - **Back office ergonomics:** Ctrl/Cmd+S saves the open form, Esc closes it, dashboard first, needs-attention shortcuts that jump to the right tab.
 
+## 15c. What we learned, class by class
+### Class 6 - From a local prototype to a cloud backend (20 Oct 2026)
+- A deployed website is not the same as a cloud-backed product.
+- localStorage lives in one browser, is not shared, can be cleared and has no real login, so it is not enough for a managed site.
+- Supabase provides a database, file storage, authentication and an API.
+- Architecture: Cursor (here Claude Code) to GitHub to Vercel to Supabase. Visitors read through the front end; administrators log in to manage content.
+- A database schema is the blueprint of tables, fields, types and relations. `schema.sql` creates it, and SQL written by AI must be reviewed before it is run.
+- Secrets stay out of GitHub: connection keys live in `.env`, which is listed in `.gitignore`.
+- Authentication (who are you?) is not authorization (what may you do?). Roles: pending, admin, super admin, with approval by a super admin.
+- Faculty management in the cloud: create, read, update, delete, reorder and photos, synchronized with the public Faculty page.
+- Evidence: the back-office dashboard screenshot published in the Announcements section.
+
 ## 16. Test and verification log
 - **20 Oct 2026, production:** created, edited, reordered, deleted faculty and news from the admin; verified photo upload and deletion in Storage; verified drafts are invisible to the public; verified an anonymous visitor cannot insert, delete, upload or read profiles; verified pending, admin and super admin permissions with a role simulation that rolls back.
 - **Known limits:** automated tests not yet written (planned for the testing week); marketplace has no spam protection beyond a honeypot and database limits.
