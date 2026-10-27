@@ -30,14 +30,9 @@ export async function loadAlumni(pane, ctx) {
   const distinct = (k) => [...new Set(rows.map((r) => r[k]).filter((v) => v !== null && v !== ''))].sort((a, b) => (typeof a === 'number' ? b - a : String(a).localeCompare(b)))
   const opts = (list, cur, all) => `<option value="">${all}</option>` + list.map((v) => `<option value="${esc(v)}" ${String(v) === String(cur) ? 'selected' : ''}>${esc(v)}</option>`).join('')
 
-  const filtered = () => {
-    const q = S.q.trim().toLowerCase(), co = S.company.trim().toLowerCase()
-    const list = rows.filter((r) =>
-      (!q || [r.full_name, r.student_id, r.email, r.company, r.job_title].some((v) => (v || '').toLowerCase().includes(q))) &&
-      (!S.degree || r.degree_program === S.degree) && (!S.dept || r.department === S.dept) &&
-      (!S.year || String(r.graduation_year) === S.year) && (!co || (r.company || '').toLowerCase().includes(co)))
+  const sortRows = (list) => {
     const { key, dir } = S.sort
-    return list.sort((a, b) => {
+    return [...list].sort((a, b) => {
       const x = a[key], y = b[key]
       if (x == null && y == null) return 0
       if (x == null) return 1 // blanks always last
@@ -45,21 +40,23 @@ export async function loadAlumni(pane, ctx) {
       return (typeof x === 'number' ? x - y : String(x).localeCompare(String(y))) * dir
     })
   }
+  const filtered = () => {
+    const q = S.q.trim().toLowerCase(), co = S.company.trim().toLowerCase()
+    return sortRows(rows.filter((r) =>
+      (!q || [r.full_name, r.student_id, r.email, r.company, r.job_title].some((v) => (v || '').toLowerCase().includes(q))) &&
+      (!S.degree || r.degree_program === S.degree) && (!S.dept || r.department === S.dept) &&
+      (!S.year || String(r.graduation_year) === S.year) && (!co || (r.company || '').toLowerCase().includes(co))))
+  }
 
   pane.innerHTML = `<div class="box"><div class="spread"><h3 style="margin:0" id="atitle">Alumni (${rows.length})</h3>
     <div class="acts"><button class="btn o" id="aimp">Import CSV</button><button class="btn o" id="aexp">Export CSV</button><button class="btn" id="aadd">+ Add alumnus</button></div></div>
-    <div id="aimphost"></div><div id="aform"></div><div id="ahist"></div>
+    <div id="aimphost"></div><div id="aexphost"></div><div id="aform"></div><div id="ahist"></div>
     <div id="aview"></div></div>`
 
   const host = (id) => document.getElementById(id)
   host('aadd').onclick = () => form(null)
   host('aimp').onclick = () => importPanel()
-  host('aexp').onclick = () => {
-    const list = filtered()
-    if (!list.length) return fail('Nothing to export with the current filters.')
-    download(`alumni-${new Date().toISOString().slice(0, 10)}.csv`, toCsv(list))
-    notify(`Exported ${list.length} record(s) to CSV.`)
-  }
+  host('aexp').onclick = () => exportPanel()
   drawRecords()
 
   /* ------------------------------ records ------------------------------ */
@@ -97,6 +94,7 @@ export async function loadAlumni(pane, ctx) {
       </tbody></table>` : '<p style="color:var(--mut);margin:24px 0">No alumni yet. Add one, or import a CSV file.</p>'
     host('apager').innerHTML = pages > 1 ? `<button class="btn o sm" id="pprev" ${S.page === 0 ? 'disabled' : ''}>← Previous</button><span style="align-self:center;font-size:13px;color:var(--mut)">${S.page + 1} / ${pages}</span><button class="btn o sm" id="pnext" ${S.page >= pages - 1 ? 'disabled' : ''}>Next →</button>` : ''
     if (pages > 1) { host('pprev').onclick = () => { S.page--; paintTable() }; host('pnext').onclick = () => { S.page++; paintTable() } }
+    if (host('aexphost').firstElementChild) drawExport() // filters, sorting or columns changed under an open export review
     const t = host('atable')
     t.querySelectorAll('[data-sort]').forEach((b) => (b.onclick = () => { const k = b.dataset.sort; S.sort = { key: k, dir: S.sort.key === k ? -S.sort.dir : 1 }; paintTable() }))
     t.querySelectorAll('[data-aedit]').forEach((b) => (b.onclick = () => form(rows.find((r) => r.id === b.dataset.aedit))))
@@ -111,7 +109,7 @@ export async function loadAlumni(pane, ctx) {
 
   /* ------------------------------ add / edit ------------------------------ */
   function form(a) {
-    host('aimphost').innerHTML = ''; host('ahist').innerHTML = ''
+    host('aimphost').innerHTML = ''; host('ahist').innerHTML = ''; host('aexphost').innerHTML = ''
     const v = (k) => esc(a?.[k] ?? '')
     const depts = distinct('department')
     host('aform').innerHTML = `<form id="af" style="border-top:1px solid var(--bd);margin-top:18px;padding-top:6px"><h4 style="margin:12px 0 0">${a ? 'Edit alumnus' : 'New alumnus'}</h4>
@@ -146,7 +144,7 @@ export async function loadAlumni(pane, ctx) {
 
   /* ------------------------------ history of one record ------------------------------ */
   async function history(a) {
-    host('aform').innerHTML = ''; host('aimphost').innerHTML = ''
+    host('aform').innerHTML = ''; host('aimphost').innerHTML = ''; host('aexphost').innerHTML = ''
     host('ahist').innerHTML = `<div style="border-top:1px solid var(--bd);margin-top:18px;padding-top:12px"><h4 style="margin:0 0 8px">History — ${esc(a.full_name)}</h4>${skeletonList(3)}</div>`
     host('ahist').scrollIntoView({ behavior: 'smooth', block: 'nearest' })
     // direct changes, plus the batch imports that created or updated this record (import rows list the Student IDs they touched)
@@ -164,9 +162,61 @@ export async function loadAlumni(pane, ctx) {
     host('hclose').onclick = () => (host('ahist').innerHTML = '')
   }
 
+  /* ------------------------------ CSV export: review before download ------------------------------ */
+  const X = { scope: 'filtered', cols: 'all' } // the choices made in the open panel
+  const activeFilters = () => [
+    S.q.trim() && ['Search', `"${S.q.trim()}"`], S.degree && ['Degree Program', S.degree], S.year && ['Graduation Year', S.year],
+    S.dept && ['Department', S.dept], S.company.trim() && ['Company', `"${S.company.trim()}"`],
+  ].filter(Boolean)
+
+  function exportPanel() {
+    host('aform').innerHTML = ''; host('ahist').innerHTML = ''; host('aimphost').innerHTML = ''
+    X.scope = activeFilters().length ? 'filtered' : 'all'; X.cols = 'all'
+    drawExport()
+    host('aexphost').scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+  }
+
+  function drawExport() {
+    const box = host('aexphost'), filters = activeFilters()
+    if (!filters.length) X.scope = 'all'
+    if (cols.length === COLUMNS.length) X.cols = 'all' // nothing to choose between
+    const matching = filtered()
+    const list = X.scope === 'filtered' ? matching : sortRows(rows)
+    const out = X.cols === 'shown' ? cols : COLUMNS
+    const n = list.length, word = (k, one, many) => (k === 1 ? one : many)
+    const name = `alumni-${new Date().toISOString().slice(0, 10)}.csv`
+    const opt = (group, val, on, label, count) => `<label class="xopt"><input type="radio" name="${group}" value="${val}" ${on ? 'checked' : ''}><span>${label}</span><b>${count}</b></label>`
+    const arrow = S.sort.dir > 0 ? '▲' : '▼'
+    box.innerHTML = `<div class="imp"><div class="spread"><h4 style="margin:0">Export alumni to CSV</h4><button class="btn o sm" id="xclose">Close</button></div>
+      <p class="impnote"><span>Check what you are about to download. The file is built in your browser and saved to your Downloads folder when you press the button.</span></p>
+      ${!rows.length ? '<p style="color:var(--mut)">There are no alumni to export yet.</p>' : `
+      <h5 class="xh">Records</h5>
+      ${filters.length ? `<div class="chips2"><span class="xlab">Active filters:</span>${filters.map(([k, v]) => `<span class="pill"><span>${k}</span>: <b>${esc(v)}</b></span>`).join('')}</div>
+        ${opt('xs', 'filtered', X.scope === 'filtered', 'Only the records matching the current filters', matching.length)}${opt('xs', 'all', X.scope === 'all', 'All alumni', rows.length)}`
+        : '<p class="xline"><span>No filters are active, so all alumni will be exported.</span></p>'}
+      <h5 class="xh">Columns</h5>
+      ${cols.length < COLUMNS.length ? `${opt('xc', 'all', X.cols === 'all', 'All columns', COLUMNS.length)}${opt('xc', 'shown', X.cols === 'shown', 'Only the columns shown in the table', cols.length)}` : ''}
+      <div class="chips2">${out.map((k) => `<span class="pill">${LABELS[k]}</span>`).join('')}</div>
+      <h5 class="xh">Preview</h5>
+      ${n ? `<div class="scroll"><table class="ipv xpv"><thead><tr>${out.map((k) => `<th>${LABELS[k]}</th>`).join('')}</tr></thead><tbody>${list.slice(0, 5).map((r) => `<tr>${out.map((k) => `<td>${cell(r, k)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>
+        ${n > 5 ? `<p class="impnote" style="margin:6px 0 0">…and ${n - 5} more</p>` : ''}` : '<p style="color:var(--err);margin:6px 0">Nothing to export with the current filters.</p>'}
+      <div class="xsum"><span>File name</span><b>${esc(name)}</b><span>Contents</span><b>${n} ${word(n, 'record', 'records')} × ${out.length} ${word(out.length, 'column', 'columns')}</b>
+        <span>Order</span><b><span>${LABELS[S.sort.key]}</span> ${arrow}</b><span>Format</span><b>UTF-8 with BOM, opens correctly in Excel</b></div>
+      <p class="xwarn">This file contains personal data (emails, phone numbers). Store it securely and share it only with people who need it.</p>
+      <p class="acts" style="margin-top:12px"><button class="btn" id="xgo" ${n ? '' : 'disabled'}>Download ${n} ${word(n, 'record', 'records')}</button><button class="btn o" id="xcancel">Cancel</button></p>`}</div>`
+    const close = () => (box.innerHTML = '')
+    box.querySelector('#xclose').onclick = close
+    box.querySelector('#xcancel')?.addEventListener('click', close)
+    ;[['xs', 'scope'], ['xc', 'cols']].forEach(([group, key]) => box.querySelectorAll(`[name=${group}]`).forEach((r) => (r.onchange = () => {
+      X[key] = r.value; drawExport(); box.querySelector(`[name=${group}]:checked`)?.focus({ preventScroll: true })
+    })))
+    const go = box.querySelector('#xgo')
+    if (go) go.onclick = () => { download(name, toCsv(list, out)); close(); toast(`Exported ${n} record(s) to CSV.`) }
+  }
+
   /* ------------------------------ CSV batch import ------------------------------ */
   function importPanel() {
-    host('aform').innerHTML = ''; host('ahist').innerHTML = ''
+    host('aform').innerHTML = ''; host('ahist').innerHTML = ''; host('aexphost').innerHTML = ''
     host('aimphost').innerHTML = `<div class="imp"><div class="spread"><h4 style="margin:0">Import alumni from CSV</h4><button class="btn o sm" id="icancel">Close</button></div>
       <p class="impnote"><span>CSV file → validate → preview → import. Nothing is saved until you press Import.</span> <span>Required columns: Name, Student ID.</span> <span>Years in the ROC calendar (110 = 2021) are converted automatically.</span> <span>Excel: use Save as → CSV UTF-8.</span></p>
       <div class="acts" style="margin-bottom:10px"><button class="btn o sm" id="itpl">Download CSV template</button></div>

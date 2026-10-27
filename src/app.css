@@ -132,3 +132,9 @@ td.grip{cursor:grab;color:var(--mut);width:22px;user-select:none;font-size:18px;
 
 td.rank{color:var(--mut);font-variant-numeric:tabular-nums;width:28px}
 tr.moved td{animation:movedflash 1.8s var(--ease,ease) both}@keyframes movedflash{0%,35%{background:color-mix(in srgb,var(--acc) 30%,transparent)}100%{background:transparent}}
+.xh{margin:16px 0 4px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--mut)}
+.xopt{display:flex;align-items:center;gap:10px;margin:6px 0;font-weight:500;color:var(--tx);cursor:pointer}.xopt input{width:auto;margin:0}.xopt b{color:var(--g)}
+.xlab,.xline{font-size:13.5px;color:var(--mut);margin:0}.xline{margin:4px 0}
+.xsum{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;margin:14px 0 4px;padding:12px 14px;border:1px solid var(--bd);border-radius:10px;background:var(--w);font-size:13.5px}.xsum>span{color:var(--mut)}.xsum b{font-weight:600}
+.xpv td{max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.xwarn{font-size:13px;color:var(--mut);margin:10px 0 0}
