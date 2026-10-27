@@ -198,3 +198,5 @@ html[data-theme=dark] .hdr .dd{background:var(--b)}
   .hdr.open{max-height:100vh;overflow:auto}
 }
 @keyframes rise{from{opacity:0;transform:translateY(14px)}}
+
+.fcat{display:inline-block;vertical-align:middle;margin-left:8px;padding:1px 10px;border-radius:999px;font-size:11.5px;font-weight:700;letter-spacing:.02em;background:var(--b2);color:var(--g)}

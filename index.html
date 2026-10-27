@@ -100,7 +100,7 @@ html{scroll-padding-top:110px}
 <meta name="theme-color" content="#0f4c5c">
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="stylesheet" href="/src/ui.css">
-<script>try{var d=document.documentElement,t=localStorage.getItem("theme");if(!t&&matchMedia("(prefers-color-scheme: dark)").matches)t="dark";if(t)d.dataset.theme=t;d.classList.add("js")}catch(e){}</script>
+<script>try{var d=document.documentElement,t=localStorage.getItem("theme");if(t)d.dataset.theme=t;d.classList.add("js")}catch(e){}</script>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -174,7 +174,7 @@ document.getElementById("secs").innerHTML=s;
 /* language: content marked data-zh swaps with the shared language switch in the header */
 var els=[].slice.call(document.querySelectorAll("[data-zh]"));
 els.forEach(function(e){e._en=e.innerHTML});
-function applyLang(){var zh=false;try{zh=localStorage.getItem("lang")=="zh"}catch(e){}els.forEach(function(e){e.innerHTML=zh?e.getAttribute("data-zh"):e._en});document.documentElement.lang=zh?"zh-Hant":"en"}
+function applyLang(){var zh=false;try{zh=localStorage.getItem("lang")=="zh"}catch(e){}els.forEach(function(e){e.innerHTML=zh?e.getAttribute("data-zh"):e._en});document.documentElement.lang=zh?"zh-Hant":"en";document.title=zh?"輔仁大學國際經營管理碩士班（imMBA）":"Fu Jen Catholic University International MBA (imMBA)"}
 window.addEventListener("langchange",applyLang);applyLang();
 </script>
 <script type="module" src="/src/news.js"></script>

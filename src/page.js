@@ -15,7 +15,7 @@ function render() {
   const cur = pages.find((p) => p.slug === slug)
   if (!cur) { document.title = 'imMBA'; app.innerHTML = `<div class="msg err">${t('Page not found.', '找不到此頁面。')} <a href="/">${t('Back home', '回首頁')}</a></div>`; return }
   const title = pick(cur, 'title')
-  document.title = title + ' · imMBA'
+  document.title = /imMBA/i.test(title) ? title : title + ' · imMBA' // no "imMBA · imMBA"
   const src = isZh() ? cur.source_url_zh : cur.source_url_en
   const related = docs.filter((d) => d.category === DOC_CAT[cur.slug])
   const missingNote = isZh() ? (!cur.body_zh && cur.body_en ? t('', '（此頁尚無中文版，顯示英文內容）') : '') : (!cur.body_en && cur.body_zh ? '(No English version yet — showing the Chinese content.)' : '')

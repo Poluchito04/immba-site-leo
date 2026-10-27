@@ -129,3 +129,6 @@ td.grip{cursor:grab;color:var(--mut);width:22px;user-select:none;font-size:18px;
 .pwhint{font-size:13px;margin:6px 0 0}.pwhint.ok{color:var(--ok)}.pwhint.bad{color:var(--err)}
 
 .layout.contact{grid-template-columns:minmax(0,1fr) 320px}@media(max-width:800px){.layout.contact{grid-template-columns:minmax(0,1fr)}.layout.contact aside{margin-top:0!important}.layout.contact form{margin-top:10px!important}}
+
+td.rank{color:var(--mut);font-variant-numeric:tabular-nums;width:28px}
+tr.moved td{animation:movedflash 1.8s var(--ease,ease) both}@keyframes movedflash{0%,35%{background:color-mix(in srgb,var(--acc) 30%,transparent)}100%{background:transparent}}

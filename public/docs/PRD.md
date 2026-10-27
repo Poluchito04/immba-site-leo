@@ -197,7 +197,7 @@ To turn a static, partly Chinese-only, hand-edited website into a bilingual, dat
 - Auto-translate gives a first draft that a human must review.
 
 ## 15b. Design and UX decisions
-- **Visual system:** one palette (deep teal, coral accent) with serif headings and a light and a dark theme. The theme follows the device setting and can be switched with the button; the choice is remembered.
+- **Visual system:** one palette (deep teal, coral accent) with serif headings and a light and a dark theme. The site opens in the light theme by default (the device's dark setting is not applied automatically); visitors can switch with the button and the choice is remembered.
 - **Motion with purpose:** content reveals as it scrolls into view, statistics count up once, cards lift on hover, the hero gradient drifts slowly and pages cross-fade when navigating. Everything switches off for people who prefer reduced motion.
 - **Fast to use:** global search (press Ctrl/Cmd+K or /) across pages, faculty, news, documents and listings, in the current language; sticky compact header; back-to-top button and reading progress bar; skeleton placeholders instead of blank screens; toast messages instead of banners.
 - **Orientation:** admissions deadline countdown in the hero (source: the official announcement), key facts strip, four "why imMBA" cards, previous/next links between content pages, breadcrumbs, faculty search with clickable research tags.
@@ -245,12 +245,13 @@ AI wrote the SQL and the code, but it had to be reviewed and tested in productio
 - **Decision:** link photos and documents to the official site and cite the source.
 - **20 Oct 2026 (evening):** design and UX pass: dark mode, global search, scroll animations, countdown, mobile menu, skeleton loaders, toasts, faculty search.
 
-- **20 Oct 2026 (class 7):** alumni database (`supabase/v5.sql`), Alumni tab with CRUD, search, filters, sortable and selectable columns, per-record history and global activity log; CSV template, validated batch import with preview and duplicate handling; export of the filtered set; audit of role changes.
+- **20 Oct 2026 (class 7):** alumni database (`supabase/v5.sql`), Alumni tab with CRUD, search, filters, sortable and selectable columns, per-record history; CSV template, validated batch import with preview and duplicate handling; export of the filtered set; audit of role changes.
 - **Decision:** one summary `IMPORT` audit row per batch instead of one row per imported record, so a 500-row import does not bury the log; deletions keep a full snapshot of the record.
 - **Decision:** the sample CSV has ROC years, so years are stored as calendar years and converted on import.
 - **Decision:** CSV only (Excel users save as CSV UTF-8); no spreadsheet library is added to keep the site light.
 - **27 Oct 2026:** fixed 404s on university files: links under `/esubweb/immbaengindex/` and `/subweb/immba/` were rewritten to the live `/smarteditupfiles/` path in downloads and pages (`supabase/fix-file-links.sql`); 93 of 96 university links now answer 200.
 - **27 Oct 2026:** fixed the header flicker (it shrank and grew again on scroll because the browser's scroll anchoring pushed the page back above the threshold; now two thresholds); password fields have a show/hide eye and sign-up asks for the password twice; the home page no longer shows Faculty (Announcements first, then Events; the menu links to the Faculty page); added an example faculty profile; login pages show a form-shaped placeholder instead of card skeletons.
+- **27 Oct 2026:** the public Faculty page now lists people in exactly the order set in the back office (it used to group by category, so a person moved to 2nd could appear near the end); each card keeps a category pill and the chips act as filters. Reordering in the back office shows a confirmation toast, highlights the moved row and numbers the rows. The site opens in the light theme by default. The **Activity log** is its own back-office tab (not inside Alumni) and covers every area (news, faculty, alumni, pages, documents, marketplace, administrator roles) with Area, Action and Administrator filters; each alumnus keeps its own History button. Faculty was removed from the home page, which now shows Announcements then Events.
 
 ## 19. Final reflection (to be written by the student)
 Write this yourself at the end of the course. Suggested prompts:

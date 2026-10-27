@@ -7,12 +7,14 @@ import { isZh } from './i18n.js'
 import { pwField, bindPasswords, matchHint } from './password.js'
 import { loadDashboard } from './admin-dashboard.js'
 import { loadAlumni } from './admin-alumni.js'
+import { loadActivity } from './admin-activity.js'
 import { loadPages, loadDownloads, loadListings, loadInquiries } from './admin-content.js'
 
 const app = document.getElementById('app')
 const who = document.getElementById('who')
 const BUCKET = 'faculty-photos'
 const FIELDS = ['name', 'title', 'education', 'research_fields', 'department', 'phone', 'email', 'website', 'category', 'name_zh', 'title_zh', 'education_zh', 'research_fields_zh', 'department_zh']
+let movedId = null // faculty row to highlight after a reorder
 let session = null, profile = null, faculty = [], news = [], editingNews = null, tab = 'dashboard', editing = null, flash = null
 
 const PW_TXT = { show: ['Show password', '顯示密碼'], hide: ['Hide password', '隱藏密碼'], match: ['Passwords match', '密碼相符'], mismatch: ['Passwords do not match', '兩次輸入的密碼不一致'] }
@@ -132,14 +134,14 @@ function renderNewPassword() {
 function renderDashboard() {
   const isSuper = profile.role === 'super_admin'
   if (tab === 'approvals' && !isSuper) tab = 'faculty'
-  app.innerHTML = `${flashHtml()}<div class="tabs">${[['dashboard', 'Dashboard'], ['news', 'News & events'], ['faculty', 'Faculty'], ['alumni', 'Alumni'], ['pages', 'Pages'], ['downloads', 'Documents'], ['marketplace', 'Marketplace'], ['inquiries', 'Inquiries']].map(([k, l]) => `<button data-t="${k}" class="${tab === k ? 'on' : ''}">${l}</button>`).join('')}
+  app.innerHTML = `${flashHtml()}<div class="tabs">${[['dashboard', 'Dashboard'], ['news', 'News & events'], ['faculty', 'Faculty'], ['alumni', 'Alumni'], ['pages', 'Pages'], ['downloads', 'Documents'], ['marketplace', 'Marketplace'], ['inquiries', 'Inquiries'], ['activity', 'Activity log']].map(([k, l]) => `<button data-t="${k}" class="${tab === k ? 'on' : ''}">${l}</button>`).join('')}
     ${isSuper ? `<button data-t="approvals" class="${tab === 'approvals' ? 'on' : ''}">Administrators</button>` : ''}</div><div id="pane"></div>`
   app.querySelectorAll('[data-t]').forEach((b) => (b.onclick = () => { tab = b.dataset.t; editing = null; renderDashboard() }))
   const pane = document.getElementById('pane')
   pane.innerHTML = skeletonList(6)
   new MutationObserver(() => autoReveal(pane)).observe(pane, { childList: true })
   const ctx = { supabase, notify, goto: (t) => { tab = t; renderDashboard() } }
-  const views = { dashboard: () => loadDashboard(pane, ctx), news: loadNews, faculty: loadFaculty, alumni: () => loadAlumni(pane, ctx), pages: () => loadPages(pane, ctx), downloads: () => loadDownloads(pane, ctx), marketplace: () => loadListings(pane, ctx), inquiries: () => loadInquiries(pane, ctx), approvals: loadApprovals }
+  const views = { dashboard: () => loadDashboard(pane, ctx), news: loadNews, faculty: loadFaculty, alumni: () => loadAlumni(pane, ctx), pages: () => loadPages(pane, ctx), downloads: () => loadDownloads(pane, ctx), marketplace: () => loadListings(pane, ctx), inquiries: () => loadInquiries(pane, ctx), activity: () => loadActivity(pane, ctx), approvals: loadApprovals }
   ;(views[tab] || loadFaculty)()
 }
 
@@ -257,8 +259,9 @@ async function loadFaculty() {
   faculty = data
   pane.innerHTML = `<div class="box"><div class="spread"><h3 style="margin:0">Faculty members (${faculty.length})</h3>
     <button class="btn" id="add">+ Add faculty</button></div>
-    <div id="form"></div><div class="scroll"><table><thead><tr><th></th><th></th><th>Name</th><th>中文</th><th>Title</th><th>Type</th><th>Order</th><th></th></tr></thead><tbody>
-    ${faculty.map((f, i) => `<tr data-row="${f.id}"><td class="grip" draggable="true" title="Drag to reorder" aria-label="Drag to reorder">⋮⋮</td><td>${safeUrl(f.image_url) ? `<img class="thumb" src="${esc(f.image_url)}" alt="">` : '<div class="thumb"></div>'}</td>
+    <p style="font-size:13px;color:var(--mut);margin:8px 0 0">The public Faculty page lists people in exactly this order. Drag a row by ⋮⋮ or use the arrows.</p>
+    <div id="form"></div><div class="scroll"><table><thead><tr><th></th><th>#</th><th></th><th>Name</th><th>中文</th><th>Title</th><th>Type</th><th>Order</th><th></th></tr></thead><tbody>
+    ${faculty.map((f, i) => `<tr data-row="${f.id}"><td class="grip" draggable="true" title="Drag to reorder" aria-label="Drag to reorder">⋮⋮</td><td class="rank">${i + 1}</td><td>${safeUrl(f.image_url) ? `<img class="thumb" src="${esc(f.image_url)}" alt="">` : '<div class="thumb"></div>'}</td>
       <td><b>${esc(f.name)}</b></td><td>${esc(f.name_zh || '—')}</td><td>${esc(f.title)}</td><td><span class="pill">${esc(f.category)}</span></td>
       <td><div class="acts"><button class="btn o sm" data-up="${f.id}" ${i === 0 ? 'disabled' : ''} aria-label="Move up">↑</button>
         <button class="btn o sm" data-down="${f.id}" ${i === faculty.length - 1 ? 'disabled' : ''} aria-label="Move down">↓</button></div></td>
@@ -279,6 +282,10 @@ async function loadFaculty() {
     tr.addEventListener('drop', (e) => { e.preventDefault(); const id = dragId; dragId = null; if (id && id !== tr.dataset.row) reorderTo(id, tr.dataset.row) })
   })
   pane.querySelectorAll('[data-down]').forEach((b) => (b.onclick = () => move(b.dataset.down, 1)))
+  if (movedId) {
+    const row = pane.querySelector(`tr[data-row="${movedId}"]`); movedId = null
+    if (row) { row.classList.add('moved'); const r = row.getBoundingClientRect(); if (r.top < 120 || r.bottom > innerHeight - 20) row.scrollIntoView({ block: 'center', behavior: 'smooth' }) }
+  }
 }
 
 function showForm(f) {
@@ -347,26 +354,33 @@ async function remove(f) {
   notify(f.name + ' deleted.')
 }
 
+// renumber 1..N and save only the rows whose position changed; the list is reloaded in place so the scroll position stays
+async function saveOrder(list, moving) {
+  const changed = list.map((f, k) => ({ f, order: k + 1 })).filter(({ f, order }) => f.sort_order !== order)
+  if (!changed.length) return
+  const results = await Promise.all(changed.map(({ f, order }) => supabase.from('faculty').update({ sort_order: order }).eq('id', f.id)))
+  const err = results.find((r) => r.error)
+  if (err) { toast(err.error.message, 'err', 6000); return loadFaculty() }
+  movedId = moving.id
+  toast(`${moving.name} moved to position ${list.findIndex((f) => f.id === moving.id) + 1}.`)
+  await loadFaculty()
+}
+
 async function reorderTo(dragId, targetId) {
   const list = faculty.filter((f) => f.id !== dragId)
   const moving = faculty.find((f) => f.id === dragId)
   const at = list.findIndex((f) => f.id === targetId)
   const from = faculty.findIndex((f) => f.id === dragId), to = faculty.findIndex((f) => f.id === targetId)
   list.splice(from < to ? at + 1 : at, 0, moving) // dropping below moves after the target, above moves before it
-  const changed = list.map((f, k) => ({ f, order: k + 1 })).filter(({ f, order }) => f.sort_order !== order)
-  const results = await Promise.all(changed.map(({ f, order }) => supabase.from('faculty').update({ sort_order: order }).eq('id', f.id)))
-  const err = results.find((r) => r.error)
-  err ? notify(err.error.message, 'err') : notify(moving.name + ' moved.')
+  await saveOrder(list, moving)
 }
 
 async function move(id, dir) {
   const list = [...faculty], i = list.findIndex((f) => f.id === id), j = i + dir
   if (j < 0 || j >= list.length) return
+  const moving = list[i]
   ;[list[i], list[j]] = [list[j], list[i]]
-  const changed = list.map((f, k) => ({ f, order: k + 1 })).filter(({ f, order }) => f.sort_order !== order)
-  const results = await Promise.all(changed.map(({ f, order }) => supabase.from('faculty').update({ sort_order: order }).eq('id', f.id)))
-  const err = results.find((r) => r.error)
-  err ? notify(err.error.message, 'err') : renderDashboard()
+  await saveOrder(list, moving)
 }
 
 /* ---------- super admin: approvals ---------- */

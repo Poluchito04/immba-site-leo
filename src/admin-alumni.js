@@ -1,36 +1,23 @@
 import { esc } from './util.js'
 import { skeletonList, toast } from './ui.js'
 import { COLUMNS, LABELS, DEGREES, TEMPLATE_CSV, decodeBytes, validateCsv, toCsv } from './alumni-csv.js'
+import { logTable } from './admin-activity.js'
 
 const DEFAULT_COLS = ['full_name', 'student_id', 'department', 'degree_program', 'graduation_year', 'company']
 const LS_COLS = 'alumni-cols'
 const PAGE = 50
-const ACTION_CLASS = { CREATE: '', UPDATE: 'pending', DELETE: 'rejected', IMPORT: 'super_admin' }
 
-// filters and view survive the full re-render that every notify() triggers
-const S = { q: '', degree: '', dept: '', year: '', company: '', sort: { key: 'full_name', dir: 1 }, view: 'records', page: 0, act: '', who: '' }
+// filters survive the full re-render that every notify() triggers
+const S = { q: '', degree: '', dept: '', year: '', company: '', sort: { key: 'full_name', dir: 1 }, page: 0 }
 
 const loadCols = () => { try { const c = JSON.parse(localStorage.getItem(LS_COLS)); if (Array.isArray(c) && c.length) return c.filter((x) => COLUMNS.includes(x)) } catch { /* private mode */ } return [...DEFAULT_COLS] }
 const saveCols = (c) => { try { localStorage.setItem(LS_COLS, JSON.stringify(c)) } catch { /* ignore */ } }
 const nice = (e) => (e?.code === '23505' || /duplicate key/i.test(e?.message || '') ? 'That Student ID or email already exists.' : e?.message || 'Something went wrong.')
 const cell = (r, k) => (r[k] ?? '') === '' ? '<span style="color:var(--mut)">—</span>' : k === 'degree_program' ? esc(r[k]) : esc(r[k])
-const when = (t) => new Date(t).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })
 const download = (name, text, type = 'text/csv;charset=utf-8') => {
   const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(new Blob([text], { type })), download: name })
   document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000)
 }
-
-/** one human line per audit row: "Company: ABC → XYZ" */
-export function describeChange(a) {
-  const c = a.changes || {}
-  if (a.action === 'IMPORT' && a.via) return `${a.via === 'created' ? 'Created' : 'Updated'} by CSV import: ${c.file || 'CSV'}`
-  if (a.action === 'UPDATE') return Object.entries(c).map(([k, v]) => `${LABELS[k] || (k === 'role' ? 'Role' : k)}: ${v?.from ?? '∅'} → ${v?.to ?? '∅'}`).join(' · ') || '—'
-  if (a.action === 'IMPORT') return `${c.file || 'CSV'} — ${c.inserted ?? 0} added, ${c.updated ?? 0} updated, ${c.skipped ?? 0} skipped, ${c.failed ?? 0} failed`
-  if (a.action === 'CREATE' || a.action === 'INSERT') return 'New record'
-  if (a.action === 'DELETE') return 'Record deleted'
-  return ''
-}
-const actionName = (a) => (a === 'INSERT' ? 'CREATE' : a)
 
 export async function loadAlumni(pane, ctx) {
   const { supabase, notify } = ctx
@@ -61,12 +48,10 @@ export async function loadAlumni(pane, ctx) {
 
   pane.innerHTML = `<div class="box"><div class="spread"><h3 style="margin:0" id="atitle">Alumni (${rows.length})</h3>
     <div class="acts"><button class="btn o" id="aimp">Import CSV</button><button class="btn o" id="aexp">Export CSV</button><button class="btn" id="aadd">+ Add alumnus</button></div></div>
-    <div class="tabs" style="margin-top:14px"><button data-v="records" class="${S.view === 'records' ? 'on' : ''}">Records</button><button data-v="activity" class="${S.view === 'activity' ? 'on' : ''}">Activity log</button></div>
     <div id="aimphost"></div><div id="aform"></div><div id="ahist"></div>
     <div id="aview"></div></div>`
 
   const host = (id) => document.getElementById(id)
-  pane.querySelectorAll('[data-v]').forEach((b) => (b.onclick = () => { S.view = b.dataset.v; pane.querySelectorAll('[data-v]').forEach((x) => x.classList.toggle('on', x === b)); drawView() }))
   host('aadd').onclick = () => form(null)
   host('aimp').onclick = () => importPanel()
   host('aexp').onclick = () => {
@@ -75,9 +60,7 @@ export async function loadAlumni(pane, ctx) {
     download(`alumni-${new Date().toISOString().slice(0, 10)}.csv`, toCsv(list))
     notify(`Exported ${list.length} record(s) to CSV.`)
   }
-  drawView()
-
-  function drawView() { S.view === 'records' ? drawRecords() : drawActivity() }
+  drawRecords()
 
   /* ------------------------------ records ------------------------------ */
   function drawRecords() {
@@ -179,34 +162,6 @@ export async function loadAlumni(pane, ctx) {
     host('ahist').innerHTML = `<div style="border-top:1px solid var(--bd);margin-top:18px;padding-top:12px"><div class="spread"><h4 style="margin:0">History — ${esc(a.full_name)}</h4><button class="btn o sm" id="hclose">Close</button></div>
       ${err ? `<div class="msg err">${esc(err.message)}</div>` : logTable(log || [], false)}</div>`
     host('hclose').onclick = () => (host('ahist').innerHTML = '')
-  }
-
-  /* ------------------------------ global activity ------------------------------ */
-  async function drawActivity() {
-    host('aview').innerHTML = skeletonList(5)
-    const { data: log, error: err } = await supabase.from('audit_log').select('*').in('table_name', ['alumni', 'profiles']).order('created_at', { ascending: false }).limit(300)
-    if (S.view !== 'activity') return
-    if (err) { host('aview').innerHTML = `<div class="msg err">${esc(err.message)} — did you run supabase/v5.sql?</div>`; return }
-    const actors = [...new Set(log.map((l) => l.actor_email).filter(Boolean))].sort()
-    host('aview').innerHTML = `<div class="afilters" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr))"><div><label>Action</label><select id="lact">${opts(['CREATE', 'UPDATE', 'DELETE', 'IMPORT'], S.act, 'All')}</select></div>
-      <div><label>Administrator</label><select id="lwho">${opts(actors, S.who, 'All')}</select></div></div>
-      <p style="font-size:13px;color:var(--mut)">Every create, update, delete and import by an administrator is recorded by the database itself and cannot be edited from the back office.</p><div class="scroll" id="alog"></div>`
-    const paint = () => {
-      const list = log.filter((l) => (!S.act || actionName(l.action) === S.act) && (!S.who || l.actor_email === S.who))
-      host('alog').innerHTML = logTable(list, true)
-    }
-    host('lact').onchange = (e) => { S.act = e.target.value; paint() }
-    host('lwho').onchange = (e) => { S.who = e.target.value; paint() }
-    paint()
-  }
-
-  function logTable(list, withRecord) {
-    if (!list.length) return '<p style="color:var(--mut)">No activity recorded.</p>'
-    return `<table><thead><tr><th>Time</th><th>Admin</th><th>Action</th>${withRecord ? '<th>Record</th>' : ''}<th>Change</th></tr></thead><tbody>${list.map((l) => {
-      const act = actionName(l.action)
-      const snap = act === 'DELETE' && l.changes ? `<details><summary style="cursor:pointer;color:var(--g)">Deleted values</summary><div style="font-size:12.5px;color:var(--mut)">${Object.entries(l.changes).filter(([, v]) => v !== null && v !== '').map(([k, v]) => `${esc(LABELS[k] || k)}: ${esc(v)}`).join(' · ')}</div></details>` : ''
-      return `<tr><td style="white-space:nowrap">${esc(when(l.created_at))}</td><td>${esc(l.actor_email || '—')}</td><td><span class="pill ${ACTION_CLASS[act] ?? ''}">${esc(act)}</span></td>${withRecord ? `<td>${esc(l.table_name === 'profiles' ? 'Account: ' : '')}${esc(l.row_label || '—')}</td>` : ''}<td>${esc(describeChange({ ...l, action: act }))}${snap}</td></tr>`
-    }).join('')}</tbody></table>`
   }
 
   /* ------------------------------ CSV batch import ------------------------------ */
