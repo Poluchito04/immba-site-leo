@@ -150,7 +150,7 @@ To turn a static, partly Chinese-only, hand-edited website into a bilingual, dat
   - Scenario 2 - Given a rejected listing, When anyone browses the marketplace, Then it never appears.
 
 ## 11. Information architecture
-- Home: notice bar, branding, navigation, action area, hero, then sections for each menu item.
+- Home: notice bar, branding, navigation, action area, hero, then Announcements and Events. Faculty has its own page (`/faculty.html`), linked from the menu.
 - Navigation: About (Overview and Ranking; Our Learning Environment), Admissions (Apply), Curriculum (Curriculum and Requirements), Faculty, Guide, Graduation, Dual Degree, Overseas Exchange, Marketplace, Events, Announcements, Downloads, College of Management.
 - Link types: internal links look like normal menu items; external links carry the arrow icon and open a new tab; documents show the file type (PDF, XLS, DOC); action links are buttons that start with a verb.
 
@@ -250,6 +250,7 @@ AI wrote the SQL and the code, but it had to be reviewed and tested in productio
 - **Decision:** the sample CSV has ROC years, so years are stored as calendar years and converted on import.
 - **Decision:** CSV only (Excel users save as CSV UTF-8); no spreadsheet library is added to keep the site light.
 - **27 Oct 2026:** fixed 404s on university files: links under `/esubweb/immbaengindex/` and `/subweb/immba/` were rewritten to the live `/smarteditupfiles/` path in downloads and pages (`supabase/fix-file-links.sql`); 93 of 96 university links now answer 200.
+- **27 Oct 2026:** fixed the header flicker (it shrank and grew again on scroll because the browser's scroll anchoring pushed the page back above the threshold; now two thresholds); password fields have a show/hide eye and sign-up asks for the password twice; the home page no longer shows Faculty (Announcements first, then Events; the menu links to the Faculty page); added an example faculty profile; login pages show a form-shaped placeholder instead of card skeletons.
 
 ## 19. Final reflection (to be written by the student)
 Write this yourself at the end of the course. Suggested prompts:

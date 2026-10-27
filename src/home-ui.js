@@ -1,7 +1,5 @@
 import { autoReveal } from './ui.js'
 import { mountChrome } from './chrome.js'
-import { supabase, configured, esc } from './supabase.js'
-import { facultyCard } from './facultycard.js'
 
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches
 const isZh = () => document.documentElement.lang.startsWith('zh')
@@ -44,19 +42,3 @@ new MutationObserver(paintDeadline).observe(document.documentElement, { attribut
 autoReveal()
 let raf
 new MutationObserver(() => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => autoReveal()) }).observe(document.getElementById('secs'), { childList: true, subtree: true })
-
-/* faculty: every professor shown directly, one per row */
-const flist = document.getElementById('faculty-list')
-let fac = []
-const paintFaculty = () => {
-  if (!flist) return
-  flist.innerHTML = fac.length ? fac.map(facultyCard).join('') : `<p class="d">${isZh() ? '目前沒有教師資料。' : 'No faculty yet.'}</p>`
-  flist.querySelectorAll('[data-tag]').forEach((b) => (b.onclick = () => { location.href = '/faculty.html?q=' + encodeURIComponent(b.dataset.tag) }))
-}
-if (flist && configured) {
-  supabase.from('faculty').select('*').order('sort_order').order('created_at').then(({ data, error }) => {
-    if (error) { flist.innerHTML = `<p class="d">${esc(error.message)}</p>`; return }
-    fac = data; paintFaculty()
-  })
-  new MutationObserver(paintFaculty).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] })
-}

@@ -6,7 +6,7 @@ Stack: static multi-page site with Vite + vanilla JS, **Supabase** (Postgres, Au
 Live: https://immba-copia.vercel.app · Product docs: `/project.html` (source: `public/docs/PRD.md`)
 
 ## Features
-- Public site: home (5 sections), content pages (About, Admissions, Curriculum, Guide, Graduation, Dual Degree, Exchange), faculty, announcements and events as cards, downloads library, moderated student marketplace, language switch.
+- Public site: home (5 sections), content pages (About, Admissions, Curriculum, Guide, Graduation, Dual Degree, Exchange), faculty page (not on the home page), announcements and events as cards (the home page shows Announcements, then Events), downloads library, moderated student marketplace, language switch.
 - Back office (`/admin.html`): login, roles (`pending` → `admin` → `super_admin`), dashboard and CSV report, management of news/events (bilingual with auto-translate and sync check), faculty (with photos and reorder), pages, documents, marketplace moderation, administrator approvals, activity log, **alumni database** (CRUD, search and filters, selectable columns, CSV batch import with validation and preview, CSV export of the filtered set, field-level audit trail with per-record history).
 - Security: Row Level Security on every table, safe markdown renderer, link sanitising, no secrets in the repo.
 

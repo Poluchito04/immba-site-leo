@@ -2,8 +2,9 @@ import { supabase, configured, esc } from './supabase.js'
 import { mountChrome } from './chrome.js'
 import { t } from './i18n.js'
 import { toast } from './ui.js'
+import { pwField, bindPasswords, matchHint } from './password.js'
 
-mountChrome()
+mountChrome({ skeleton: 'form' })
 const app = document.getElementById('app')
 let session = null, role = null, mode = 'login', inquiries = [], pendingEmail = null
 
@@ -13,13 +14,16 @@ function authForm() {
   const titles = { login: t('Sign in', '登入'), register: t('Create your account', '建立帳號') }
   app.innerHTML = `<form class="box auth" id="f"><h3 style="margin-top:0">${titles[mode]}</h3>
     <label>Email</label><input type="email" name="email" required autocomplete="email">
-    <label>${t('Password', '密碼')}</label><input type="password" name="password" required minlength="6" autocomplete="${mode === 'login' ? 'current-password' : 'new-password'}">
+    ${pwField({ name: 'password', label: t('Password', '密碼'), autocomplete: mode === 'login' ? 'current-password' : 'new-password' })}
+    ${mode === 'register' ? `${pwField({ name: 'password2', label: t('Confirm password', '確認密碼'), autocomplete: 'new-password' })}${matchHint}<p style="font-size:12px;color:var(--mut);margin:8px 0 0">${t('At least 6 characters.', '至少 6 個字元。')}</p>` : ''}
     <p><button class="btn" type="submit" style="width:100%">${titles[mode]}</button></p>
     <p style="font-size:14px;text-align:center">${mode === 'login' ? `<a href="#" data-m="register">${t('Create an account', '建立帳號')}</a>` : `<a href="#" data-m="login">${t('Already registered? Sign in', '已有帳號？登入')}</a>`}</p>
     <p style="font-size:12px;color:var(--mut);text-align:center">${t('Member accounts let you follow your inquiries. Administrators use the', '會員帳號可追蹤您的諮詢。管理員請使用')} <a href="/admin.html">${t('back office', '後台')}</a>.</p></form>`
   app.querySelectorAll('[data-m]').forEach((a) => (a.onclick = (e) => { e.preventDefault(); mode = a.dataset.m; authForm() }))
+  const pw = bindPasswords(app, (k) => ({ show: t('Show password', '顯示密碼'), hide: t('Hide password', '隱藏密碼'), match: t('Passwords match', '密碼相符'), mismatch: t('Passwords do not match', '兩次輸入的密碼不一致') }[k]))
   document.getElementById('f').onsubmit = async (e) => {
     e.preventDefault()
+    if (mode === 'register' && !pw.matches()) return document.querySelector('[name=password2]').reportValidity()
     const fd = new FormData(e.target), email = fd.get('email'), password = fd.get('password')
     const btn = e.target.querySelector('button'); btn.disabled = true
     let error

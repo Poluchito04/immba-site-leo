@@ -176,7 +176,8 @@ html{scroll-padding-top:120px}
 .hdr nav li{position:relative}
 .hdr nav li.has>a::after{content:" ▾";font-size:10px;opacity:.7}
 .hdr .dd{display:none;position:absolute;top:100%;left:0;min-width:240px;background:var(--w);border:1px solid var(--bd);border-radius:10px;padding:6px;box-shadow:0 12px 28px #1b2a3322;z-index:40}
-.hdr nav li:hover>.dd,.hdr nav li:focus-within>.dd,.hdr nav li.open>.dd{display:block}
+.hdr nav li:hover>.dd,.hdr nav li:focus-within>.dd,.hdr nav li.open>.dd{display:block;animation:ddin .18s var(--ease) both}
+@keyframes ddin{from{opacity:0;transform:translateY(-6px)}}
 .hdr .dd a{padding:9px 12px;font-size:14px;white-space:nowrap}
 .hdr .only-m{display:none}
 html[data-theme=dark] .hdr .cm{background:var(--b);color:var(--tx)}

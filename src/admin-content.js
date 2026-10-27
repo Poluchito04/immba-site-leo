@@ -10,6 +10,7 @@ const DCATS = ['admissions', 'curriculum', 'graduation', 'dual', 'other']
 export async function loadPages(pane, ctx) {
   const { supabase, notify } = ctx
   const { data, error } = await supabase.from('pages').select('*').order('sort_order')
+  if (!pane.isConnected) return // a newer render replaced this tab while it was loading
   if (error) { pane.innerHTML = `<div class="msg err">${esc(error.message)} — did you run supabase/v2.sql?</div>`; return }
   pane.innerHTML = `<div class="box"><div class="spread"><h3 style="margin:0">Content pages (${data.length})</h3><button class="btn" id="addp">+ Add page</button></div><div id="pform"></div>
     <div class="scroll"><table><thead><tr><th>Page</th><th>English title</th><th>中文標題</th><th>Languages</th><th>Status</th><th></th></tr></thead><tbody>
@@ -69,6 +70,7 @@ export async function loadPages(pane, ctx) {
 export async function loadDownloads(pane, ctx) {
   const { supabase, notify } = ctx
   const { data, error } = await supabase.from('downloads').select('*').order('category').order('sort_order')
+  if (!pane.isConnected) return // a newer render replaced this tab while it was loading
   if (error) { pane.innerHTML = `<div class="msg err">${esc(error.message)}</div>`; return }
   pane.innerHTML = `<div class="box"><div class="spread"><h3 style="margin:0">Documents (${data.length})</h3><button class="btn" id="addd">+ Add document</button></div><div id="dform"></div>
     <div class="scroll"><table><thead><tr><th>Type</th><th>Title</th><th>Category</th><th>Status</th><th></th></tr></thead><tbody>
@@ -108,6 +110,7 @@ export async function loadDownloads(pane, ctx) {
 export async function loadListings(pane, ctx) {
   const { supabase, notify } = ctx
   const { data, error } = await supabase.from('listings').select('*').order('created_at', { ascending: false })
+  if (!pane.isConnected) return // a newer render replaced this tab while it was loading
   if (error) { pane.innerHTML = `<div class="msg err">${esc(error.message)}</div>`; return }
   const order = { pending: 0, approved: 1, rejected: 2 }
   data.sort((a, b) => order[a.status] - order[b.status])
@@ -127,6 +130,7 @@ let inqFilter = 'open'
 export async function loadInquiries(pane, ctx) {
   const { supabase, notify } = ctx
   const { data, error } = await supabase.from('inquiries').select('*').order('created_at', { ascending: false })
+  if (!pane.isConnected) return // a newer render replaced this tab while it was loading
   if (error) { pane.innerHTML = `<div class="msg err">${esc(error.message)} — did you run supabase/v3.sql?</div>`; return }
   const list = data.filter((q) => inqFilter === 'all' || (inqFilter === 'open' ? q.status !== 'closed' && q.status !== 'answered' : q.status === inqFilter))
   const count = (s) => data.filter((q) => q.status === s).length

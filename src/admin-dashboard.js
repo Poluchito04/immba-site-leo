@@ -26,6 +26,7 @@ export async function loadDashboard(pane, { supabase, goto }) {
     supabase.from('page_views').select('path,lang,created_at').gte('created_at', since).limit(5000),
     q('inquiries', 'id,status,topic,created_at'),
   ])
+  if (!pane.isConnected) return // a newer render replaced this tab while it was loading
   const err = [fac, news, pages, dls, lst, prof, log, views, inq].find((r) => r.error)
   if (err) { pane.innerHTML = `<div class="msg err">${esc(err.error.message)} — did you run supabase/v2.sql?</div>`; return }
   const F = fac.data, N = news.data, P = pages.data, D = dls.data, L = lst.data, U = prof.data, V = views.data, I = inq.data
@@ -84,7 +85,7 @@ export async function loadDashboard(pane, { supabase, goto }) {
     </div>
     <p style="margin-top:18px"><button class="btn o sm" id="csv">Download report (CSV)</button></p>`
   pane.querySelectorAll('[data-goto]').forEach((a) => (a.onclick = (e) => { e.preventDefault(); goto(a.dataset.goto) }))
-  document.getElementById('csv').onclick = () => {
+  pane.querySelector('#csv').onclick = () => {
     const rows = [['metric', 'value'], ['faculty', F.length], ['news_published', newsOnly.filter((n) => n.published).length], ['news_drafts', drafts], ['events', events.length], ['pages', P.length],
       ['documents', D.length], ['listings_approved', L.filter((l) => l.status === 'approved').length], ['listings_pending', pendingListings], ['admins_pending', pendingAdmins],
       ['visits_14d', V.length], ['inquiries', I.length], ['inquiries_new', newInq], ['inquiries_answered_pct', answeredPct], ['members', members], ['visits_zh_pct', zhShare], ['news_bilingual_pct', pct(newsBoth.length, N.length)], ['faculty_zh_pct', pct(facZh.length, F.length)], ['pages_bilingual_pct', pct(pagesBoth.length, P.length)],

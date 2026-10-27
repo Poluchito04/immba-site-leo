@@ -18,7 +18,7 @@ function render() {
     document.getElementById('again').onclick = () => { sent = false; render() }
     return
   }
-  app.innerHTML = `<div class="layout" style="grid-template-columns:1fr 320px"><form class="box" id="cf" style="margin-top:34px"><h3 style="margin-top:0">${t('Your inquiry', '您的諮詢')}</h3>
+  app.innerHTML = `<div class="layout contact"><form class="box" id="cf" style="margin-top:34px"><h3 style="margin-top:0">${t('Your inquiry', '您的諮詢')}</h3>
     <div class="row2"><div><label>${t('Your name', '姓名')} *</label><input name="name" required minlength="2" maxlength="80" autocomplete="name"></div>
     <div><label>Email *</label><input type="email" name="email" required maxlength="120" autocomplete="email" value="${esc(session?.user?.email || '')}"></div></div>
     <label>${t('Topic', '主題')}</label><select name="topic">${TOPICS.map(([k, en, zh]) => `<option value="${k}">${t(en, zh)}</option>`).join('')}</select>

@@ -3,6 +3,8 @@ import { translate } from './translate.js'
 import { toast, autoReveal, skeletonList } from './ui.js'
 import { mountAdminI18n } from './admin-i18n.js'
 import { mountChrome } from './chrome.js'
+import { isZh } from './i18n.js'
+import { pwField, bindPasswords, matchHint } from './password.js'
 import { loadDashboard } from './admin-dashboard.js'
 import { loadAlumni } from './admin-alumni.js'
 import { loadPages, loadDownloads, loadListings, loadInquiries } from './admin-content.js'
@@ -13,6 +15,8 @@ const BUCKET = 'faculty-photos'
 const FIELDS = ['name', 'title', 'education', 'research_fields', 'department', 'phone', 'email', 'website', 'category', 'name_zh', 'title_zh', 'education_zh', 'research_fields_zh', 'department_zh']
 let session = null, profile = null, faculty = [], news = [], editingNews = null, tab = 'dashboard', editing = null, flash = null
 
+const PW_TXT = { show: ['Show password', '顯示密碼'], hide: ['Hide password', '隱藏密碼'], match: ['Passwords match', '密碼相符'], mismatch: ['Passwords do not match', '兩次輸入的密碼不一致'] }
+const pwText = (k) => PW_TXT[k][isZh() ? 1 : 0]
 const notify = (text, type = 'ok') => { toast(text, type, type === 'err' ? 6000 : 3200); render() }
 const flashHtml = () => { if (!flash) return ''; const h = `<div class="msg ${flash.type}">${esc(flash.text)}</div>`; flash = null; return h }
 
@@ -28,7 +32,7 @@ function shortcuts() {
 }
 
 async function boot() {
-  mountChrome({ trackPath: false, assistant: false }) // same header as the public site
+  mountChrome({ trackPath: false, assistant: false, skeleton: 'form' }) // same header as the public site
   mountAdminI18n()
   shortcuts()
   if (!configured) {
@@ -72,13 +76,16 @@ function renderAuth(mode = 'login') {
   const titles = { login: 'Log in', register: 'Create account', reset: 'Reset password' }
   app.innerHTML = `${flashHtml()}<form class="box auth" id="f"><h3 style="margin-top:0">${titles[mode]}</h3>
     <label>Email</label><input type="email" name="email" required autocomplete="email">
-    ${mode !== 'reset' ? '<label>Password</label><input type="password" name="password" required minlength="6" autocomplete="' + (mode === 'login' ? 'current-password' : 'new-password') + '">' : ''}
+    ${mode !== 'reset' ? pwField({ name: 'password', label: 'Password', autocomplete: mode === 'login' ? 'current-password' : 'new-password' }) : ''}
+    ${mode === 'register' ? pwField({ name: 'password2', label: 'Confirm password', autocomplete: 'new-password' }) + matchHint + '<p style="font-size:12px;color:var(--mut);margin:8px 0 0">At least 6 characters.</p>' : ''}
     <p><button class="btn" type="submit" style="width:100%">${titles[mode]}</button></p>
     <p style="font-size:14px;text-align:center">
       ${mode === 'login' ? '<a href="#" data-m="register">Create account</a> · <a href="#" data-m="reset">Forgot password?</a>' : '<a href="#" data-m="login">← Back to log in</a>'}</p></form>`
   app.querySelectorAll('[data-m]').forEach((a) => (a.onclick = (e) => { e.preventDefault(); renderAuth(a.dataset.m) }))
+  const pw = bindPasswords(app, pwText)
   document.getElementById('f').onsubmit = async (e) => {
     e.preventDefault()
+    if (mode === 'register' && !pw.matches()) return app.querySelector('[name=password2]').reportValidity()
     const fd = new FormData(e.target), email = fd.get('email'), password = fd.get('password')
     const btn = e.target.querySelector('button'); btn.disabled = true
     const redirect = location.origin + '/admin.html'
@@ -109,10 +116,12 @@ function renderCheckEmail(email, unconfirmed = false) {
 
 function renderNewPassword() {
   app.innerHTML = `<form class="box auth" id="f"><h3 style="margin-top:0">Choose a new password</h3>
-    <label>New password</label><input type="password" name="password" required minlength="6" autocomplete="new-password">
+    ${pwField({ name: 'password', label: 'New password', autocomplete: 'new-password' })}${pwField({ name: 'password2', label: 'Confirm password', autocomplete: 'new-password' })}${matchHint}
     <p><button class="btn" style="width:100%">Save password</button></p></form>`
+  const pw = bindPasswords(app, pwText)
   document.getElementById('f').onsubmit = async (e) => {
     e.preventDefault()
+    if (!pw.matches()) return app.querySelector('[name=password2]').reportValidity()
     const { error } = await supabase.auth.updateUser({ password: new FormData(e.target).get('password') })
     if (error) { app.insertAdjacentHTML('afterbegin', `<div class="msg err">${esc(error.message)}</div>`); return }
     flash = { text: 'Password updated.', type: 'ok' }; refresh()
@@ -146,6 +155,7 @@ const syncState = (n) => {
 async function loadNews() {
   const pane = document.getElementById('pane')
   const { data, error } = await supabase.from('news').select('*').order('pinned', { ascending: false }).order('news_date', { ascending: false }).order('sort_order')
+  if (!pane.isConnected) return // a newer render replaced this tab while it was loading
   if (error) { pane.innerHTML = `<div class="msg err">${esc(error.message)} — did you run supabase/news.sql?</div>`; return }
   news = data
   pane.innerHTML = `<div class="box"><div class="spread"><h3 style="margin:0">News & events (${news.length})</h3><div class="acts"><button class="btn o" id="restn" title="Put back the original list of announcements">Restore default announcements</button><button class="btn" id="addn">+ Add item</button></div></div>
@@ -242,6 +252,7 @@ async function removeNews(n) {
 async function loadFaculty() {
   const pane = document.getElementById('pane')
   const { data, error } = await supabase.from('faculty').select('*').order('sort_order').order('created_at')
+  if (!pane.isConnected) return // a newer render replaced this tab while it was loading
   if (error) { pane.innerHTML = `<div class="msg err">${esc(error.message)}</div>`; return }
   faculty = data
   pane.innerHTML = `<div class="box"><div class="spread"><h3 style="margin:0">Faculty members (${faculty.length})</h3>
@@ -362,6 +373,7 @@ async function move(id, dir) {
 async function loadApprovals() {
   const pane = document.getElementById('pane')
   const { data, error } = await supabase.from('profiles').select('*').order('created_at', { ascending: false })
+  if (!pane.isConnected) return // a newer render replaced this tab while it was loading
   if (error) { pane.innerHTML = `<div class="msg err">${esc(error.message)}</div>`; return }
   const order = { pending: 0, admin: 1, super_admin: 2, member: 3, rejected: 4 }
   data.sort((a, b) => order[a.role] - order[b.role])

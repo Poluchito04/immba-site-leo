@@ -36,6 +36,7 @@ export async function loadAlumni(pane, ctx) {
   const { supabase, notify } = ctx
   const fail = (m) => toast(m, 'err', 6000) // unlike notify(), keeps the open form and its typed values
   const { data, error } = await supabase.from('alumni').select('*').order('full_name').range(0, 4999)
+  if (!pane.isConnected) return // a newer render replaced this tab while it was loading
   if (error) { pane.innerHTML = `<div class="msg err">${esc(error.message)} — did you run supabase/v5.sql?</div>`; return }
   let rows = data, cols = loadCols()
 

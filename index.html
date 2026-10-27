@@ -162,14 +162,12 @@ html{scroll-padding-top:110px}
 <script>
 var O="https://www.management.fju.edu.tw/esubweb/immbaengindex/";
 var S=[
-["faculty","Faculty","師資介紹","Meet the teaching team behind the program.","認識本班的教師團隊。"],
-["events","Events","活動集錦","Info sessions and program activities.","說明會與各項活動。"],
-["announcements","Announcements","公告","Latest notices for applicants and students.","給申請者與學生的最新公告。"]];
+["announcements","Announcements","公告","Latest notices for applicants and students.","給申請者與學生的最新公告。"],
+["events","Events","活動集錦","Info sessions and program activities.","說明會與各項活動。"]];
 var s="";
 S.forEach(function(x){
  s+='<section id="'+x[0]+'"><div class="wrap"><h3 data-zh="'+x[2]+'">'+x[1]+'</h3><p class="d" data-zh="'+x[4]+'">'+x[3]+'</p>';
  if(x[0]=='announcements')s+='<div id="news-grid" class="ncards"><p class="d">Loading announcements…</p></div><p class="src"><span data-zh="資料來源：">Source:</span> <a href="'+O+'news.php" target="_blank" rel="noopener" data-zh="輔大 imMBA 官方公告 ↗">Fu Jen imMBA official announcements ↗</a></p>';
- if(x[0]=='faculty')s+='<div id="faculty-list" class="fgrid"><p class="d">Loading faculty…</p></div><p class="src"><span data-zh="資料來源：">Source:</span> <a href="'+O+'teacher.php" target="_blank" rel="noopener" data-zh="輔大 imMBA 官方師資頁 ↗">Fu Jen imMBA official faculty page ↗</a></p>';
  if(x[0]=='events')s+='<div id="events-grid" class="ncards"><p class="d">Loading events…</p></div>';
  s+='</div></section>'});
 document.getElementById("secs").innerHTML=s;

@@ -48,3 +48,5 @@ export function toast(text, type = 'ok', ms = 3600) {
 
 export const skeletonCards = (n = 6) => `<div class="skgrid">${Array.from({ length: n }, () => '<div class="skcard"><div class="sk" style="height:12px;width:40%"></div><div class="sk" style="height:18px"></div><div class="sk" style="height:14px;width:85%"></div><div class="sk" style="height:14px;width:60%"></div></div>').join('')}</div>`
 export const skeletonList = (n = 8) => Array.from({ length: n }, () => '<div class="sk" style="height:48px;margin-bottom:8px"></div>').join('')
+/** placeholder the size of the login box, so the page does not jump when the form appears */
+export const skeletonForm = () => '<div class="box auth" aria-hidden="true"><div class="sk" style="height:24px;width:45%;margin-bottom:22px"></div><div class="sk" style="height:14px;width:20%;margin-bottom:8px"></div><div class="sk" style="height:40px;margin-bottom:18px"></div><div class="sk" style="height:14px;width:25%;margin-bottom:8px"></div><div class="sk" style="height:40px;margin-bottom:22px"></div><div class="sk" style="height:42px;border-radius:999px"></div></div>'
