@@ -53,6 +53,7 @@ const D = {
   'Inquiries': '諮詢', 'Inquiries by topic': '各主題諮詢數', 'New inquiries': '新諮詢', 'Registered members': '註冊會員', 'Content items': '內容項目', 'Visiting': '客座', 'To handle': '待處理', 'Answered': '已回覆', 'Closed': '已結案', 'All': '全部', 'New': '新', 'In progress': '處理中', 'Save': '儲存', 'Internal / reply note (visible to the member)': '內部 / 回覆備註（會員可見）', 'No inquiries yet.': '尚無諮詢。', 'Member account': '會員帳號', 'member': '會員', 'new': '新', 'in_progress': '處理中', 'answered': '已回覆', 'closed': '已結案', 'Inquiry updated.': '諮詢已更新。', 'Inquiry deleted.': '諮詢已刪除。', 'Image (optional, JPG/PNG/WebP, max 2 MB)': '圖片（選填，JPG/PNG/WebP，最大 2 MB）', 'Current image kept unless you choose a new one.': '除非選擇新圖片，否則保留目前圖片。', 'Download': '下載', 'Light': '淺色', 'Dark': '深色',
 }
 const R = [
+  [/^(Created|Updated) by CSV import: (.+)$/, (m) => `${m[1] === 'Created' ? '透過 CSV 匯入建立' : '透過 CSV 匯入更新'}：${m[2]}`],
   [/^Alumni \((\d+)\)$/, (m) => `校友 (${m[1]})`], [/^History — (.+)$/, (m) => `歷程 — ${m[1]}`], [/^Alumni record (created|updated|deleted): (.+)$/, (m) => `校友紀錄已${{ created: '建立', updated: '更新', deleted: '刪除' }[m[1]]}：${m[2]}`],
   [/^Exported (\d+) record\(s\) to CSV\.$/, (m) => `已匯出 ${m[1]} 筆紀錄至 CSV。`], [/^Import (\d+) rows?$/, (m) => `匯入 ${m[1]} 列`], [/^Importing… (\d+) \/ (\d+)$/, (m) => `匯入中… ${m[1]} / ${m[2]}`],
   [/^(\d+) ready$/, (m) => `${m[1]} 筆就緒`], [/^(\d+) with warnings$/, (m) => `${m[1]} 筆有警告`], [/^(\d+) duplicates$/, (m) => `${m[1]} 筆重複`], [/^(\d+) with errors$/, (m) => `${m[1]} 筆有錯誤`], [/^(\d+) empty rows skipped$/, (m) => `已略過 ${m[1]} 列空白`],

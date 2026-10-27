@@ -23,6 +23,7 @@ const download = (name, text, type = 'text/csv;charset=utf-8') => {
 /** one human line per audit row: "Company: ABC → XYZ" */
 export function describeChange(a) {
   const c = a.changes || {}
+  if (a.action === 'IMPORT' && a.via) return `${a.via === 'created' ? 'Created' : 'Updated'} by CSV import: ${c.file || 'CSV'}`
   if (a.action === 'UPDATE') return Object.entries(c).map(([k, v]) => `${LABELS[k] || (k === 'role' ? 'Role' : k)}: ${v?.from ?? '∅'} → ${v?.to ?? '∅'}`).join(' · ') || '—'
   if (a.action === 'IMPORT') return `${c.file || 'CSV'} — ${c.inserted ?? 0} added, ${c.updated ?? 0} updated, ${c.skipped ?? 0} skipped, ${c.failed ?? 0} failed`
   if (a.action === 'CREATE' || a.action === 'INSERT') return 'New record'
@@ -164,7 +165,16 @@ export async function loadAlumni(pane, ctx) {
     host('aform').innerHTML = ''; host('aimphost').innerHTML = ''
     host('ahist').innerHTML = `<div style="border-top:1px solid var(--bd);margin-top:18px;padding-top:12px"><h4 style="margin:0 0 8px">History — ${esc(a.full_name)}</h4>${skeletonList(3)}</div>`
     host('ahist').scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-    const { data: log, error: err } = await supabase.from('audit_log').select('*').eq('table_name', 'alumni').eq('record_id', a.id).order('created_at', { ascending: false })
+    // direct changes, plus the batch imports that created or updated this record (import rows list the Student IDs they touched)
+    const base = () => supabase.from('audit_log').select('*').eq('table_name', 'alumni')
+    const [direct, ins, upd] = await Promise.all([
+      base().eq('record_id', a.id),
+      base().eq('action', 'IMPORT').contains('changes', { student_ids: { inserted: [a.student_id] } }),
+      base().eq('action', 'IMPORT').contains('changes', { student_ids: { updated: [a.student_id] } }),
+    ])
+    const err = direct.error || ins.error || upd.error
+    const log = [...(direct.data || []), ...(ins.data || []).map((l) => ({ ...l, via: 'created' })), ...(upd.data || []).map((l) => ({ ...l, via: 'updated' }))]
+      .sort((x, y) => new Date(y.created_at) - new Date(x.created_at))
     host('ahist').innerHTML = `<div style="border-top:1px solid var(--bd);margin-top:18px;padding-top:12px"><div class="spread"><h4 style="margin:0">History — ${esc(a.full_name)}</h4><button class="btn o sm" id="hclose">Close</button></div>
       ${err ? `<div class="msg err">${esc(err.message)}</div>` : logTable(log || [], false)}</div>`
     host('hclose').onclick = () => (host('ahist').innerHTML = '')
