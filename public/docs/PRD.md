@@ -227,6 +227,7 @@ To turn a static, partly Chinese-only, hand-edited website into a bilingual, dat
 
 ## 16. Test and verification log
 - **20 Oct 2026, production:** created, edited, reordered, deleted faculty and news from the admin; verified photo upload and deletion in Storage; verified drafts are invisible to the public; verified an anonymous visitor cannot insert, delete, upload or read profiles; verified pending, admin and super admin permissions with a role simulation that rolls back.
+- **20 Oct 2026, production (class 7):** ran `v5.sql`; imported the 20-row class CSV (20 added, ROC years converted); verified search, degree filter, column chooser, edit (audit shows company and job title old to new), duplicate Student ID rejected without losing the form, re-import in skip and update modes (blank cells keep existing values), export CSV, delete (audit keeps a snapshot), Chinese interface. Test data was deleted afterwards.
 - **Automated tests:** `npm test` includes unit tests for the alumni CSV parser and validator (quotes, delimiters, ROC years, degree synonyms, empty rows, duplicates, encoding, formula-safe export) and a check against the 20-row class sample.
 - **Known limits:** automated tests not yet written (planned for the testing week); marketplace has no spam protection beyond a honeypot and database limits.
 

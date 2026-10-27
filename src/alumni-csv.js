@@ -154,7 +154,7 @@ export function validateCsv(text, existing = {}) {
     for (const f of ['admission_year', 'graduation_year']) {
       const y = normalizeYear(data[f])
       if (y.error) errors.push(`${LABELS[f]}: ${y.error} ("${data[f]}").`)
-      else { if (y.roc) warnings.push(`${LABELS[f]} ${data[f]} read as ROC year → ${y.value}.`); data[f] = y.value }
+      else { if (y.roc) out.rocYears = true; data[f] = y.value }
     }
     if (data.admission_year && data.graduation_year && data.graduation_year < data.admission_year) errors.push('Graduation year is before admission year.')
 

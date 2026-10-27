@@ -103,6 +103,7 @@ begin
   for r in select * from jsonb_array_elements(p_rows) loop
     sid := nullif(btrim(r->>'student_id'), '');
     begin
+      ex := null;
       select id into ex from public.alumni
        where student_id = sid or (nullif(r->>'email','') is not null and lower(email) = lower(r->>'email'))
        order by (student_id = sid) desc limit 1;

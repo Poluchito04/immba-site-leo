@@ -36,6 +36,7 @@ test('a good row passes; empty optional fields only warn', () => {
   const r = validateCsv(`${HEAD}\nEmily Lee,10920002,Business Administration,Bachelor's Program,110,114,emily.lee@example.com,,,\n`)
   assert.equal(r.headerErrors.length, 0)
   assert.equal(r.rows[0].status, 'warn')
+  assert.equal(r.rocYears, true) // converted silently, flagged once for the whole file
   assert.equal(r.rows[0].data.phone, null)
   assert.equal(r.rows[0].data.admission_year, 2021)
   assert.equal(r.rows[0].data.degree_program, 'Bachelor')

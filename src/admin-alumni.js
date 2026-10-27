@@ -1,5 +1,5 @@
 import { esc } from './util.js'
-import { skeletonList } from './ui.js'
+import { skeletonList, toast } from './ui.js'
 import { COLUMNS, LABELS, DEGREES, TEMPLATE_CSV, decodeBytes, validateCsv, toCsv } from './alumni-csv.js'
 
 const DEFAULT_COLS = ['full_name', 'student_id', 'department', 'degree_program', 'graduation_year', 'company']
@@ -33,6 +33,7 @@ const actionName = (a) => (a === 'INSERT' ? 'CREATE' : a)
 
 export async function loadAlumni(pane, ctx) {
   const { supabase, notify } = ctx
+  const fail = (m) => toast(m, 'err', 6000) // unlike notify(), keeps the open form and its typed values
   const { data, error } = await supabase.from('alumni').select('*').order('full_name').range(0, 4999)
   if (error) { pane.innerHTML = `<div class="msg err">${esc(error.message)} — did you run supabase/v5.sql?</div>`; return }
   let rows = data, cols = loadCols()
@@ -68,7 +69,7 @@ export async function loadAlumni(pane, ctx) {
   host('aimp').onclick = () => importPanel()
   host('aexp').onclick = () => {
     const list = filtered()
-    if (!list.length) return notify('Nothing to export with the current filters.', 'err')
+    if (!list.length) return fail('Nothing to export with the current filters.')
     download(`alumni-${new Date().toISOString().slice(0, 10)}.csv`, toCsv(list))
     notify(`Exported ${list.length} record(s) to CSV.`)
   }
@@ -119,7 +120,7 @@ export async function loadAlumni(pane, ctx) {
       const r = rows.find((x) => x.id === b.dataset.adel)
       if (!confirm(`Delete the alumni record "${r.full_name}" (${r.student_id})? The deletion is logged in the activity log.`)) return
       const res = await supabase.from('alumni').delete().eq('id', r.id)
-      res.error ? notify(nice(res.error), 'err') : notify(`Alumni record deleted: ${r.full_name}`)
+      res.error ? fail(nice(res.error)) : notify(`Alumni record deleted: ${r.full_name}`)
     }))
   }
 
@@ -148,10 +149,10 @@ export async function loadAlumni(pane, ctx) {
       const g = (k) => f[k].value.trim() || null, yr = (k) => (f[k].value ? parseInt(f[k].value, 10) : null)
       const row = { full_name: g('full_name'), student_id: g('student_id'), department: g('department'), degree_program: f.degree_program.value, admission_year: yr('admission_year'), graduation_year: yr('graduation_year'),
         email: g('email')?.toLowerCase() ?? null, phone: g('phone'), company: g('company'), job_title: g('job_title'), notes: g('notes') }
-      if (row.admission_year && row.graduation_year && row.graduation_year < row.admission_year) return notify('Graduation year is before admission year.', 'err')
+      if (row.admission_year && row.graduation_year && row.graduation_year < row.admission_year) return fail('Graduation year is before admission year.', 'err')
       const btn = f.querySelector('[type=submit]'); btn.disabled = true
       const res = a ? await supabase.from('alumni').update(row).eq('id', a.id) : await supabase.from('alumni').insert(row)
-      if (res.error) { btn.disabled = false; return notify(nice(res.error), 'err') }
+      if (res.error) { btn.disabled = false; return fail(nice(res.error)) }
       notify(a ? `Alumni record updated: ${row.full_name}` : `Alumni record created: ${row.full_name}`)
     }
     host('aform').scrollIntoView({ behavior: 'smooth', block: 'nearest' })
@@ -201,7 +202,7 @@ export async function loadAlumni(pane, ctx) {
   function importPanel() {
     host('aform').innerHTML = ''; host('ahist').innerHTML = ''
     host('aimphost').innerHTML = `<div class="imp"><div class="spread"><h4 style="margin:0">Import alumni from CSV</h4><button class="btn o sm" id="icancel">Close</button></div>
-      <p class="impnote">CSV file <b>→</b> validate <b>→</b> preview <b>→</b> import. Nothing is saved until you press Import. Required columns: <b>Name</b> and <b>Student ID</b>. Years in the ROC calendar (110 = 2021) are converted automatically. Excel: use <i>Save as → CSV UTF-8</i>.</p>
+      <p class="impnote"><span>CSV file → validate → preview → import. Nothing is saved until you press Import.</span> <span>Required columns: Name, Student ID.</span> <span>Years in the ROC calendar (110 = 2021) are converted automatically.</span> <span>Excel: use Save as → CSV UTF-8.</span></p>
       <div class="acts" style="margin-bottom:10px"><button class="btn o sm" id="itpl">Download CSV template</button></div>
       <label class="drop" id="idrop" tabindex="0"><input type="file" id="ifile" accept=".csv,text/csv,.txt" hidden><b>Choose a CSV file</b> <span>or drop it here</span></label><div id="iout"></div></div>`
     const drop = host('idrop'), file = host('ifile')
@@ -220,7 +221,7 @@ export async function loadAlumni(pane, ctx) {
       if (!/\.(csv|txt)$/i.test(f.name) && !/csv|text/.test(f.type)) { out.innerHTML = '<div class="msg err">That is not a CSV file. In Excel use Save as → CSV UTF-8.</div>'; return }
       out.innerHTML = skeletonList(3)
       const { text, encoding } = decodeBytes(await f.arrayBuffer())
-      const res = validateCsv(problem ? text + '�' : text, { studentIds: new Set(rows.map((r) => r.student_id)), emails: new Set(rows.map((r) => (r.email || '').toLowerCase()).filter(Boolean)) })
+      const res = validateCsv(text, { studentIds: new Set(rows.map((r) => r.student_id)), emails: new Set(rows.map((r) => (r.email || '').toLowerCase()).filter(Boolean)) })
       preview(f.name, res, encoding)
     }
 
@@ -232,7 +233,7 @@ export async function loadAlumni(pane, ctx) {
       const c = res.counts
       let update = false, only = false
       const importable = () => res.rows.filter((r) => r.status === 'ok' || r.status === 'warn' || (update && r.status === 'duplicate' && r.inDatabase))
-      out.innerHTML = `${head}${msgs}<div class="chips2"><span class="pill">${c.ok} ready</span><span class="pill pending">${c.warn} with warnings</span><span class="pill super_admin">${c.duplicate} duplicates</span><span class="pill rejected">${c.error} with errors</span>${res.emptyRows ? `<span class="pill" style="background:var(--b)">${res.emptyRows} empty rows skipped</span>` : ''}</div>
+      out.innerHTML = `${head}${msgs}${res.rocYears ? '<p style="font-size:13px;color:var(--mut);margin:6px 0">Years in the ROC calendar were converted (110 = 2021).</p>' : ''}<div class="chips2"><span class="pill">${c.ok} ready</span><span class="pill pending">${c.warn} with warnings</span><span class="pill super_admin">${c.duplicate} duplicates</span><span class="pill rejected">${c.error} with errors</span>${res.emptyRows ? `<span class="pill" style="background:var(--b)">${res.emptyRows} empty rows skipped</span>` : ''}</div>
         <div class="spread" style="margin:10px 0"><label style="display:inline;margin:0;font-weight:500"><input type="checkbox" id="iupd" style="width:auto"> Update existing records when the Student ID or email already exists (blank cells keep current values)</label>
         <label style="display:inline;margin:0;font-weight:500"><input type="checkbox" id="ionly" style="width:auto"> Show problems only</label></div>
         <div class="scroll" id="ipv"></div>
@@ -258,7 +259,7 @@ export async function loadAlumni(pane, ctx) {
         for (let i = 0; i < send.length; i += 500) {
           btn.textContent = `Importing… ${Math.min(i + 500, send.length)} / ${send.length}`
           const { data: r, error: e } = await supabase.rpc('import_alumni', { p_rows: send.slice(i, i + 500), p_update: update, p_filename: name })
-          if (e) { btn.disabled = false; btn.textContent = 'Import'; return notify(e.message + ' (did you run supabase/v5.sql?)', 'err') }
+          if (e) { btn.disabled = false; btn.textContent = 'Import'; return fail(e.message + ' (did you run supabase/v5.sql?)') }
           tot.inserted += r.inserted; tot.updated += r.updated; tot.skipped += r.skipped; tot.failed.push(...r.failed)
         }
         if (tot.failed.length) alert('Some rows could not be imported:\n' + tot.failed.slice(0, 20).map((f) => `${f.student_id}: ${f.error}`).join('\n'))
