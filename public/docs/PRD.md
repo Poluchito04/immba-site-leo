@@ -110,7 +110,7 @@ To turn a static, partly Chinese-only, hand-edited website into a bilingual, dat
 ## 9. MVP (midterm demo) and next steps
 - **MVP:** public home with navigation and bilingual switch; news cards; faculty page; content pages; login with roles; news and faculty management; deployed on Vercel with Supabase.
 - **Delivered beyond MVP:** downloads, marketplace with moderation, dashboard, audit log, page-view analytics.
-- **Next:** AI features (week 13), testing and hardening (week 11), responsible-AI review (week 15), user feedback round.
+- **Next:** user feedback round (three classmate interviews), responsible-AI review (week 15), more tests for the browser interface.
 
 ## 9b. Course "Final Project Requirements" coverage
 - **1. Users (browse, submit inquiry/form, register):** public pages; contact form; member registration and login.
@@ -225,14 +225,14 @@ AI wrote the SQL and the code, but it had to be reviewed and tested in productio
 - **20 Oct 2026, production:** created, edited, reordered, deleted faculty and news from the admin; verified photo upload and deletion in Storage; verified drafts are invisible to the public; verified an anonymous visitor cannot insert, delete, upload or read profiles; verified pending, admin and super admin permissions with a role simulation that rolls back.
 - **20 Oct 2026, production (class 7):** ran `v5.sql`; imported the 20-row class CSV (20 added, ROC years converted); verified search, degree filter, column chooser, edit (audit shows company and job title old to new), duplicate Student ID rejected without losing the form, re-import in skip and update modes (blank cells keep existing values), export CSV, delete (audit keeps a snapshot), Chinese interface. Test data was deleted afterwards.
 - **Automated tests:** `npm test` includes unit tests for the alumni CSV parser and validator (quotes, delimiters, ROC years, degree synonyms, empty rows, duplicates, encoding, formula-safe export) and a check against the 20-row class sample.
-- **Known limits:** automated tests not yet written (planned for the testing week); marketplace has no spam protection beyond a honeypot and database limits.
+- **Known limits:** tests cover the Markdown renderer, translations, retrieval and the alumni CSV parser, but not the browser interface (checked by hand in production); marketplace has no spam protection beyond a honeypot and database limits.
 
 ## 17. AI usage and responsible use
 - Claude Code was used as the AI coding agent (agreed with the instructor), with GitHub and Vercel for versioning and deployment.
 - AI generated drafts of code, SQL and documentation; the student reviewed behaviour, tested in production and decides what ships.
 - Auto-translation is a draft only; humans approve text before publishing.
 - Privacy: only information already public on the official website (names, emails, phone extensions) is shown; analytics store no personal data; secrets are never committed.
-- Planned AI feature (week 13): an admissions FAQ assistant that answers only from published pages, cites the page, and says when it does not know.
+- AI feature (built): an admissions FAQ assistant that answers only from published pages and database content, cites the source link, and says when it does not know (it never guesses).
 
 ## 18. Change and decision log
 - **6 Oct 2026:** first version of the site (home with 5 sections, navigation with dropdowns, hero, language switch). Published with GitHub and Vercel.
