@@ -11,7 +11,7 @@ Live: https://immba-copia.vercel.app · Product docs: `/project.html` (source: `
 - Security: Row Level Security on every table, safe markdown renderer, link sanitising, no secrets in the repo.
 
 ## Setup
-1. Create a Supabase project. In the SQL Editor run, in order: `supabase/schema.sql`, `supabase/seed-faculty.sql`, `supabase/news.sql`, `supabase/seed-news.sql`, `supabase/v2.sql`, then the later migrations `supabase/v3.sql`, `supabase/v4.sql` and `supabase/v5.sql` (alumni database, audit trail, CSV import).
+1. Create a Supabase project. In the SQL Editor run, in order: `supabase/schema.sql`, `supabase/seed-faculty.sql`, `supabase/news.sql`, `supabase/seed-news.sql`, `supabase/v2.sql`, `supabase/fix-file-links.sql` (corrects old university file paths), then the later migrations `supabase/v3.sql`, `supabase/v4.sql` and `supabase/v5.sql` (alumni database, audit trail, CSV import).
 2. Register once in `/admin.html`, then make yourself the first super admin:
    `update public.profiles set role = 'super_admin' where email = 'YOUR_EMAIL';`
 3. In Supabase → Auth → URL configuration set the Site URL and add `https://YOUR-DOMAIN/admin.html` as a redirect URL.

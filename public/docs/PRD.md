@@ -253,6 +253,7 @@ To turn a static, partly Chinese-only, hand-edited website into a bilingual, dat
 - **Decision:** one summary `IMPORT` audit row per batch instead of one row per imported record, so a 500-row import does not bury the log; deletions keep a full snapshot of the record.
 - **Decision:** the sample CSV has ROC years, so years are stored as calendar years and converted on import.
 - **Decision:** CSV only (Excel users save as CSV UTF-8); no spreadsheet library is added to keep the site light.
+- **27 Oct 2026:** fixed 404s on university files: links under `/esubweb/immbaengindex/` and `/subweb/immba/` were rewritten to the live `/smarteditupfiles/` path in downloads and pages (`supabase/fix-file-links.sql`); 93 of 96 university links now answer 200.
 
 ## 19. Final reflection (to be written by the student)
 Write this yourself at the end of the course. Suggested prompts:

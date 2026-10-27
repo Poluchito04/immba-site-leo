@@ -207,7 +207,7 @@ First round: Oct. 15, 2026, 13:00 – Dec. 4, 2026, 23:59 (Taiwan time)
 
 Second round: Mar. 1, 2027, 13:00 – May 15, 2027, 23:59 (Taiwan time)
 
-[Admission Brochure for Fall 2027](https://www.management.fju.edu.tw/esubweb/immbaengindex/smarteditupfiles/immbaengindex/FJCU_116-1Admission.pdf)
+[Admission Brochure for Fall 2027](https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/FJCU_116-1Admission.pdf)
 
 [Please apply online](http://idsasys.oie.fju.edu.tw/) or [http://idsasys.oie.fju.edu.tw/](http://idsasys.oie.fju.edu.tw/)
 
@@ -279,7 +279,7 @@ There is only one chance to request and the deadline is in the first week of the
 
 ◎簡章及報名
 
-[116甄試 簡版簡章](https://www.management.fju.edu.tw/subweb/immba/smarteditupfiles/immba/116%20imMBA.pdf)
+[116甄試 簡版簡章](https://www.management.fju.edu.tw/smarteditupfiles/immba/116%20imMBA.pdf)
 
 [116甄試 完整簡章](https://exam.fju.edu.tw/admission/251)
 
@@ -291,7 +291,7 @@ There is only one chance to request and the deadline is in the first week of the
 
 ◎招生報名資料
 
-1.[書面資料審查表](https://www.management.fju.edu.tw/subweb/immba/smarteditupfiles/immba/116%200819.doc)
+1.[書面資料審查表](https://www.management.fju.edu.tw/smarteditupfiles/immba/116%200819.doc)
 
 2.國民身分證影本
 
@@ -299,7 +299,7 @@ There is only one chance to request and the deadline is in the first week of the
 
 4.學士班歷年成績單
 
-5.[自傳暨讀書計畫](https://www.management.fju.edu.tw/subweb/immba/smarteditupfiles/immba/2026%201019.pdf)
+5.[自傳暨讀書計畫](https://www.management.fju.edu.tw/smarteditupfiles/immba/2026%201019.pdf)
 
 6.推薦信乙封
 
@@ -348,17 +348,17 @@ It is mandatory to contact the imMBA office in advance to make sure the name and
 
 Updated Curriculum
 
-[Fall 2026 and spring 2027 Curriculum](https://www.management.fju.edu.tw/esubweb/immbaengindex/smarteditupfiles/immbaengindex/0907.pdf)
+[Fall 2026 and spring 2027 Curriculum](https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/0907.pdf)
 
-[Course Catalog and Objectives](https://www.management.fju.edu.tw/esubweb/immbaengindex/smarteditupfiles/immbaengindex/imMBA_course%20introduction%202026%2005%2022.pdf)
+[Course Catalog and Objectives](https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/imMBA_course%20introduction%202026%2005%2022.pdf)
 
-[Course Structure for Graduation-115](https://www.management.fju.edu.tw/esubweb/immbaengindex/smarteditupfiles/immbaengindex/Curriculum%20structure-115.xls)
+[Course Structure for Graduation-115](https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/Curriculum%20structure-115.xls)
 
-[Course Structure for Graduation-114](https://www.management.fju.edu.tw/esubweb/immbaengindex/smarteditupfiles/immbaengindex/Curriculum%20structure-114%282%29.xls)
+[Course Structure for Graduation-114](https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/Curriculum%20structure-114%282%29.xls)
 
-[Course Structure for Graduation-113](https://www.management.fju.edu.tw/esubweb/immbaengindex/smarteditupfiles/immbaengindex/Curriculum%20structure-113%282%29.xls)
+[Course Structure for Graduation-113](https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/Curriculum%20structure-113%282%29.xls)
 
-[Course Structure for Graduation-112](https://www.management.fju.edu.tw/esubweb/immbaengindex/smarteditupfiles/immbaengindex/Curriculum%20structure-112%283%29.xls)
+[Course Structure for Graduation-112](https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/Curriculum%20structure-112%283%29.xls)
 
 Each semester, the imMBA office will release a list of professors in late March and early October for enrolled students to select their thesis advisor. Students are advised to wait patiently for the list.
 
@@ -366,7 +366,7 @@ To preserve the right to apply for the thesis defense and graduate, students nee
 
 Graduation Requirements
 
-[Students enrolled in/ from fall 2025](https://www.management.fju.edu.tw/esubweb/immbaengindex/smarteditupfiles/immbaengindex/GR-ENG-Fall%202025%20%28v2026%2005%2018%29.pdf)
+[Students enrolled in/ from fall 2025](https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/GR-ENG-Fall%202025%20%28v2026%2005%2018%29.pdf)
 
 [Students enrolled in/ from fall 2024](https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/GR-ENG-Fall%202024%20%28v2024%200516%29.pdf)
 
@@ -382,19 +382,19 @@ Graduation Requirements
 
 ◎上課時間表
 
-[最新上課時間表](https://www.management.fju.edu.tw/subweb/immba/smarteditupfiles/immba/0907.pdf)
+[最新上課時間表](https://www.management.fju.edu.tw/smarteditupfiles/immba/0907.pdf)
 
-[課程目錄與學習目標](https://www.management.fju.edu.tw/subweb/immba/smarteditupfiles/immba/imMBA_course%20introduction%202026%2005%2022.pdf)
+[課程目錄與學習目標](https://www.management.fju.edu.tw/smarteditupfiles/immba/imMBA_course%20introduction%202026%2005%2022.pdf)
 
 ◎畢業修課規劃與結構
 
-[115畢業修課規劃與結構](https://www.management.fju.edu.tw/subweb/immba/smarteditupfiles/immba/Curriculum%20structure-115.xls)
+[115畢業修課規劃與結構](https://www.management.fju.edu.tw/smarteditupfiles/immba/Curriculum%20structure-115.xls)
 
-[114畢業修課規劃與結構](https://www.management.fju.edu.tw/subweb/immba/smarteditupfiles/immba/Curriculum%20structure-114%281%29.xls)
+[114畢業修課規劃與結構](https://www.management.fju.edu.tw/smarteditupfiles/immba/Curriculum%20structure-114%281%29.xls)
 
-[113畢業修課規劃與結構](https://www.management.fju.edu.tw/subweb/immba/smarteditupfiles/immba/Curriculum%20structure-113%281%29.xls)
+[113畢業修課規劃與結構](https://www.management.fju.edu.tw/smarteditupfiles/immba/Curriculum%20structure-113%281%29.xls)
 
-[112畢業修課規劃與結構](https://www.management.fju.edu.tw/subweb/immba/smarteditupfiles/immba/Curriculum%20structure-112%281%29.xls)
+[112畢業修課規劃與結構](https://www.management.fju.edu.tw/smarteditupfiles/immba/Curriculum%20structure-112%281%29.xls)
 
 >>本碩士班每學期分別於3月底及10月初提供教師群名單，供同學自行聯繫並確認指導老師。同學在期間內依據規定辦理即可。
 
@@ -420,7 +420,7 @@ Graduation Requirements
 
 >>關於基礎課程(限大學非商管之同學)、專業必修、專業選修、論文撰寫、英文畢業門檻皆有規定，為保障自身學習權益並順利取得輔大MBA學位，請同學務必詳讀修業規則並配合辦理。
 
-[Fall 2025入學起適用](https://www.management.fju.edu.tw/subweb/immba/smarteditupfiles/immba/GR-C-Fall%202025%28v2026%200518%29%281%29.pdf)
+[Fall 2025入學起適用](https://www.management.fju.edu.tw/smarteditupfiles/immba/GR-C-Fall%202025%28v2026%200518%29%281%29.pdf)
 
 [Fall 2024入學起適用](https://www.management.fju.edu.tw/smarteditupfiles/immba/GR-C-Fall%202024%20%28v2024%200516%29%282%29.pdf)
 
@@ -503,7 +503,7 @@ No. The office announces advisor information after each add/drop period. Most st
 MBA正規課程安排：同學應在開學前一個月瀏覽國際經管官網，了解修課資訊及畢業規定；所辦會在開學前三週以Email公告選課細節，同學必須依據內容跟上進度。[更多課程及抵免相關資訊](https://www.management.fju.edu.tw/subweb/immba/class.php?CID=20)','https://www.management.fju.edu.tw/esubweb/immbaengindex/subedit.php?EID=35','https://www.management.fju.edu.tw/subweb/immba/subedit.php?EID=243'),
   ('graduation','more',6,'Graduation','畢業與離校','Graduation requirements, please read the version that suits you:
 
-[Students enrolled in/ from fall 2025](https://www.management.fju.edu.tw/esubweb/immbaengindex/smarteditupfiles/immbaengindex/GR-ENG-Fall%202025%20%28v2026%2005%2018%29%281%29.pdf)
+[Students enrolled in/ from fall 2025](https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/GR-ENG-Fall%202025%20%28v2026%2005%2018%29%281%29.pdf)
 
 [Students enrolled in/ from fall 2024](https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/GR-ENG-Fall%202024%20%28v2024%200516%29.pdf)
 
@@ -523,29 +523,29 @@ MBA正規課程安排：同學應在開學前一個月瀏覽國際經管官網�
 
 Thesis, defense process and graduation guideline
 
-[Overall steps for the thesis defense and graduation](https://www.management.fju.edu.tw/esubweb/immbaengindex/smarteditupfiles/immbaengindex/OD%20Process%202026%200709.pdf)
+[Overall steps for the thesis defense and graduation](https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/OD%20Process%202026%200709.pdf)
 
 [Thesis resources from FJCU library](https://home.lib.fju.edu.tw/TC/essaywriting)
 
 [00 Thesis Format](https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/imMBA%20thesis%20format%201210.pdf)
 
-[01 Thesis Final Defense Agreement](https://www.management.fju.edu.tw/esubweb/immbaengindex/smarteditupfiles/immbaengindex/01%20OD%20Agreement%202026%200825.pdf)
+[01 Thesis Final Defense Agreement](https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/01%20OD%20Agreement%202026%200825.pdf)
 
-[02 Thesis Acceptance](https://www.management.fju.edu.tw/esubweb/immbaengindex/smarteditupfiles/immbaengindex/02%20Acceptance%281%29.pdf)','◎論文口試與離校流程
+[02 Thesis Acceptance](https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/02%20Acceptance%281%29.pdf)','◎論文口試與離校流程
 
 同學必須符合[修業規則](http://www.management.fju.edu.tw/subweb/immba/class.php?CID=20)之規定，才具備申請論文口試之資格。每一個學期皆可申請論文口試，Fall的口試截止日為每年的1月31日、Sping的口試截止日為每年的7月31日(實際截止日需要配合當年度的[輔大行事曆](http://www.secretariat.fju.edu.tw/article.jsp?articleID=8))。
 
 論文口試前和後皆有必要程序需要充足作業時間，請同學務必依據「論文口試流程與畢業規範」提前規劃辦理，以便順利取得輔大MBA學位。
 
-[論文口試流程與畢業規範](https://www.management.fju.edu.tw/subweb/immba/smarteditupfiles/immba/OD%20Process%202026%200709.pdf)
+[論文口試流程與畢業規範](https://www.management.fju.edu.tw/smarteditupfiles/immba/OD%20Process%202026%200709.pdf)
 
 [圖書館論文資源](https://home.lib.fju.edu.tw/TC/essaywriting)
 
 [00論文格式](https://www.management.fju.edu.tw/smarteditupfiles/immba/imMBA%20thesis%20format%201210%281%29.pdf)
 
-[01論文口試同意書](https://www.management.fju.edu.tw/subweb/immba/smarteditupfiles/immba/01%20OD%20Agreement%202026%200825%283%29.pdf)
+[01論文口試同意書](https://www.management.fju.edu.tw/smarteditupfiles/immba/01%20OD%20Agreement%202026%200825%283%29.pdf)
 
-[02論文修改完成證明書](https://www.management.fju.edu.tw/subweb/immba/smarteditupfiles/immba/02%20Acceptance.pdf)
+[02論文修改完成證明書](https://www.management.fju.edu.tw/smarteditupfiles/immba/02%20Acceptance.pdf)
 
 ◎修業規則
 
@@ -618,7 +618,7 @@ Top 15 best business schools in Michigan [More](https://www.umflint.edu/som/rank
 
 9 concentrations and degree awarded
 
-[Master of Business Administration (MBA)](https://www.management.fju.edu.tw/esubweb/immbaengindex/smarteditupfiles/immbaengindex/UM-Flint%201+1-2024%200219.pdf)
+[Master of Business Administration (MBA)](https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/UM-Flint%201+1-2024%200219.pdf)
 
 Application and qualifications
 
@@ -636,11 +636,11 @@ In the first year at FJCU:
 
 Minimum English requirements are subject to change, including sub-cores, please visit the partner school''s website for updates.
 
-[More course arrangements](https://www.management.fju.edu.tw/esubweb/immbaengindex/smarteditupfiles/immbaengindex/UM-Flint%201+1-2024%200219%282%29.pdf)
+[More course arrangements](https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/UM-Flint%201+1-2024%200219%282%29.pdf)
 
 Tuition and fees
 
-UM-Flint offers in-state tuition fees and scholarships to imMBA students. [More](https://www.management.fju.edu.tw/esubweb/immbaengindex/smarteditupfiles/immbaengindex/UM-Flint%201+1-2024%200219%283%29.pdf)
+UM-Flint offers in-state tuition fees and scholarships to imMBA students. [More](https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/UM-Flint%201+1-2024%200219%283%29.pdf)
 
 Dual Master Degree with KEDGE Business School (KEDGE, France)
 
@@ -656,7 +656,7 @@ KEDGE is a triple accredited school (AACSB, AMBA, and EQUIS) and Grandes Ecoles.
 
 Major and degree awarded
 
-[Master in Management](https://www.management.fju.edu.tw/esubweb/immbaengindex/smarteditupfiles/immbaengindex/2026%2004%2003.pdf) (60 ECTS). It also requires a minimum of 6 months of internship or practical experience following admission to KEDGE.
+[Master in Management](https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/2026%2004%2003.pdf) (60 ECTS). It also requires a minimum of 6 months of internship or practical experience following admission to KEDGE.
 
 Application and qualifications
 
@@ -674,7 +674,7 @@ In the first year at FJCU:
 
 Minimum English requirements are subject to change, including sub-cores, please visit the partner school''s website for updates.
 
-[More course arrangements](https://www.management.fju.edu.tw/esubweb/immbaengindex/smarteditupfiles/immbaengindex/2026%2004%2003%281%29.pdf)
+[More course arrangements](https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/2026%2004%2003%281%29.pdf)
 
 Tuition and fees
 
@@ -694,9 +694,9 @@ IQS is AACSB accredited and top 20 Master in Management worldwide according to F
 
 Major and degree awarded
 
-[Master in International Marketing in a Digital Environment (MIMDE)](https://www.management.fju.edu.tw/esubweb/immbaengindex/smarteditupfiles/immbaengindex/1+1%20with%20IQS-Intl_%20marketing%20in%20a%20digital%20environment%202024-2029.pdf)
+[Master in International Marketing in a Digital Environment (MIMDE)](https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/1+1%20with%20IQS-Intl_%20marketing%20in%20a%20digital%20environment%202024-2029.pdf)
 
-[Master in Industrial Business Management (MIBM)](https://www.management.fju.edu.tw/esubweb/immbaengindex/smarteditupfiles/immbaengindex/1+1%20with%20IQS-Industrial%20business%20mgmt%202024-2029.pdf)
+[Master in Industrial Business Management (MIBM)](https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/1+1%20with%20IQS-Industrial%20business%20mgmt%202024-2029.pdf)
 
 Application and qualifications
 
@@ -714,7 +714,7 @@ In the first year at FJCU:
 
 Minimum English requirements are subject to change, including sub-cores, please visit the partner school''s website for updates.
 
-More course arrangements [MIMDE](https://www.management.fju.edu.tw/esubweb/immbaengindex/smarteditupfiles/immbaengindex/1+1%20with%20IQS-Intl_%20marketing%20in%20a%20digital%20environment%202024-2029%281%29.pdf) [MIB](https://www.management.fju.edu.tw/esubweb/immbaengindex/smarteditupfiles/immbaengindex/1+1%20with%20IQS-Industrial%20business%20mgmt%202024-2029%281%29.pdf)[M](https://www.management.fju.edu.tw/esubweb/immbaengindex/smarteditupfiles/immbaengindex/1+1%20with%20IQS-Industrial%20business%20mgmt%202024-2029%281%29.pdf)
+More course arrangements [MIMDE](https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/1+1%20with%20IQS-Intl_%20marketing%20in%20a%20digital%20environment%202024-2029%281%29.pdf) [MIB](https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/1+1%20with%20IQS-Industrial%20business%20mgmt%202024-2029%281%29.pdf)[M](https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/1+1%20with%20IQS-Industrial%20business%20mgmt%202024-2029%281%29.pdf)
 
 Tuition and fees
 
@@ -778,7 +778,7 @@ Top 15 best business schools in Michigan
 
 ◎9大專業領域和授予學位
 
-[Master of Business Administration (MBA)](https://www.management.fju.edu.tw/subweb/immba/smarteditupfiles/immba/UM-Flint%201+1-2024%200219.pdf)
+[Master of Business Administration (MBA)](https://www.management.fju.edu.tw/smarteditupfiles/immba/UM-Flint%201+1-2024%200219.pdf)
 
 ◎申請日期及入學條件
 
@@ -796,7 +796,7 @@ Minimum English requirements are subject to change, including sub-cores, please 
 
 ◎學雜費和獎學金
 
-密西根大學-Flint分校以in-state標準收取學雜費並提供獎學金和研究助理職缺給優秀且積極爭取的同學。[更多資訊及合約內容](https://www.management.fju.edu.tw/subweb/immba/smarteditupfiles/immba/UM-Flint%201+1-2024%200219%282%29.pdf)
+密西根大學-Flint分校以in-state標準收取學雜費並提供獎學金和研究助理職缺給優秀且積極爭取的同學。[更多資訊及合約內容](https://www.management.fju.edu.tw/smarteditupfiles/immba/UM-Flint%201+1-2024%200219%282%29.pdf)
 
 Dual Master Degree with KEDGE Business School (KEDGE, France)
 
@@ -812,7 +812,7 @@ KEDGE高等商學院獲得三桂冠認證(AACSB、EQUIS和AMBA) ，全球不到1
 
 ◎專業領域和授予學位
 
-[Master in Management](https://www.management.fju.edu.tw/subweb/immba/smarteditupfiles/immba/2026%2004%2003%281%29.pdf) (60 ECTS) 並要求入學KEDGE之後6個月以上的實習/實務經驗。
+[Master in Management](https://www.management.fju.edu.tw/smarteditupfiles/immba/2026%2004%2003%281%29.pdf) (60 ECTS) 並要求入學KEDGE之後6個月以上的實習/實務經驗。
 
 ◎申請日期及入學條件
 
@@ -826,7 +826,7 @@ KEDGE高等商學院獲得三桂冠認證(AACSB、EQUIS和AMBA) ，全球不到1
 
 Minimum English requirements are subject to change, including sub-cores, please visit the partner school''s website for updates.
 
-[更多雙方課程修業規劃](https://www.management.fju.edu.tw/subweb/immba/smarteditupfiles/immba/2026%2004%2003.pdf)
+[更多雙方課程修業規劃](https://www.management.fju.edu.tw/smarteditupfiles/immba/2026%2004%2003.pdf)
 
 ◎學雜費
 
@@ -864,7 +864,7 @@ IQS管理學院獲得AACSB認證，管理碩士類別被Financial Times評為全
 
 Minimum English requirements are subject to change, including sub-cores, please visit the partner school''s website for updates.
 
-更多雙方課程修業規劃 [MIMDE](https://www.management.fju.edu.tw/subweb/immba/smarteditupfiles/immba/1+1%20with%20IQS-Intl_%20marketing%20in%20a%20digital%20environment%202024-2029%281%29.pdf) [MIBM](https://www.management.fju.edu.tw/subweb/immba/smarteditupfiles/immba/1+1%20with%20IQS-Industrial%20business%20mgmt%202024-2029%282%29.pdf)
+更多雙方課程修業規劃 [MIMDE](https://www.management.fju.edu.tw/smarteditupfiles/immba/1+1%20with%20IQS-Intl_%20marketing%20in%20a%20digital%20environment%202024-2029%281%29.pdf) [MIBM](https://www.management.fju.edu.tw/smarteditupfiles/immba/1+1%20with%20IQS-Industrial%20business%20mgmt%202024-2029%282%29.pdf)
 
 ◎學雜費
 
@@ -886,67 +886,67 @@ on conflict (slug) do update set body_en=excluded.body_en, body_zh=excluded.body
 
 -- Downloads (links to official files)
 insert into public.downloads (title_en,title_zh,file_url,file_type,category,sort_order) values
-  ('Admission Brochure for Fall 2027',null,'https://www.management.fju.edu.tw/esubweb/immbaengindex/smarteditupfiles/immbaengindex/FJCU_116-1Admission.pdf','PDF','admissions',1),
-  (null,'116甄試 簡版簡章','https://www.management.fju.edu.tw/subweb/immba/smarteditupfiles/immba/116%20imMBA.pdf','PDF','admissions',2),
-  (null,'書面資料審查表','https://www.management.fju.edu.tw/subweb/immba/smarteditupfiles/immba/116%200819.doc','DOC','admissions',3),
-  (null,'自傳暨讀書計畫','https://www.management.fju.edu.tw/subweb/immba/smarteditupfiles/immba/2026%201019.pdf','PDF','admissions',4),
+  ('Admission Brochure for Fall 2027',null,'https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/FJCU_116-1Admission.pdf','PDF','admissions',1),
+  (null,'116甄試 簡版簡章','https://www.management.fju.edu.tw/smarteditupfiles/immba/116%20imMBA.pdf','PDF','admissions',2),
+  (null,'書面資料審查表','https://www.management.fju.edu.tw/smarteditupfiles/immba/116%200819.doc','DOC','admissions',3),
+  (null,'自傳暨讀書計畫','https://www.management.fju.edu.tw/smarteditupfiles/immba/2026%201019.pdf','PDF','admissions',4),
   (null,'輔仁大學鼓勵學士班成績優異學生就讀碩士班獎學金辦法','https://www.management.fju.edu.tw/smarteditupfiles/immba/20230620.pdf','PDF','admissions',5),
   (null,'國際經營管理碩士學位學程學生獎助學金辦法','https://www.management.fju.edu.tw/smarteditupfiles/immba/2023%2010%2018%281%29.pdf','PDF','admissions',6),
-  ('Fall 2026 and spring 2027 Curriculum',null,'https://www.management.fju.edu.tw/esubweb/immbaengindex/smarteditupfiles/immbaengindex/0907.pdf','PDF','curriculum',7),
-  ('Course Catalog and Objectives',null,'https://www.management.fju.edu.tw/esubweb/immbaengindex/smarteditupfiles/immbaengindex/imMBA_course%20introduction%202026%2005%2022.pdf','PDF','curriculum',8),
-  ('Course Structure for Graduation-115',null,'https://www.management.fju.edu.tw/esubweb/immbaengindex/smarteditupfiles/immbaengindex/Curriculum%20structure-115.xls','XLS','curriculum',9),
-  ('Course Structure for Graduation-114',null,'https://www.management.fju.edu.tw/esubweb/immbaengindex/smarteditupfiles/immbaengindex/Curriculum%20structure-114%282%29.xls','XLS','curriculum',10),
-  ('Course Structure for Graduation-113',null,'https://www.management.fju.edu.tw/esubweb/immbaengindex/smarteditupfiles/immbaengindex/Curriculum%20structure-113%282%29.xls','XLS','curriculum',11),
-  ('Course Structure for Graduation-112',null,'https://www.management.fju.edu.tw/esubweb/immbaengindex/smarteditupfiles/immbaengindex/Curriculum%20structure-112%283%29.xls','XLS','curriculum',12),
-  ('Students enrolled in/ from fall 2025',null,'https://www.management.fju.edu.tw/esubweb/immbaengindex/smarteditupfiles/immbaengindex/GR-ENG-Fall%202025%20%28v2026%2005%2018%29.pdf','PDF','curriculum',13),
+  ('Fall 2026 and spring 2027 Curriculum',null,'https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/0907.pdf','PDF','curriculum',7),
+  ('Course Catalog and Objectives',null,'https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/imMBA_course%20introduction%202026%2005%2022.pdf','PDF','curriculum',8),
+  ('Course Structure for Graduation-115',null,'https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/Curriculum%20structure-115.xls','XLS','curriculum',9),
+  ('Course Structure for Graduation-114',null,'https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/Curriculum%20structure-114%282%29.xls','XLS','curriculum',10),
+  ('Course Structure for Graduation-113',null,'https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/Curriculum%20structure-113%282%29.xls','XLS','curriculum',11),
+  ('Course Structure for Graduation-112',null,'https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/Curriculum%20structure-112%283%29.xls','XLS','curriculum',12),
+  ('Students enrolled in/ from fall 2025',null,'https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/GR-ENG-Fall%202025%20%28v2026%2005%2018%29.pdf','PDF','curriculum',13),
   ('Students enrolled in/ from fall 2024',null,'https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/GR-ENG-Fall%202024%20%28v2024%200516%29.pdf','PDF','graduation',14),
   ('Students enrolled in/ from fall 2023',null,'https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/GR-ENG-Fall%202023%20%28v20221124%29.pdf','PDF','graduation',15),
   ('Students enrolled in/ from fall 2021',null,'https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/GR-ENG-Fall%202021%20%28v20210429%29%20r1.pdf','PDF','graduation',16),
   ('Students enrolled in/ from fall 2018',null,'https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/GR-ENG-Fall%202018%20%28v20180719%29%20r1.pdf','PDF','graduation',17),
   ('Students enrolled in/ from fall 2017',null,'https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/GR-ENG-Fall%202017%20%28v20180719%29%20r1.pdf','PDF','graduation',18),
   ('Students enrolled in/ from fall 2014',null,'https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/2014%281%29.pdf','PDF','graduation',19),
-  (null,'最新上課時間表','https://www.management.fju.edu.tw/subweb/immba/smarteditupfiles/immba/0907.pdf','PDF','curriculum',20),
-  (null,'課程目錄與學習目標','https://www.management.fju.edu.tw/subweb/immba/smarteditupfiles/immba/imMBA_course%20introduction%202026%2005%2022.pdf','PDF','curriculum',21),
-  (null,'115畢業修課規劃與結構','https://www.management.fju.edu.tw/subweb/immba/smarteditupfiles/immba/Curriculum%20structure-115.xls','XLS','curriculum',22),
-  (null,'114畢業修課規劃與結構','https://www.management.fju.edu.tw/subweb/immba/smarteditupfiles/immba/Curriculum%20structure-114%281%29.xls','XLS','curriculum',23),
-  (null,'113畢業修課規劃與結構','https://www.management.fju.edu.tw/subweb/immba/smarteditupfiles/immba/Curriculum%20structure-113%281%29.xls','XLS','curriculum',24),
-  (null,'112畢業修課規劃與結構','https://www.management.fju.edu.tw/subweb/immba/smarteditupfiles/immba/Curriculum%20structure-112%281%29.xls','XLS','curriculum',25),
-  (null,'Fall 2025入學起適用','https://www.management.fju.edu.tw/subweb/immba/smarteditupfiles/immba/GR-C-Fall%202025%28v2026%200518%29%281%29.pdf','PDF','curriculum',26),
+  (null,'最新上課時間表','https://www.management.fju.edu.tw/smarteditupfiles/immba/0907.pdf','PDF','curriculum',20),
+  (null,'課程目錄與學習目標','https://www.management.fju.edu.tw/smarteditupfiles/immba/imMBA_course%20introduction%202026%2005%2022.pdf','PDF','curriculum',21),
+  (null,'115畢業修課規劃與結構','https://www.management.fju.edu.tw/smarteditupfiles/immba/Curriculum%20structure-115.xls','XLS','curriculum',22),
+  (null,'114畢業修課規劃與結構','https://www.management.fju.edu.tw/smarteditupfiles/immba/Curriculum%20structure-114%281%29.xls','XLS','curriculum',23),
+  (null,'113畢業修課規劃與結構','https://www.management.fju.edu.tw/smarteditupfiles/immba/Curriculum%20structure-113%281%29.xls','XLS','curriculum',24),
+  (null,'112畢業修課規劃與結構','https://www.management.fju.edu.tw/smarteditupfiles/immba/Curriculum%20structure-112%281%29.xls','XLS','curriculum',25),
+  (null,'Fall 2025入學起適用','https://www.management.fju.edu.tw/smarteditupfiles/immba/GR-C-Fall%202025%28v2026%200518%29%281%29.pdf','PDF','curriculum',26),
   (null,'Fall 2024入學起適用','https://www.management.fju.edu.tw/smarteditupfiles/immba/GR-C-Fall%202024%20%28v2024%200516%29%282%29.pdf','PDF','curriculum',27),
   (null,'Fall 2023入學起適用','https://www.management.fju.edu.tw/smarteditupfiles/immba/GR-C-Fall%202023%20%28v20221124%29.pdf','PDF','curriculum',28),
   (null,'Fall 2021入學起適用','https://www.management.fju.edu.tw/smarteditupfiles/immba/GR-C-Fall%202021%20%28v20210429%29.pdf','PDF','curriculum',29),
   (null,'Fall 2018入學起適用','https://www.management.fju.edu.tw/smarteditupfiles/immba/GR-C-Fall%202018%20%28v20180719%29%281%29.pdf','PDF','curriculum',30),
   (null,'Fall 2017入學起適用','https://www.management.fju.edu.tw/smarteditupfiles/immba/GR-C-Fall%202017%20%28v20180719%29%281%29.pdf','PDF','curriculum',31),
   (null,'Fall 2014入學起適用','https://www.management.fju.edu.tw/smarteditupfiles/immba/GR-C-Fall%202014%20%28v2080719%29%281%29.pdf','PDF','curriculum',32),
-  ('Students enrolled in/ from fall 2025',null,'https://www.management.fju.edu.tw/esubweb/immbaengindex/smarteditupfiles/immbaengindex/GR-ENG-Fall%202025%20%28v2026%2005%2018%29%281%29.pdf','PDF','graduation',33),
-  ('Overall steps for the thesis defense and graduation',null,'https://www.management.fju.edu.tw/esubweb/immbaengindex/smarteditupfiles/immbaengindex/OD%20Process%202026%200709.pdf','PDF','graduation',34),
+  ('Students enrolled in/ from fall 2025',null,'https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/GR-ENG-Fall%202025%20%28v2026%2005%2018%29%281%29.pdf','PDF','graduation',33),
+  ('Overall steps for the thesis defense and graduation',null,'https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/OD%20Process%202026%200709.pdf','PDF','graduation',34),
   ('00 Thesis Format',null,'https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/imMBA%20thesis%20format%201210.pdf','PDF','graduation',35),
-  ('01 Thesis Final Defense Agreement',null,'https://www.management.fju.edu.tw/esubweb/immbaengindex/smarteditupfiles/immbaengindex/01%20OD%20Agreement%202026%200825.pdf','PDF','graduation',36),
-  ('02 Thesis Acceptance',null,'https://www.management.fju.edu.tw/esubweb/immbaengindex/smarteditupfiles/immbaengindex/02%20Acceptance%281%29.pdf','PDF','graduation',37),
-  (null,'論文口試流程與畢業規範','https://www.management.fju.edu.tw/subweb/immba/smarteditupfiles/immba/OD%20Process%202026%200709.pdf','PDF','graduation',38),
+  ('01 Thesis Final Defense Agreement',null,'https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/01%20OD%20Agreement%202026%200825.pdf','PDF','graduation',36),
+  ('02 Thesis Acceptance',null,'https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/02%20Acceptance%281%29.pdf','PDF','graduation',37),
+  (null,'論文口試流程與畢業規範','https://www.management.fju.edu.tw/smarteditupfiles/immba/OD%20Process%202026%200709.pdf','PDF','graduation',38),
   (null,'00論文格式','https://www.management.fju.edu.tw/smarteditupfiles/immba/imMBA%20thesis%20format%201210%281%29.pdf','PDF','graduation',39),
-  (null,'01論文口試同意書','https://www.management.fju.edu.tw/subweb/immba/smarteditupfiles/immba/01%20OD%20Agreement%202026%200825%283%29.pdf','PDF','graduation',40),
-  (null,'02論文修改完成證明書','https://www.management.fju.edu.tw/subweb/immba/smarteditupfiles/immba/02%20Acceptance.pdf','PDF','graduation',41),
+  (null,'01論文口試同意書','https://www.management.fju.edu.tw/smarteditupfiles/immba/01%20OD%20Agreement%202026%200825%283%29.pdf','PDF','graduation',40),
+  (null,'02論文修改完成證明書','https://www.management.fju.edu.tw/smarteditupfiles/immba/02%20Acceptance.pdf','PDF','graduation',41),
   ('the dual-degree application',null,'https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/0310.pdf','PDF','dual',42),
-  ('Master of Business Administration (MBA)',null,'https://www.management.fju.edu.tw/esubweb/immbaengindex/smarteditupfiles/immbaengindex/UM-Flint%201+1-2024%200219.pdf','PDF','dual',43),
-  ('More course arrangements',null,'https://www.management.fju.edu.tw/esubweb/immbaengindex/smarteditupfiles/immbaengindex/UM-Flint%201+1-2024%200219%282%29.pdf','PDF','dual',44),
-  ('More',null,'https://www.management.fju.edu.tw/esubweb/immbaengindex/smarteditupfiles/immbaengindex/UM-Flint%201+1-2024%200219%283%29.pdf','PDF','dual',45),
-  ('Master in Management',null,'https://www.management.fju.edu.tw/esubweb/immbaengindex/smarteditupfiles/immbaengindex/2026%2004%2003.pdf','PDF','dual',46),
-  ('More course arrangements',null,'https://www.management.fju.edu.tw/esubweb/immbaengindex/smarteditupfiles/immbaengindex/2026%2004%2003%281%29.pdf','PDF','dual',47),
-  ('Master in International Marketing in a Digital Environment (MIMDE)',null,'https://www.management.fju.edu.tw/esubweb/immbaengindex/smarteditupfiles/immbaengindex/1+1%20with%20IQS-Intl_%20marketing%20in%20a%20digital%20environment%202024-2029.pdf','PDF','dual',48),
-  ('Master in Industrial Business Management (MIBM)',null,'https://www.management.fju.edu.tw/esubweb/immbaengindex/smarteditupfiles/immbaengindex/1+1%20with%20IQS-Industrial%20business%20mgmt%202024-2029.pdf','PDF','dual',49),
-  ('MIMDE',null,'https://www.management.fju.edu.tw/esubweb/immbaengindex/smarteditupfiles/immbaengindex/1+1%20with%20IQS-Intl_%20marketing%20in%20a%20digital%20environment%202024-2029%281%29.pdf','PDF','dual',50),
-  ('M',null,'https://www.management.fju.edu.tw/esubweb/immbaengindex/smarteditupfiles/immbaengindex/1+1%20with%20IQS-Industrial%20business%20mgmt%202024-2029%281%29.pdf','PDF','dual',51),
+  ('Master of Business Administration (MBA)',null,'https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/UM-Flint%201+1-2024%200219.pdf','PDF','dual',43),
+  ('More course arrangements',null,'https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/UM-Flint%201+1-2024%200219%282%29.pdf','PDF','dual',44),
+  ('More',null,'https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/UM-Flint%201+1-2024%200219%283%29.pdf','PDF','dual',45),
+  ('Master in Management',null,'https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/2026%2004%2003.pdf','PDF','dual',46),
+  ('More course arrangements',null,'https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/2026%2004%2003%281%29.pdf','PDF','dual',47),
+  ('Master in International Marketing in a Digital Environment (MIMDE)',null,'https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/1+1%20with%20IQS-Intl_%20marketing%20in%20a%20digital%20environment%202024-2029.pdf','PDF','dual',48),
+  ('Master in Industrial Business Management (MIBM)',null,'https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/1+1%20with%20IQS-Industrial%20business%20mgmt%202024-2029.pdf','PDF','dual',49),
+  ('MIMDE',null,'https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/1+1%20with%20IQS-Intl_%20marketing%20in%20a%20digital%20environment%202024-2029%281%29.pdf','PDF','dual',50),
+  ('M',null,'https://www.management.fju.edu.tw/smarteditupfiles/immbaengindex/1+1%20with%20IQS-Industrial%20business%20mgmt%202024-2029%281%29.pdf','PDF','dual',51),
   (null,'申請書','https://www.management.fju.edu.tw/smarteditupfiles/immba/0310.pdf','PDF','dual',52),
-  (null,'Master of Business Administration (MBA)','https://www.management.fju.edu.tw/subweb/immba/smarteditupfiles/immba/UM-Flint%201+1-2024%200219.pdf','PDF','dual',53),
+  (null,'Master of Business Administration (MBA)','https://www.management.fju.edu.tw/smarteditupfiles/immba/UM-Flint%201+1-2024%200219.pdf','PDF','dual',53),
   (null,'更多雙方課程修業規劃','https://www.management.fju.edu.tw/smarteditupfiles/immba/UM-Flint%201+1-2024%200219%281%29.pdf','PDF','dual',54),
-  (null,'更多資訊及合約內容','https://www.management.fju.edu.tw/subweb/immba/smarteditupfiles/immba/UM-Flint%201+1-2024%200219%282%29.pdf','PDF','dual',55),
-  (null,'Master in Management','https://www.management.fju.edu.tw/subweb/immba/smarteditupfiles/immba/2026%2004%2003%281%29.pdf','PDF','dual',56),
-  (null,'更多雙方課程修業規劃','https://www.management.fju.edu.tw/subweb/immba/smarteditupfiles/immba/2026%2004%2003.pdf','PDF','dual',57),
+  (null,'更多資訊及合約內容','https://www.management.fju.edu.tw/smarteditupfiles/immba/UM-Flint%201+1-2024%200219%282%29.pdf','PDF','dual',55),
+  (null,'Master in Management','https://www.management.fju.edu.tw/smarteditupfiles/immba/2026%2004%2003%281%29.pdf','PDF','dual',56),
+  (null,'更多雙方課程修業規劃','https://www.management.fju.edu.tw/smarteditupfiles/immba/2026%2004%2003.pdf','PDF','dual',57),
   (null,'1.Master in International Marketing in a Digital Environment (MIMDE)','https://www.management.fju.edu.tw/smarteditupfiles/immba/1+1%20with%20IQS-Intl_%20marketing%20in%20a%20digital%20environment%202024-2029.pdf','PDF','dual',58),
   (null,'2.Master in Industrial Business Management (MIBM)','https://www.management.fju.edu.tw/smarteditupfiles/immba/1+1%20with%20IQS-Industrial%20business%20mgmt%202024-2029.pdf','PDF','dual',59),
-  (null,'MIMDE','https://www.management.fju.edu.tw/subweb/immba/smarteditupfiles/immba/1+1%20with%20IQS-Intl_%20marketing%20in%20a%20digital%20environment%202024-2029%281%29.pdf','PDF','dual',60),
-  (null,'MIBM','https://www.management.fju.edu.tw/subweb/immba/smarteditupfiles/immba/1+1%20with%20IQS-Industrial%20business%20mgmt%202024-2029%282%29.pdf','PDF','dual',61);
+  (null,'MIMDE','https://www.management.fju.edu.tw/smarteditupfiles/immba/1+1%20with%20IQS-Intl_%20marketing%20in%20a%20digital%20environment%202024-2029%281%29.pdf','PDF','dual',60),
+  (null,'MIBM','https://www.management.fju.edu.tw/smarteditupfiles/immba/1+1%20with%20IQS-Industrial%20business%20mgmt%202024-2029%282%29.pdf','PDF','dual',61);
 
 -- Faculty Chinese data (from the official Chinese page)
 update public.faculty f set name_zh=v.n, title_zh=v.t, department_zh=v.d, education_zh=v.e, research_fields_zh=v.r
