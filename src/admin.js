@@ -4,6 +4,7 @@ import { toast, autoReveal, skeletonList } from './ui.js'
 import { mountAdminI18n } from './admin-i18n.js'
 import { mountChrome } from './chrome.js'
 import { loadDashboard } from './admin-dashboard.js'
+import { loadAlumni } from './admin-alumni.js'
 import { loadPages, loadDownloads, loadListings, loadInquiries } from './admin-content.js'
 
 const app = document.getElementById('app')
@@ -19,10 +20,10 @@ const flashHtml = () => { if (!flash) return ''; const h = `<div class="msg ${fl
 function shortcuts() {
   // Ctrl/Cmd+S saves the open form, Esc closes it
   addEventListener('keydown', (e) => {
-    const form = document.querySelector('#ff, #nf, #pf, #df')
+    const form = document.querySelector('#ff, #nf, #pf, #df, #af')
     if (!form) return
     if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') { e.preventDefault(); form.requestSubmit() }
-    else if (e.key === 'Escape' && !document.getElementById('pal')?.classList.contains('open')) form.querySelector('#cancel, #ncancel, #pc, #dc')?.click()
+    else if (e.key === 'Escape' && !document.getElementById('pal')?.classList.contains('open')) form.querySelector('#cancel, #ncancel, #pc, #dc, #acancel')?.click()
   })
 }
 
@@ -122,14 +123,14 @@ function renderNewPassword() {
 function renderDashboard() {
   const isSuper = profile.role === 'super_admin'
   if (tab === 'approvals' && !isSuper) tab = 'faculty'
-  app.innerHTML = `${flashHtml()}<div class="tabs">${[['dashboard', 'Dashboard'], ['news', 'News & events'], ['faculty', 'Faculty'], ['pages', 'Pages'], ['downloads', 'Documents'], ['marketplace', 'Marketplace'], ['inquiries', 'Inquiries']].map(([k, l]) => `<button data-t="${k}" class="${tab === k ? 'on' : ''}">${l}</button>`).join('')}
+  app.innerHTML = `${flashHtml()}<div class="tabs">${[['dashboard', 'Dashboard'], ['news', 'News & events'], ['faculty', 'Faculty'], ['alumni', 'Alumni'], ['pages', 'Pages'], ['downloads', 'Documents'], ['marketplace', 'Marketplace'], ['inquiries', 'Inquiries']].map(([k, l]) => `<button data-t="${k}" class="${tab === k ? 'on' : ''}">${l}</button>`).join('')}
     ${isSuper ? `<button data-t="approvals" class="${tab === 'approvals' ? 'on' : ''}">Administrators</button>` : ''}</div><div id="pane"></div>`
   app.querySelectorAll('[data-t]').forEach((b) => (b.onclick = () => { tab = b.dataset.t; editing = null; renderDashboard() }))
   const pane = document.getElementById('pane')
   pane.innerHTML = skeletonList(6)
   new MutationObserver(() => autoReveal(pane)).observe(pane, { childList: true })
   const ctx = { supabase, notify, goto: (t) => { tab = t; renderDashboard() } }
-  const views = { dashboard: () => loadDashboard(pane, ctx), news: loadNews, faculty: loadFaculty, pages: () => loadPages(pane, ctx), downloads: () => loadDownloads(pane, ctx), marketplace: () => loadListings(pane, ctx), inquiries: () => loadInquiries(pane, ctx), approvals: loadApprovals }
+  const views = { dashboard: () => loadDashboard(pane, ctx), news: loadNews, faculty: loadFaculty, alumni: () => loadAlumni(pane, ctx), pages: () => loadPages(pane, ctx), downloads: () => loadDownloads(pane, ctx), marketplace: () => loadListings(pane, ctx), inquiries: () => loadInquiries(pane, ctx), approvals: loadApprovals }
   ;(views[tab] || loadFaculty)()
 }
 
@@ -364,8 +365,8 @@ async function loadApprovals() {
   if (error) { pane.innerHTML = `<div class="msg err">${esc(error.message)}</div>`; return }
   const order = { pending: 0, admin: 1, super_admin: 2, member: 3, rejected: 4 }
   data.sort((a, b) => order[a.role] - order[b.role])
-  pane.innerHTML = `<div class="box"><h3 style="margin-top:0">Administrators</h3><div class="scroll"><table><thead><tr><th>Email</th><th>Status</th><th></th></tr></thead><tbody>
-    ${data.map((p) => `<tr><td>${esc(p.email)}</td><td><span class="pill ${p.role}">${esc(p.role)}</span></td><td>
+  pane.innerHTML = `<div class="box"><h3 style="margin-top:0">Administrators</h3><div class="scroll"><table><thead><tr><th>Email</th><th>Registered</th><th>Status</th><th></th></tr></thead><tbody>
+    ${data.map((p) => `<tr><td>${esc(p.email)}</td><td style="white-space:nowrap">${esc(new Date(p.created_at).toLocaleDateString([], { dateStyle: 'medium' }))}</td><td><span class="pill ${p.role}">${esc(p.role)}</span></td><td>
       ${p.id === session.user.id || p.role === 'super_admin' ? '' : `<div class="acts">
         ${p.role !== 'admin' ? `<button class="btn sm" data-set="admin" data-id="${p.id}">Approve</button>` : ''}
         ${p.role !== 'rejected' ? `<button class="btn danger sm" data-set="rejected" data-id="${p.id}">${p.role === 'admin' ? 'Remove access' : 'Reject'}</button>` : ''}</div>`}</td></tr>`).join('')}

@@ -154,12 +154,21 @@ To turn a static, partly Chinese-only, hand-edited website into a bilingual, dat
 - Navigation: About (Overview and Ranking; Our Learning Environment), Admissions (Apply), Curriculum (Curriculum and Requirements), Faculty, Guide, Graduation, Dual Degree, Overseas Exchange, Marketplace, Events, Announcements, Downloads, College of Management.
 - Link types: internal links look like normal menu items; external links carry the arrow icon and open a new tab; documents show the file type (PDF, XLS, DOC); action links are buttons that start with a verb.
 
+### Class 7 requirements ("Multi-Admin Back-Office Management", 20 Oct 2026)
+- **Admin approval workflow:** register, verify email, `pending`, super admin review, `admin` (or `rejected`). The Administrators tab shows each applicant's email, registration date and current status, and every role change is written to the audit log.
+- **Alumni database:** schema with `full_name`, `student_id`, `department`, `degree_program`, `admission_year`, `graduation_year`, `email`, `phone`, `company`, `job_title`, `notes`; degree program is a controlled dropdown (Bachelor, Master, Doctoral, Other).
+- **Alumni management (Alumni tab):** add, view, edit, delete, search (name, ID, email, company), filter (degree program, graduation year, department, company), view activity history per record.
+- **Audit trail:** every create, update and delete writes who, what action, which record, when and the changed fields (old and new values).
+- **CSV batch import:** downloadable template; validation before importing (required fields, empty rows, invalid degree values, wrong column names, duplicates by Student ID or email, encoding problems); preview with row-level errors; empty cells handled.
+- **Export CSV:** exports the filtered dataset. **Dynamic columns:** a Columns checklist updates the table immediately.
+
 ## 12. Roles and permissions
 - **Visitor:** read published content; submit a marketplace listing (stays pending); send an inquiry.
 - **Member:** a registered visitor. Follows the status of their own inquiries; never gets any editing right.
 - **Pending:** registered and verified but cannot enter the back office.
 - **Admin:** create, edit and delete news, events, faculty, pages, downloads; moderate listings; see the dashboard.
 - **Super admin:** everything an admin can do, plus approve or reject administrators.
+- Alumni data is personal data: only admins and super admins can read or write it (no public read policy). Nobody can edit or delete audit rows from the browser.
 - Rules are enforced in the database with Row Level Security, not only in the interface.
 
 ## 13. Database design
@@ -169,8 +178,9 @@ To turn a static, partly Chinese-only, hand-edited website into a bilingual, dat
 - **downloads:** bilingual title, file URL, file type, category, order, published.
 - **listings:** marketplace item with price, category, seller, contact, status (pending, approved, rejected).
 - **inquiries:** visitor questions with topic, language, status (new, in progress, answered, closed) and an optional note shown to the member.
+- **alumni:** one row per graduate: the 11 fields above, `created_by`, timestamps. Unique Student ID and unique email (case-insensitive); checks on degree values, year ranges and email format. Years are stored as calendar years (ROC years in a CSV are converted: 110 = 2021).
 - **profiles:** one row per login user with role (member, pending, admin, super_admin, rejected).
-- **audit_log:** who changed what and when (filled by database triggers).
+- **audit_log:** who changed what and when (filled by database triggers). Since v5 it also stores `record_id` and `changes` (JSON: new values on create, `{field: {from, to}}` on update, a full snapshot on delete) and one `IMPORT` summary row per batch.
 - **page_views:** path, language, timestamp (no personal data).
 - **Storage:** public bucket for faculty photos; only admins can write.
 
@@ -207,8 +217,17 @@ To turn a static, partly Chinese-only, hand-edited website into a bilingual, dat
 - Faculty management in the cloud: create, read, update, delete, reorder and photos, synchronized with the public Faculty page.
 - Evidence: the back-office dashboard screenshot published in the Announcements section.
 
+### Class 7 - Multi-admin back office, audit trail and batch import (20 Oct 2026)
+- More access requires more accountability: when several administrators edit the same data we must be able to answer who changed what, when, and what exactly changed.
+- An audit trail records who, what action, which record, when and what changed. Business data tells us the current state; audit data tells us how we got there.
+- Good data management starts with a clear data structure; controlled inputs (a dropdown for degree program) improve data quality because "MBA", "M.B.A.", "Master" and "Master's" would otherwise be four different values.
+- One-by-one CRUD does not scale to 500 records: CSV batch import follows the flow CSV file, validate, import, Supabase, verify. Validation comes before importing.
+- Storing data is not enough: search, filter, choosing which columns to display and exporting the filtered set turn data into usable information.
+- Implemented with Claude Code and reviewed by the student: the audit is written by database triggers (not by the browser), duplicate protection is a unique index (not only a preview warning), and the import is validated twice (in the browser for the preview, in the database function for safety).
+
 ## 16. Test and verification log
 - **20 Oct 2026, production:** created, edited, reordered, deleted faculty and news from the admin; verified photo upload and deletion in Storage; verified drafts are invisible to the public; verified an anonymous visitor cannot insert, delete, upload or read profiles; verified pending, admin and super admin permissions with a role simulation that rolls back.
+- **Automated tests:** `npm test` includes unit tests for the alumni CSV parser and validator (quotes, delimiters, ROC years, degree synonyms, empty rows, duplicates, encoding, formula-safe export) and a check against the 20-row class sample.
 - **Known limits:** automated tests not yet written (planned for the testing week); marketplace has no spam protection beyond a honeypot and database limits.
 
 ## 17. AI usage and responsible use
@@ -228,6 +247,11 @@ To turn a static, partly Chinese-only, hand-edited website into a bilingual, dat
 - **Decision:** moderate marketplace listings before publishing to avoid spam and abuse.
 - **Decision:** link photos and documents to the official site and cite the source.
 - **20 Oct 2026 (evening):** design and UX pass: dark mode, global search, scroll animations, countdown, mobile menu, skeleton loaders, toasts, faculty search.
+
+- **20 Oct 2026 (class 7):** alumni database (`supabase/v5.sql`), Alumni tab with CRUD, search, filters, sortable and selectable columns, per-record history and global activity log; CSV template, validated batch import with preview and duplicate handling; export of the filtered set; audit of role changes.
+- **Decision:** one summary `IMPORT` audit row per batch instead of one row per imported record, so a 500-row import does not bury the log; deletions keep a full snapshot of the record.
+- **Decision:** the sample CSV has ROC years, so years are stored as calendar years and converted on import.
+- **Decision:** CSV only (Excel users save as CSV UTF-8); no spreadsheet library is added to keep the site light.
 
 ## 19. Final reflection (to be written by the student)
 Write this yourself at the end of the course. Suggested prompts:

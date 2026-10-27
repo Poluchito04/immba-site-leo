@@ -106,3 +106,16 @@ footer{background:var(--dark);color:#cfe6e8;text-align:center;padding:24px 20px;
 
 @media(max-width:800px){.layout{padding-top:20px}.side{display:none}}
 td.grip{cursor:grab;color:var(--mut);width:22px;user-select:none;font-size:18px;letter-spacing:-3px}td.grip:active{cursor:grabbing}tr.dragging{opacity:.4}tr.dragover td{border-top:3px solid var(--acc)}
+
+/* ---- alumni (class 7) ---- */
+.afilters{display:grid;grid-template-columns:2fr 1fr 1fr 1.4fr 1.4fr;gap:0 14px;margin-top:6px}@media(max-width:860px){.afilters{grid-template-columns:1fr 1fr}}
+.thsort{background:none;border:0;padding:0;font:inherit;color:inherit;text-transform:inherit;letter-spacing:inherit;cursor:pointer;white-space:nowrap}.thsort:hover{color:var(--g)}
+.colmenu{position:relative}.colmenu summary{list-style:none;display:inline-block;cursor:pointer}.colmenu summary::-webkit-details-marker{display:none}
+.colpop{position:absolute;right:0;top:calc(100% + 6px);z-index:30;min-width:200px;background:var(--w);border:1px solid var(--bd);border-radius:10px;padding:10px 14px;box-shadow:0 14px 34px #14262b33;animation:pop .2s var(--ease,ease) both}
+.colpop label{display:flex;align-items:center;gap:8px;margin:6px 0;font-weight:500;color:var(--tx);cursor:pointer}.colpop input{width:auto}
+.imp{border:1px dashed var(--bd);border-radius:12px;padding:16px 18px;margin-top:16px;background:color-mix(in srgb,var(--b) 55%,transparent)}
+.impnote{font-size:13.5px;color:var(--mut);margin:8px 0 12px}
+.drop{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;margin:0;padding:26px 14px;border:2px dashed var(--bd);border-radius:12px;background:var(--w);color:var(--tx);font-size:14px;font-weight:500;cursor:pointer;transition:border-color .2s,background-color .2s,transform .2s}
+.drop:hover,.drop:focus-visible,.drop.over{border-color:var(--g);background:var(--b);outline:none}.drop.over{transform:scale(1.01)}.drop span{color:var(--mut)}
+.chips2{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0}
+.ipv td,.ipv th{padding:7px 8px;font-size:13px}.ipv tr.st-error td{background:color-mix(in srgb,var(--err) 7%,transparent)}.ipv tr.st-duplicate td{background:color-mix(in srgb,var(--g) 6%,transparent)}
