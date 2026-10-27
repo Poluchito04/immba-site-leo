@@ -12,6 +12,8 @@ const excerpt = (t, max = 150) => {
   return s.length > max ? s.slice(0, max).trim() + '…' : s
 }
 
+const paragraphs = (t) => (t || '').split(/\n{2,}/).map((x) => x.trim()).filter(Boolean).map((x) => `<p>${esc(x)}</p>`).join('')
+
 function render(kind) {
   const grid = GRIDS[kind]
   if (!grid) return
@@ -25,7 +27,7 @@ function render(kind) {
     const link = safeUrl(zh ? n.link_url_zh || n.link_url : n.link_url || n.link_url_zh)
     const img = safeUrl(n.image_url) ? `<img class="nimg" src="${esc(safeUrl(n.image_url))}" alt="${esc(title)}" loading="lazy">` : ''
     return `<article class="ncard${img ? ' withimg' : ''}">${img}<div><time datetime="${esc(n.news_date)}">${esc(n.news_date.replace(/-/g, '/'))}</time>${n.pinned ? `<span class="top">${zh ? '置頂' : 'PINNED'}</span>` : ''}</div>
-      <h4>${esc(title)}</h4><p>${esc(excerpt(body, n.image_url ? 320 : 150))}</p>
+      <h4>${esc(title)}</h4>${link ? `<p>${esc(excerpt(body, n.image_url ? 320 : 150))}</p>` : paragraphs(body)}
       ${link ? `<a href="${esc(link)}" target="_blank" rel="noopener">${zh ? '查看詳情' : 'View Details'}</a>` : ''}</article>`
   }).join('')
   if (items.length > LIMIT) {

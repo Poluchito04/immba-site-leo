@@ -207,15 +207,11 @@ To turn a static, partly Chinese-only, hand-edited website into a bilingual, dat
 
 ## 15c. What we learned, class by class
 ### Class 6 - From a local prototype to a cloud backend (20 Oct 2026)
-- A deployed website is not the same as a cloud-backed product.
-- localStorage lives in one browser, is not shared, can be cleared and has no real login, so it is not enough for a managed site.
-- Supabase provides a database, file storage, authentication and an API.
-- Architecture: Cursor (here Claude Code) to GitHub to Vercel to Supabase. Visitors read through the front end; administrators log in to manage content.
-- A database schema is the blueprint of tables, fields, types and relations. `schema.sql` creates it, and SQL written by AI must be reviewed before it is run.
-- Secrets stay out of GitHub: connection keys live in `.env`, which is listed in `.gitignore`.
-- Authentication (who are you?) is not authorization (what may you do?). Roles: pending, admin, super admin, with approval by a super admin.
-- Faculty management in the cloud: create, read, update, delete, reorder and photos, synchronized with the public Faculty page.
-- Evidence: the back-office dashboard screenshot published in the Announcements section.
+A website published on Vercel is not yet a product. While everything lived in the browser (localStorage), content could not be shared, could be lost and had no real login. Moving the data to Supabase gave the site a database, file storage and authentication, so administrators can log in and edit what visitors see.
+
+The architecture is simple: Claude Code writes the code, GitHub stores it, Vercel publishes it and Supabase keeps the data. Two ideas matter most: secrets such as keys live in `.env` and never in GitHub, and authentication (who you are) is different from authorization (what you may do), hence the pending, admin and super admin roles.
+
+AI wrote the SQL and the code, but it had to be reviewed and tested in production before being trusted. Evidence: the back-office dashboard screenshot in the Announcements section.
 
 ### Class 7 - Multi-admin back office, audit trail and batch import (20 Oct 2026)
 - More access requires more accountability: when several administrators edit the same data we must be able to answer who changed what, when, and what exactly changed.
