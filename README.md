@@ -3,7 +3,7 @@
 Bilingual (English / 中文) program website for the Fu Jen imMBA, built for the course *AI-Assisted Digital Product Development*.
 Stack: static multi-page site with Vite + vanilla JS, **Supabase** (Postgres, Auth, Storage) and **Vercel**. Built with Claude Code.
 
-Live: https://immba-copia.vercel.app · Product docs: `/project.html` (source: `public/docs/PRD.md`)
+Live: https://immba-copia.vercel.app · Product docs: `/project.html` (sources: `public/docs/PRD.md`, `public/docs/SPEC.md` at `/project.html?doc=spec`). Supabase MCP for Claude Code: `.mcp.json` (read-only; authenticate once with `/mcp`)
 
 ## Features
 - Public site: home (5 sections), content pages (About, Admissions, Curriculum, Guide, Graduation, Dual Degree, Exchange), faculty page (not on the home page), announcements and events as cards (the home page shows Announcements, then Events), downloads library, moderated student marketplace, language switch.
