@@ -1,11 +1,12 @@
 import { esc } from './util.js'
 import { skeletonList } from './ui.js'
 import { LABELS } from './alumni-csv.js'
+import { STATUS_EN } from './trade.js'
 
 const ACTION_CLASS = { CREATE: '', UPDATE: 'pending', DELETE: 'rejected', IMPORT: 'super_admin' }
 const SHOWN = 200
 // audit_log.table_name -> the tab an administrator knows it by
-const AREAS = { news: 'News & events', faculty: 'Faculty', alumni: 'Alumni', pages: 'Pages', downloads: 'Documents', listings: 'Marketplace', profiles: 'Administrators' }
+const AREAS = { news: 'News & events', faculty: 'Faculty', alumni: 'Alumni', pages: 'Pages', downloads: 'Documents', listings: 'Marketplace', orders: 'Transactions', profiles: 'Administrators' }
 
 // filters survive the full re-render that every notify() triggers
 const S = { area: '', act: '', who: '' }
@@ -17,6 +18,8 @@ export const actionName = (a) => (a === 'INSERT' ? 'CREATE' : a)
 export function describeChange(a) {
   const c = a.changes || {}
   if (a.action === 'IMPORT' && a.via) return `${a.via === 'created' ? 'Created' : 'Updated'} by CSV import: ${c.file || 'CSV'}`
+  if (a.table_name === 'orders' && a.action === 'UPDATE' && c.status) return `${STATUS_EN(c.status.from)} → ${STATUS_EN(c.status.to)}`
+  if (a.table_name === 'orders' && (a.action === 'CREATE' || a.action === 'INSERT')) return `Order placed: ${c.buyer || 'buyer'} → ${c.seller || 'seller'}, NT$ ${Number(c.total || 0).toLocaleString()}`
   if (a.action === 'UPDATE') return Object.entries(c).map(([k, v]) => `${LABELS[k] || (k === 'role' ? 'Role' : k)}: ${v?.from ?? '∅'} → ${v?.to ?? '∅'}`).join(' · ') || 'Edited'
   if (a.action === 'IMPORT') return `${c.file || 'CSV'} — ${c.inserted ?? 0} added, ${c.updated ?? 0} updated, ${c.skipped ?? 0} skipped, ${c.failed ?? 0} failed`
   if (a.action === 'CREATE' || a.action === 'INSERT') return 'New record'

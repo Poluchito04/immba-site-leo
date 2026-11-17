@@ -27,7 +27,8 @@ Rules for any agent working on this repository:
 - **F2** Language switch EN / 中文 on every page, saved in the browser, with fallback to the other language when a translation is missing.
 - **F3** Accounts with roles `member`, `pending`, `admin`, `super_admin`, `rejected`. Self-registration creates `member` (visitor kind) or `pending` (administrator kind).
 - **F4** Back office (`/admin.html`): dashboard, news (with images), faculty (with photos and drag order), pages, downloads, marketplace, inquiries, administrators, alumni, Activity log.
-- **F5** Marketplace: anyone submits a listing; it stays hidden until an admin approves it.
+- **F5** Marketplace (class 10): a member lists a product with quantity and image; it stays hidden until an admin approves it; sellers manage stock, hide and remove; buyers use a cart and checkout; each order follows `waiting_payment → payment_confirmed → ready_to_ship → shipped → completed` (or `cancelled`); buyers, sellers and admins each get their own view; sellers get an accounting dashboard and CSV export; admins monitor all transactions read-only.
+- **F5b** Transactions are business records: an order or order line can never be deleted or edited, and a listing that has orders is hidden, not deleted.
 - **F6** Inquiries: anyone sends one; a member sees the status and the staff note of their own.
 - **F7** Alumni: CRUD, search, filters, column chooser, CSV template, validated batch import with preview (skip or update duplicates), export with a review screen.
 - **F8** Audit: every create, update and delete on audited tables records who, what, which record, when and old/new values; role changes too; one summary row per CSV import.
@@ -42,15 +43,17 @@ MVP (midterm): public home, bilingual switch, news cards, faculty, content pages
 
 ## 5. Product structure (where the code lives)
 - Pages (Vite multi-page, `vite.config.js`): `index`, `faculty`, `page`, `downloads`, `marketplace`, `contact`, `account`, `admin`, `project`.
-- Shared logic (touch with care, it affects many pages): `src/supabase.js` (client, `esc`, `safeUrl`), `src/i18n.js` (`t(en, zh)`), `src/chrome.js` (header, footer, search, language and theme switch), `src/md.js` (Markdown to safe HTML), `src/retrieval.js` (search for the assistant), `src/track.js` (page views).
-- Back office: `src/admin.js` (shell, tabs, roles), `admin-content.js`, `admin-alumni.js`, `alumni-csv.js`, `admin-activity.js`, `admin-dashboard.js`, `admin-i18n.js`.
-- Database: `supabase/schema.sql`, then `v2.sql` to `v5.sql` in order (idempotent, safe to re-run). New work goes in a **new** numbered SQL file.
+- Shared logic (touch with care, it affects many pages): `src/trade.js` (order rules, stock formula, cart, accounting, CSV: pure and tested), `src/supabase.js` (client, `esc`, `safeUrl`), `src/i18n.js` (`t(en, zh)`), `src/chrome.js` (header, footer, search, language and theme switch), `src/md.js` (Markdown to safe HTML), `src/retrieval.js` (search for the assistant), `src/track.js` (page views).
+- Back office: `src/admin.js` (shell, tabs, roles), `admin-content.js`, `admin-alumni.js`, `alumni-csv.js`, `admin-activity.js`, `admin-dashboard.js`, `admin-i18n.js`, `admin-orders.js` (Transactions tab).
+- Marketplace: `src/marketplace.js` (browse, detail, cart, checkout), `src/account.js` + `src/account-trade.js` (My orders, My listings, Sales), `src/trade-ui.js` (order card and stepper shared by buyer, seller and admin).
+- Database: `supabase/schema.sql`, then `v2.sql` to `v6.sql` in order (idempotent, safe to re-run). New work goes in a **new** numbered SQL file.
 - Tests: `tests/*.test.js`, run with `npm test` (Node test runner, no browser tests yet).
 
 ## 6. User flows
 1. **Visitor reads:** open page, choose language, read or search, optionally download a file (documents show their type).
 2. **Visitor asks:** contact form, row in `inquiries` with status `new`; if logged in as member the row is linked to them.
-3. **Visitor lists an item:** form, `listings.status = 'pending'`, invisible to the public, admin approves or rejects in the Marketplace tab.
+3. **Member lists an item:** Account → My listings → new listing (name, category, price, quantity, image), `status = 'pending'`, invisible to the public until an admin approves it in the Marketplace tab.
+3b. **Buy:** Marketplace → product → quantity → cart → contact and note → Place order; one order per seller, stock reserved; the seller sees it under Account → Sales (badge on the tab); seller confirms payment, ready to ship, shipped; buyer confirms receipt; both keep it in their history; admin sees it in back office → Transactions.
 4. **Administrator onboarding:** register, verify email, role `pending`, waiting screen; super admin approves in the Administrators tab, role becomes `admin` (or `rejected`); the change is written to the audit log.
 5. **Publish bilingual news:** fill English, press auto-translate for a Chinese draft, edit, save; the system warns if one language is missing and asks for confirmation.
 6. **Import alumni:** download template, choose CSV, validate and preview with row-level errors, pick skip or update duplicates, import, verify counts, see one `IMPORT` row in the Activity log.
@@ -64,14 +67,15 @@ MVP (midterm): public home, bilingual switch, news cards, faculty, content pages
 ## 8. Data and system design
 **Stack:** Vite 6 (vanilla JS) + Supabase (Postgres, Auth, Storage, RLS) + Vercel + GitHub (`Poluchito04/immba-site-leo`). Commits use the GitHub identity `poluchito04@gmail.com` (another identity makes Vercel block the deploy).
 
-**Tables:** `faculty`, `profiles`, `news`, `pages`, `downloads`, `listings`, `inquiries`, `alumni`, `audit_log`, `page_views`; storage buckets `faculty-photos` and `news-images` (public read, admin write). Column details are in `supabase/*.sql` and PRD section 13.
+**Tables:** `faculty`, `profiles`, `news`, `pages`, `downloads`, `listings`, `orders`, `order_items`, `inquiries`, `alumni`, `audit_log`, `page_views`; storage buckets `faculty-photos` and `news-images` (public read, admin write) and `listing-images` (public read, a member writes only in their own folder). Column details are in `supabase/*.sql` and PRD section 13.
 
 **Access matrix (enforced by RLS):**
 | Table | Anonymous | Member | Admin | Super admin |
 |---|---|---|---|---|
 | faculty | read | read | CRUD | CRUD |
 | news, pages, downloads | read only if `published` | same | CRUD, sees drafts | same |
-| listings | read `approved`; insert only with `status='pending'` | same | read all, update, delete | same |
+| listings | read `approved` and `active` | same, plus own listings; insert own with `status='pending'`; update or delete own (cannot change status or `purchased`) | read all, update (moderate), delete | same |
+| orders, order_items | none | read the ones where they are buyer or seller; **no write**; checkout and status changes only through `place_order()` / `advance_order()` | read all, **no write, no delete** | same |
 | inquiries | insert | read own | read all, update, delete | same |
 | alumni | none | none | CRUD | CRUD |
 | audit_log | none | none | read | read |
@@ -85,7 +89,11 @@ Each item is checked by hand in production unless a test is named.
 - **A1 (F2)** Given the English interface, when I switch to 中文 and reload, then all public text is Chinese and the choice persists. Test: `tests/i18n.test.js` checks that Chinese mode picks the Chinese columns and falls back to English.
 - **A2 (F3, F4)** Given a `pending` user, when they open `/admin.html`, then they see a waiting screen and no edit control; an update attempted through the API is rejected by RLS.
 - **A3 (F3, F8)** Given a super admin approves a `pending` user, then the user becomes `admin`, can edit news, and one audit row with old and new role exists.
-- **A4 (F5)** Given an anonymous listing submission, then it is saved as `pending`, does not appear on `/marketplace.html`, and appears after approval; a rejected listing never appears. An insert with `status='approved'` from an anonymous client is refused.
+- **A4 (F5)** Given a member's listing, then it is saved as `pending`, does not appear on `/marketplace.html`, and appears after approval; a rejected or hidden listing never appears. An anonymous insert, or an insert with `status='approved'`, is refused.
+- **A12 (F5)** Given a member orders 2 of a listing with 3 in stock, then an order `waiting_payment` exists, available stock is 1 and the seller sees it; ordering 2 more fails with "Only 1 left". Cancelling returns the stock. Test: `tests/trade.test.js` (rules), SQL role simulation (database).
+- **A13 (F5)** Only the seller can confirm payment, mark ready to ship and ship; the buyer can confirm receipt and cancel while waiting for payment; an admin, a stranger or a visitor calling `advance_order` is rejected; a seller cannot buy their own listing.
+- **A14 (F5b)** Given a completed order, then `delete` on `orders` or `order_items` fails for everyone, including an admin, and the order remains in buyer history, seller history and the admin Transactions tab.
+- **A15 (F5)** Seller dashboard: monthly revenue counts completed orders only; the CSV opens in Excel with Chinese text and neutralises cells starting with `=`. Admin can search an order by `#1001`, filter by status and see stalled orders.
 - **A5 (F7)** Given the 20-row class CSV, when imported, then 20 rows are added and ROC year 110 is stored as 2021. Given a repeated Student ID, then the row is reported as duplicate and the form is not lost. Test: `tests/alumni-csv.test.js`.
 - **A6 (F7)** Given blank cells in update mode, then existing values are kept.
 - **A7 (F8)** Given an alumnus edited by an admin, then the Activity log shows admin email, action, record and `{field: {from, to}}`; given a delete, then a full snapshot is kept.
@@ -110,7 +118,9 @@ Each item is checked by hand in production unless a test is named.
 | Alumni table | All rows loaded, filtered in the browser | Move search and filters to server-side queries with `limit/offset` and an index on the filter columns; import in batches |
 | `audit_log` and `page_views` | Whole table scanned for the dashboard | Aggregate in SQL or a view; keep indexes on `created_at` and `(table_name, record_id, created_at)`; archive old rows |
 | Assistant index | Built in the browser from all published content | Pre-compute server-side, or use search in Postgres |
-| Marketplace spam | Honeypot field + length limits | Rate limiting and captcha |
+| Marketplace spam | Members only (account needed), moderation, length limits | Rate limiting and captcha |
+| Orders | All of a user's orders loaded and filtered in the browser (admin: latest 2,000) | Server-side pagination and search, indexes already on buyer, seller, status; aggregate revenue in SQL |
+| Checkout concurrency | Listing rows locked per checkout | Same; keep transactions short |
 Today's code only guarantees the left column; the right column is the next work, not a promise.
 
 ## 12. Security checklist
@@ -130,10 +140,11 @@ RLS enabled on every table; no `service_role` key in the browser; `.env.local` i
 - Do not invent content: official facts need a source link; auto-translation is a draft until a human reviews it.
 - Do not edit an old SQL file that has already run in production; add a new one.
 - Do not commit with an Apple private-relay email.
-- Do not delete data without an audit snapshot.
+- Do not delete data without an audit snapshot. Never add a delete or update policy on `orders` or `order_items`; never let an administrator move an order.
 
 ## 15. Open decisions and known gaps (need the student)
 - Interviews in PRD section 7 are not done; no claim about user feedback may be written until they are.
-- Browser-interface tests do not exist yet (only unit tests: 30 passing).
+- Browser-interface tests do not exist yet (only unit tests: 42 passing).
 - Spam protection for the marketplace is minimal; server-side pagination for alumni is missing.
+- Marketplace: no real payment processor (payment is arranged offline and confirmed by the seller); no in-app notification beyond the Sales tab badge (no email); no ratings or disputes; buyers see each other's contact only through orders. Needs the student's decision: whether the seller may also mark a shipped order completed (today yes).
 - Whether the program wants a custom domain and who owns the Supabase project after the course.

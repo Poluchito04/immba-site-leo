@@ -1,4 +1,5 @@
 import { esc } from './util.js'
+import { stalled } from './trade.js'
 
 const DAY = 86400000
 const pct = (n, d) => (d ? Math.round((n / d) * 100) : 0)
@@ -15,7 +16,7 @@ export async function loadDashboard(pane, { supabase, goto }) {
   pane.innerHTML = '<div class="box">Loading dashboard…</div>'
   const since = new Date(Date.now() - 14 * DAY).toISOString()
   const q = (t, cols = '*') => supabase.from(t).select(cols)
-  const [fac, news, pages, dls, lst, prof, log, views, inq] = await Promise.all([
+  const [fac, news, pages, dls, lst, prof, log, views, inq, ord] = await Promise.all([
     q('faculty', 'id,name,name_zh,title_zh,education_zh,research_fields_zh'),
     q('news', 'id,news_date,published,kind,title_en,title_zh,content_en,content_zh'),
     q('pages', 'id,slug,body_en,body_zh,published'),
@@ -25,8 +26,10 @@ export async function loadDashboard(pane, { supabase, goto }) {
     supabase.from('audit_log').select('*').order('created_at', { ascending: false }).limit(12),
     supabase.from('page_views').select('path,lang,created_at').gte('created_at', since).limit(5000),
     q('inquiries', 'id,status,topic,created_at'),
+    q('orders', 'id,status,status_at,created_at'),
   ])
   if (!pane.isConnected) return // a newer render replaced this tab while it was loading
+  const O = ord.error ? [] : ord.data // transactions arrive with v6.sql; the dashboard still loads without it
   const err = [fac, news, pages, dls, lst, prof, log, views, inq].find((r) => r.error)
   if (err) { pane.innerHTML = `<div class="msg err">${esc(err.error.message)} — did you run supabase/v2.sql?</div>`; return }
   const F = fac.data, N = news.data, P = pages.data, D = dls.data, L = lst.data, U = prof.data, V = views.data, I = inq.data
@@ -65,6 +68,8 @@ export async function loadDashboard(pane, { supabase, goto }) {
   const att = []
   if (newInq) att.push([`${newInq} new inquir${newInq > 1 ? 'ies' : 'y'} to answer`, 'inquiries'])
   if (pendingAdmins) att.push([`${pendingAdmins} administrator${pendingAdmins > 1 ? 's' : ''} waiting for approval`, 'approvals'])
+  const abnormal = O.filter((o) => stalled(o)).length
+  if (abnormal) att.push([`${abnormal} stalled transaction${abnormal > 1 ? 's' : ''} to monitor`, 'orders'])
   if (pendingListings) att.push([`${pendingListings} marketplace listing${pendingListings > 1 ? 's' : ''} to review`, 'marketplace'])
   if (N.length - newsBoth.length) att.push([`${N.length - newsBoth.length} announcement(s) missing a language`, 'news'])
   if (drafts) att.push([`${drafts} draft announcement(s) not published`, 'news'])
@@ -73,7 +78,7 @@ export async function loadDashboard(pane, { supabase, goto }) {
 
   pane.innerHTML = `<div class="kpis">
     ${kpi(F.length, 'Faculty')}${kpi(newsOnly.filter((n) => n.published).length, 'Published news')}${kpi(events.length, 'Events')}${kpi(P.length, 'Pages')}${kpi(D.length, 'Documents')}
-    ${kpi(L.filter((l) => l.status === 'approved').length, 'Live listings')}${kpi(pendingAdmins, 'Admins to approve', true)}${kpi(pendingListings, 'Listings to review', true)}${kpi(V.length, 'Visits (14 days)')}${kpi(I.length, 'Inquiries')}${kpi(newInq, 'New inquiries', true)}${kpi(members, 'Registered members')}${kpi(D.length + P.length + N.length + F.length, 'Content items')}</div>
+    ${kpi(L.filter((l) => l.status === 'approved').length, 'Live listings')}${kpi(pendingAdmins, 'Admins to approve', true)}${kpi(pendingListings, 'Listings to review', true)}${kpi(V.length, 'Visits (14 days)')}${kpi(I.length, 'Inquiries')}${kpi(newInq, 'New inquiries', true)}${kpi(members, 'Registered members')}${kpi(O.length, 'Transactions')}${kpi(abnormal, 'Stalled transactions', true)}${kpi(D.length + P.length + N.length + F.length, 'Content items')}</div>
     <div class="cols">
       <div class="panel"><h4>Visits, last 14 days</h4>${bars(perDay, dayLabels)}<p style="font-size:13px;color:var(--mut);margin:12px 0 0">${V.length ? `${zhShare}% of visits in Chinese.` : 'No visits recorded yet.'}</p></div>
       <div class="panel"><h4>Announcements per month</h4>${bars(perMonth, months.map((m) => m.label))}</div>
@@ -88,7 +93,7 @@ export async function loadDashboard(pane, { supabase, goto }) {
   pane.querySelector('#csv').onclick = () => {
     const rows = [['metric', 'value'], ['faculty', F.length], ['news_published', newsOnly.filter((n) => n.published).length], ['news_drafts', drafts], ['events', events.length], ['pages', P.length],
       ['documents', D.length], ['listings_approved', L.filter((l) => l.status === 'approved').length], ['listings_pending', pendingListings], ['admins_pending', pendingAdmins],
-      ['visits_14d', V.length], ['inquiries', I.length], ['inquiries_new', newInq], ['inquiries_answered_pct', answeredPct], ['members', members], ['visits_zh_pct', zhShare], ['news_bilingual_pct', pct(newsBoth.length, N.length)], ['faculty_zh_pct', pct(facZh.length, F.length)], ['pages_bilingual_pct', pct(pagesBoth.length, P.length)],
+      ['visits_14d', V.length], ['inquiries', I.length], ['inquiries_new', newInq], ['inquiries_answered_pct', answeredPct], ['members', members], ['transactions', O.length], ['transactions_stalled', abnormal], ['visits_zh_pct', zhShare], ['news_bilingual_pct', pct(newsBoth.length, N.length)], ['faculty_zh_pct', pct(facZh.length, F.length)], ['pages_bilingual_pct', pct(pagesBoth.length, P.length)],
       ...perDay.map((v, i) => ['visits_' + dayKey(days[i]), v]), ...top.map(([p, n]) => ['top_' + p, n])]
     const csv = rows.map((r) => r.join(',')).join('\n')
     const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); a.download = `immba-report-${dayKey(new Date())}.csv`; a.click()

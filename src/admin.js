@@ -8,6 +8,7 @@ import { pwField, bindPasswords, matchHint } from './password.js'
 import { loadDashboard } from './admin-dashboard.js'
 import { loadAlumni } from './admin-alumni.js'
 import { loadActivity } from './admin-activity.js'
+import { loadOrders } from './admin-orders.js'
 import { loadPages, loadDownloads, loadListings, loadInquiries } from './admin-content.js'
 
 const app = document.getElementById('app')
@@ -134,14 +135,14 @@ function renderNewPassword() {
 function renderDashboard() {
   const isSuper = profile.role === 'super_admin'
   if (tab === 'approvals' && !isSuper) tab = 'faculty'
-  app.innerHTML = `${flashHtml()}<div class="tabs">${[['dashboard', 'Dashboard'], ['news', 'News & events'], ['faculty', 'Faculty'], ['alumni', 'Alumni'], ['pages', 'Pages'], ['downloads', 'Documents'], ['marketplace', 'Marketplace'], ['inquiries', 'Inquiries'], ['activity', 'Activity log']].map(([k, l]) => `<button data-t="${k}" class="${tab === k ? 'on' : ''}">${l}</button>`).join('')}
+  app.innerHTML = `${flashHtml()}<div class="tabs">${[['dashboard', 'Dashboard'], ['news', 'News & events'], ['faculty', 'Faculty'], ['alumni', 'Alumni'], ['pages', 'Pages'], ['downloads', 'Documents'], ['marketplace', 'Marketplace'], ['orders', 'Transactions'], ['inquiries', 'Inquiries'], ['activity', 'Activity log']].map(([k, l]) => `<button data-t="${k}" class="${tab === k ? 'on' : ''}">${l}</button>`).join('')}
     ${isSuper ? `<button data-t="approvals" class="${tab === 'approvals' ? 'on' : ''}">Administrators</button>` : ''}</div><div id="pane"></div>`
   app.querySelectorAll('[data-t]').forEach((b) => (b.onclick = () => { tab = b.dataset.t; editing = null; renderDashboard() }))
   const pane = document.getElementById('pane')
   pane.innerHTML = skeletonList(6)
   new MutationObserver(() => autoReveal(pane)).observe(pane, { childList: true })
   const ctx = { supabase, notify, goto: (t) => { tab = t; renderDashboard() } }
-  const views = { dashboard: () => loadDashboard(pane, ctx), news: loadNews, faculty: loadFaculty, alumni: () => loadAlumni(pane, ctx), pages: () => loadPages(pane, ctx), downloads: () => loadDownloads(pane, ctx), marketplace: () => loadListings(pane, ctx), inquiries: () => loadInquiries(pane, ctx), activity: () => loadActivity(pane, ctx), approvals: loadApprovals }
+  const views = { dashboard: () => loadDashboard(pane, ctx), news: loadNews, faculty: loadFaculty, alumni: () => loadAlumni(pane, ctx), pages: () => loadPages(pane, ctx), downloads: () => loadDownloads(pane, ctx), marketplace: () => loadListings(pane, ctx), orders: () => loadOrders(pane, ctx), inquiries: () => loadInquiries(pane, ctx), activity: () => loadActivity(pane, ctx), approvals: loadApprovals }
   ;(views[tab] || loadFaculty)()
 }
 

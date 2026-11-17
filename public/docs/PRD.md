@@ -162,9 +162,22 @@ To turn a static, partly Chinese-only, hand-edited website into a bilingual, dat
 - **CSV batch import:** downloadable template; validation before importing (required fields, empty rows, invalid degree values, wrong column names, duplicates by Student ID or email, encoding problems); preview with row-level errors; empty cells handled.
 - **Export CSV:** exports the filtered dataset. **Dynamic columns:** a Columns checklist updates the table immediately.
 
+### Class 10 requirements ("Building a Role-Based C2C Marketplace", 17 Nov 2026)
+Source: the slides of the session; the learning goals are role-based access, different interfaces for buyer, seller and administrator, an end-to-end transaction workflow, inventory and order status, linking buyer actions to seller operations, and basic sales and transaction management. "It is not about building an e-commerce website. It is about designing a multi-user transactional system."
+- **Roles:** Visitor (browse), Buyer (browse, cart, place orders, order history), Seller (list products, manage inventory, process orders, sales records), Platform Admin (manage users, monitor transactions). One account can be buyer, seller and administrator at once; the interface shows the functions of each role.
+- **Seller:** create a listing (name, category, description, price, quantity, image, status), view and edit own listings, update quantity, hide or remove a listing, see stock status. *Available Stock = Current Inventory − Purchased Quantity.*
+- **Buyer:** browse, product detail with price and availability, select quantity, shopping cart, review items, confirm quantity, submit the order. *Order created, seller notified.*
+- **Order lifecycle:** Order placed, Waiting for payment confirmation, Payment confirmed, Ready to ship, Shipped, Completed. The seller sees order ID, buyer, products, total, payment status and date and confirms payment, prepares and confirms shipment. Completed transactions stay in the buyer's order history, the seller's sales history and the platform records: **they are never deleted**.
+- **One transaction, three views:** buyer (my orders, status, purchase history), seller (orders to process, payments to confirm, products to ship, sales history), admin (all transactions, buyer and seller, status, amount).
+- **Seller dashboard:** monthly sales revenue, completed orders, pending payments, orders waiting for shipment, sales history, **CSV export** of transaction records.
+- **Platform admin:** view all transactions, search by order ID, filter by status, see buyer and seller, monitor abnormal or incomplete transactions, review transaction history. *Monitoring does not always mean editing.*
+- **Today's checklist, answered:** different functions per role (account tabs, admin tab) / sellers list products (My listings) / buyers place orders (cart and checkout) / order status updates (Sales and My orders) / orders visible to buyer and seller / inventory updates after a transaction (stock reserved at checkout, released on cancel) / completed records kept (database trigger blocks deletes).
+- **What changed from the previous version (the slides win):** (1) listing no longer open to anonymous visitors: a seller needs a member account, because orders need an identity; (2) listings gained quantity, image and hide switch; (3) a seller editing the text, price, category or image of a live listing sends it back to review, stock changes do not; (4) the public card no longer needs a phone or email, buyers order through the platform; (5) demo listings (no seller) can be browsed but not ordered.
+
 ## 12. Roles and permissions
-- **Visitor:** read published content; submit a marketplace listing (stays pending); send an inquiry.
-- **Member:** a registered visitor. Follows the status of their own inquiries; never gets any editing right.
+- **Visitor:** read published content; browse approved, visible marketplace listings; send an inquiry. Cannot buy or sell (class 10: needs an account).
+- **Member = buyer and seller:** a registered, verified user. Follows their inquiries; lists products (they stay `pending` until an administrator approves them); orders other members' products; processes orders as seller. Cannot buy their own listing. Never gets any editing right on site content.
+- **Marketplace, per role:** orders can only be created by `place_order()` and changed by `advance_order()`; the seller moves payment, ready to ship and shipped, the buyer confirms receipt (the seller may also close a shipped sale), either can cancel while waiting for payment and only the seller after payment (stock returns). **Admins have read access to all orders and no write path at all**; nobody can delete an order or its lines.
 - **Pending:** registered and verified but cannot enter the back office.
 - **Admin:** create, edit and delete news, events, faculty, pages, downloads; moderate listings; see the dashboard.
 - **Super admin:** everything an admin can do, plus approve or reject administrators.
@@ -176,19 +189,22 @@ To turn a static, partly Chinese-only, hand-edited website into a bilingual, dat
 - **news:** one record per announcement or event with title and content in both languages, dates, links, pinned, published, kind (news or event), order.
 - **pages:** slug, section, bilingual title and body, source links, published, updated_at.
 - **downloads:** bilingual title, file URL, file type, category, order, published.
-- **listings:** marketplace item with price, category, seller, contact, status (pending, approved, rejected).
+- **listings:** marketplace item with price, category, seller (`seller_id`, `seller_name`), status (pending, approved, rejected), `quantity` (inventory), `purchased`, generated `available = quantity − purchased`, `active` (hide switch), image, timestamps. A check keeps `purchased <= quantity`; a trigger lets sellers change only their own rows, never the status or the purchased counter.
+- **orders:** `order_no` (starts at 1001), buyer and seller ids plus name and email snapshots, buyer contact, note, total, status (waiting_payment, payment_confirmed, ready_to_ship, shipped, completed, cancelled) and a timestamp per step. No insert, update or delete policy: only the two functions write.
+- **order_items:** order, listing, title and unit price snapshot, quantity, generated line total; cannot be edited or deleted.
 - **inquiries:** visitor questions with topic, language, status (new, in progress, answered, closed) and an optional note shown to the member.
 - **alumni:** one row per graduate: the 11 fields above, `created_by`, timestamps. Unique Student ID and unique email (case-insensitive); checks on degree values, year ranges and email format. Years are stored as calendar years (ROC years in a CSV are converted: 110 = 2021).
 - **profiles:** one row per login user with role (member, pending, admin, super_admin, rejected).
 - **audit_log:** who changed what and when (filled by database triggers). Since v5 it also stores `record_id` and `changes` (JSON: new values on create, `{field: {from, to}}` on update, a full snapshot on delete) and one `IMPORT` summary row per batch.
 - **page_views:** path, language, timestamp (no personal data).
-- **Storage:** public bucket for faculty photos; only admins can write.
+- **Storage:** public buckets for faculty photos and news images (only admins write) and `listing-images` (a member writes only inside their own `user-id/` folder).
 
 ## 14. Dashboard and reports
 - KPI cards: faculty, published news, events, pages, downloads, approved listings, plus open items.
 - Reports: bilingual completeness (news, faculty, pages), visits in the last 14 days and top pages, announcements per month, listing status.
 - Needs attention: pending administrators, pending listings, news out of sync, drafts, faculty without Chinese data.
 - Recent activity from the audit log.
+- Class 10: transactions count and **stalled transactions** (an order stuck too long in one state: 3 days waiting for or after payment, 4 ready to ship, 7 shipped) in KPIs and the needs-attention panel.
 
 ## 15. Dual-language approach
 - One record holds both languages (shared fields: date, link, order, status).
@@ -228,10 +244,18 @@ AI wrote the SQL and the code, but it had to be reviewed and tested in productio
 - Applied: the project now has `public/docs/SPEC.md` (also at `/project.html?doc=spec`), written from the real schema, RLS and code, with verifiable acceptance criteria, edge cases, a scale table, an operations section and a "what NOT to do" list. Writing it also exposed gaps that were not in the PRD (no browser tests, alumni filtering in the browser, minimal marketplace spam protection).
 - Workshop set-up: the Supabase MCP server is declared for this project in `.mcp.json` (read-only, project ref only; the student authenticates it in the browser), so the agent can read the real schema instead of guessing.
 
+### Class 10 - Role-based C2C marketplace (17 Nov 2026)
+- A product is "a connected workflow, not a collection of pages": seller lists, buyer browses, order, payment, shipment, completion, seller inventory and sales, admin monitoring. The hard part is not the screens, it is **who is allowed to do which step**.
+- Role → permission → available actions: the same order is rendered three ways (buyer, seller, admin) from one record, and the buttons come from one rule table (`actionsFor` in `src/trade.js`) that the database repeats in `advance_order()`. The interface is a convenience; the function is the lock.
+- Two buyers can want the last copy at the same moment. The checkout locks the listing rows inside one transaction and checks stock again, so the second buyer gets "Only 0 left" instead of an oversold item. This is the kind of decision AI skips at "10 users".
+- Business records: sold items and orders cannot be deleted (a trigger refuses it, and removing a listing that has orders hides it instead).
+- Interpretation I made (to confirm with the instructor): the slides list "Seller: approved seller"; I treat the administrator's approval of each listing as that approval, instead of a separate seller application.
+
 ## 16. Test and verification log
 - **20 Oct 2026, production:** created, edited, reordered, deleted faculty and news from the admin; verified photo upload and deletion in Storage; verified drafts are invisible to the public; verified an anonymous visitor cannot insert, delete, upload or read profiles; verified pending, admin and super admin permissions with a role simulation that rolls back.
 - **20 Oct 2026, production (class 7):** ran `v5.sql`; imported the 20-row class CSV (20 added, ROC years converted); verified search, degree filter, column chooser, edit (audit shows company and job title old to new), duplicate Student ID rejected without losing the form, re-import in skip and update modes (blank cells keep existing values), export CSV, delete (audit keeps a snapshot), Chinese interface. Test data was deleted afterwards.
 - **Automated tests:** `npm test` includes unit tests for the alumni CSV parser and validator (quotes, delimiters, ROC years, degree synonyms, empty rows, duplicates, encoding, formula-safe export) and a check against the 20-row class sample.
+- **Automated tests (class 10):** `tests/trade.test.js` covers who can do what at each order status (administrators and visitors get no action), stock formula, stalled-order flags, seller accounting by month, order search, CSV with formula protection, cart limits.
 - **Known limits:** tests cover the Markdown renderer, translations, retrieval and the alumni CSV parser, but not the browser interface (checked by hand in production); marketplace has no spam protection beyond a honeypot and database limits.
 
 ## 17. AI usage and responsible use
@@ -260,6 +284,8 @@ AI wrote the SQL and the code, but it had to be reviewed and tested in productio
 - **27 Oct 2026:** fixed the header flicker (it shrank and grew again on scroll because the browser's scroll anchoring pushed the page back above the threshold; now two thresholds); password fields have a show/hide eye and sign-up asks for the password twice; the home page no longer shows Faculty (Announcements first, then Events; the menu links to the Faculty page); added an example faculty profile; login pages show a form-shaped placeholder instead of card skeletons.
 - **27 Oct 2026:** the public Faculty page now lists people in exactly the order set in the back office (it used to group by category, so a person moved to 2nd could appear near the end); each card keeps a category pill and the chips act as filters. Reordering in the back office shows a confirmation toast, highlights the moved row and numbers the rows. The site opens in the light theme by default. The **Activity log** is its own back-office tab (not inside Alumni) and covers every area (news, faculty, alumni, pages, documents, marketplace, administrator roles) with Area, Action and Administrator filters; each alumnus keeps its own History button. Faculty was removed from the home page, which now shows Announcements then Events. **Export CSV** now opens a review screen before anything is downloaded: records (filtered or all, with the active filters listed), columns (all or only those shown), a preview of the first rows, the file name, size and format, and a reminder that the file holds personal data; the figures update live if filters change while it is open.
 - **10 Nov 2026 (class 8):** added the AI-executable SPEC (`public/docs/SPEC.md`, shown at `/project.html?doc=spec` with a PRD/SPEC switch) and the read-only Supabase MCP configuration (`.mcp.json`). **Decision:** the SPEC is a separate document from the PRD (PRD = why and for whom, SPEC = exact behaviour); the code stays the source of truth.
+
+- **17 Nov 2026 (class 10):** role-based C2C marketplace (`supabase/v6.sql`): seller listings with stock and images, cart and checkout (one order per seller), order workflow with five statuses, buyer, seller and admin views, seller accounting with CSV export, admin Transactions tab (search, status filter, abnormal monitor, history), audit of every order change. **Decision:** orders are written only by two database functions that check the caller's role, so even a modified browser cannot skip a step. **Decision:** payment is arranged offline between buyer and seller and the seller confirms it (no payment processor; the slides model "confirm payment" as a seller action). **Decision:** administrators are read-only on orders.
 
 ## 19. Final reflection (to be written by the student)
 Write this yourself at the end of the course. Suggested prompts:

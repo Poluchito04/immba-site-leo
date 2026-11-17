@@ -3,10 +3,11 @@ import { mountChrome } from './chrome.js'
 import { t } from './i18n.js'
 import { toast } from './ui.js'
 import { pwField, bindPasswords, matchHint } from './password.js'
+import { loadPurchases, loadSelling, loadSales, sellerTodo } from './account-trade.js'
 
 mountChrome({ skeleton: 'form' })
 const app = document.getElementById('app')
-let session = null, role = null, mode = 'login', inquiries = [], pendingEmail = null
+let session = null, role = null, mode = 'login', inquiries = [], pendingEmail = null, tab = (location.hash || '').slice(1)
 
 const STATUS = { new: ['New', '新'], in_progress: ['In progress', '處理中'], answered: ['Answered', '已回覆'], closed: ['Closed', '已結案'] }
 
@@ -51,23 +52,45 @@ function checkEmail() {
   }
 }
 
+const TABS = [['purchases', 'My orders', '我的訂單'], ['selling', 'My listings', '我的商品'], ['sales', 'Sales', '銷售'], ['inquiries', 'My inquiries', '我的諮詢']]
+
+function inquiriesPane(pane) {
+  pane.innerHTML = `<div class="spread" style="margin-top:22px"><h3 style="margin:0">${t('My inquiries', '我的諮詢')} (${inquiries.length})</h3><a class="btn sm" href="/contact.html">${t('New inquiry', '新增諮詢')}</a></div>
+    ${inquiries.length ? `<div class="grid" style="margin-top:14px">${inquiries.map((q) => `<article class="lcard"><small>${esc(new Date(q.created_at).toLocaleDateString())} · ${esc(q.topic)}</small><h4>${esc(q.message.slice(0, 90))}${q.message.length > 90 ? '…' : ''}</h4>
+      <p><span class="pill ${q.status === 'closed' ? 'rejected' : q.status === 'new' ? 'pending' : ''}">${esc(t(...STATUS[q.status]))}</span></p>${q.admin_note ? `<p><b>${t('Reply note', '回覆備註')}:</b> ${esc(q.admin_note)}</p>` : ''}</article>`).join('')}</div>`
+      : `<div class="msg">${t('You have not sent any inquiry from this account yet.', '此帳號尚未送出任何諮詢。')}</div>`}`
+}
+
 async function dashboard() {
   const { data, error } = await supabase.from('inquiries').select('*').eq('user_id', session.user.id).order('created_at', { ascending: false })
   if (error) return (app.innerHTML = `<div class="msg err">${esc(error.message)}</div>`)
   inquiries = data
   const staff = role === 'admin' || role === 'super_admin'
-  app.innerHTML = `<div class="spread" style="margin-top:26px"><div><h3 style="margin:0">${t('Welcome', '歡迎')}, ${esc(session.user.email)}</h3><span class="pill ${staff ? 'super_admin' : ''}">${esc(staff ? role : 'member')}</span></div>
-    <div class="acts"><a class="btn" href="/contact.html">${t('New inquiry', '新增諮詢')}</a>${staff ? `<a class="btn o" href="/admin.html">${t('Back office', '後台')}</a>` : ''}<button class="btn o" id="out">${t('Sign out', '登出')}</button></div></div>
-    <h3 class="sec">${t('My inquiries', '我的諮詢')} (${inquiries.length})</h3>
-    ${inquiries.length ? `<div class="grid">${inquiries.map((q) => `<article class="lcard"><small>${esc(new Date(q.created_at).toLocaleDateString())} · ${esc(q.topic)}</small><h4>${esc(q.message.slice(0, 90))}${q.message.length > 90 ? '…' : ''}</h4>
-      <p><span class="pill ${q.status === 'closed' ? 'rejected' : q.status === 'new' ? 'pending' : ''}">${esc(t(...STATUS[q.status]))}</span></p>${q.admin_note ? `<p><b>${t('Reply note', '回覆備註')}:</b> ${esc(q.admin_note)}</p>` : ''}</article>`).join('')}</div>`
-      : `<div class="msg">${t('You have not sent any inquiry from this account yet.', '此帳號尚未送出任何諮詢。')}</div>`}`
+  const trader = staff || role === 'member'              // pending / rejected administrator applicants cannot trade
+  const tabs = trader ? TABS : TABS.filter((x) => x[0] === 'inquiries')
+  if (!tabs.some((x) => x[0] === tab)) tab = tabs[0][0]
+  app.innerHTML = `<div class="spread" style="margin-top:26px"><div><h3 style="margin:0">${t('Welcome', '歡迎')}, ${esc(session.user.email)}</h3><span class="pill ${staff ? 'super_admin' : ''}">${esc(staff ? role : role === 'member' ? 'member' : role || 'member')}</span>
+      ${trader ? `<span class="rolehint">${t('You can buy and sell on the marketplace.', '您可以在市集購買與刊登商品。')}${staff ? ' ' + t('As an administrator you also monitor every transaction in the back office (read-only).', '身為管理員，您也可在後台監看所有交易（唯讀）。') : ''}</span>` : ''}</div>
+    <div class="acts"><a class="btn" href="/marketplace.html">${t('Marketplace', '市集')}</a>${staff ? `<a class="btn o" href="/admin.html">${t('Back office', '後台')}</a>` : ''}<button class="btn o" id="out">${t('Sign out', '登出')}</button></div></div>
+    <div class="tabs" role="tablist">${tabs.map(([k, en, zh]) => `<button role="tab" data-tab="${k}" class="${tab === k ? 'on' : ''}">${t(en, zh)}${k === 'sales' ? '<b class="tbadge" id="todo" hidden></b>' : ''}</button>`).join('')}</div><div id="tpane"></div>`
   document.getElementById('out').onclick = () => supabase.auth.signOut()
+  const pane = document.getElementById('tpane')
+  const ctx = { supabase, uid: session.user.id, email: session.user.email, role, badges }
+  async function badges() {
+    if (!trader) return
+    const n = await sellerTodo(supabase, ctx.uid), b = document.getElementById('todo')
+    if (b) { b.hidden = !n; b.textContent = n }
+  }
+  const show = () => ({ purchases: loadPurchases, selling: loadSelling, sales: loadSales, inquiries: inquiriesPane }[tab])(pane, ctx)
+  app.querySelectorAll('[data-tab]').forEach((b) => (b.onclick = () => { tab = b.dataset.tab; history.replaceState(null, '', '#' + tab); app.querySelectorAll('[data-tab]').forEach((x) => x.classList.toggle('on', x === b)); show() }))
+  show(); badges()
+  // a seller who left the tab open sees new orders as soon as they come back to it
+  document.onvisibilitychange = () => { if (!document.hidden && pane.isConnected && (tab === 'sales' || tab === 'purchases')) { show(); badges() } }
 }
 
 async function refresh() {
   document.getElementById('h-title').textContent = t('My account', '我的帳號')
-  document.getElementById('h-sub').textContent = t('Follow the status of your inquiries.', '追蹤您的諮詢進度。')
+  document.getElementById('h-sub').textContent = t('Buy, sell and follow your orders and inquiries.', '購買、刊登，並追蹤您的訂單與諮詢。')
   document.title = t('My account · imMBA', '我的帳號 · imMBA')
   if (!session) return pendingEmail ? checkEmail() : authForm()
   const { data } = await supabase.from('profiles').select('role').eq('id', session.user.id).maybeSingle()
