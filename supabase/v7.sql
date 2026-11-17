@@ -180,6 +180,8 @@ revoke all on function public.advance_order(uuid, text, text) from public, anon;
 grant execute on function public.advance_order(uuid, text, text) to authenticated;
 
 -- 6. Demo store catalogue with real photos (files live in /public/market, credits in CREDITS.md) -------------------
+-- the SQL editor has no admin session, so the ownership/moderation guard is paused only for this seeding block
+alter table public.listings disable trigger listings_guard;
 update public.listings set seller_id = (select demo_store_id from public.app_settings where id = 1)
  where seller_id is null;
 update public.listings set seller_name = 'imMBA Demo Store' where seller_id = (select demo_store_id from public.app_settings where id = 1);
@@ -203,6 +205,7 @@ from (values
   ('Student backpack', 'Canvas and leather backpack, fits a 13-inch laptop. Demo product of the imMBA Demo Store (class project).', 890, 'other', 3, '/market/backpack.jpg')
 ) as v(title, description, price, category, quantity, image_url)
 where not exists (select 1 from public.listings l where l.title = v.title);
+alter table public.listings enable trigger listings_guard;
 
 -- 7. Tidy numbering when nothing has been ordered yet -----------------------------------------------------------------
 do $$ begin
