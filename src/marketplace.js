@@ -2,14 +2,15 @@ import { supabase, configured, esc } from './supabase.js'
 import { mountChrome } from './chrome.js'
 import { t } from './i18n.js'
 import { toast, skeletonCards, autoReveal } from './ui.js'
-import { available, stockState, money, cartLoad, cartSave, cartAdd, cartCount, cartLines, cartTotal } from './trade.js'
+import { available, stockState, money, cartLoad, cartSave, cartAdd, cartCount, cartLines, checkoutTotals } from './trade.js'
+import { loadSettings } from './trade-ui.js'
 
 mountChrome()
 const app = document.getElementById('app')
 const CATS = [['books', 'Books', '書籍'], ['notes', 'Notes', '筆記'], ['electronics', 'Electronics', '電子產品'], ['other', 'Other', '其他']]
 const catName = (k) => t(...(CATS.find((c) => c[0] === k)?.slice(1) || ['Other', '其他']))
 const S = { q: '', cat: 'all', sort: 'new', stock: false }
-let rows = [], session = null, role = null, cart = [], loaded = false, ver = 0
+let settings = {}, rows = [], session = null, role = null, cart = [], loaded = false, ver = 0
 const canTrade = () => Boolean(session) && ['member', 'admin', 'super_admin'].includes(role)
 
 const stockBadge = (l) => {
@@ -29,7 +30,10 @@ function filtered() {
 function banner() {
   if (!session) return `<div class="rolebar"><span><b>${t('Browsing as a visitor', '以訪客身分瀏覽')}</b> · ${t('sign in to buy or sell', '登入後即可購買或刊登')}</span><a class="btn sm" href="/account.html">${t('Sign in', '登入')}</a></div>`
   if (!canTrade()) return `<div class="rolebar"><span>${t('Your account cannot trade yet.', '您的帳號目前無法交易。')}</span></div>`
-  return `<div class="rolebar"><span><b>${esc(session.user.email)}</b> · ${t('you can buy and sell', '可購買與刊登')}</span><span class="acts"><a class="btn sm o" href="/account.html#purchases">${t('My orders', '我的訂單')}</a><a class="btn sm o" href="/account.html#sales">${t('Sales', '銷售')}</a></span></div>`
+  const staff = role === 'admin' || role === 'super_admin'
+  // the navigation buttons of the slide "Seller: Product Listing": Member Center | Platform Transactions | Admin Approval | Add New Item
+  return `<div class="rolebar"><span><b>${esc(session.user.email)}</b> · ${staff ? t('buyer, seller and administrator', '買家、賣家與管理員') : t('you can buy and sell', '可購買與刊登')}</span>
+    <span class="acts"><a class="btn sm o" href="/account.html#purchases">${t('Member center', '會員中心')}</a>${staff ? `<a class="btn sm o" href="/admin.html#orders">${t('Platform transactions', '平台交易')}</a><a class="btn sm o" href="/admin.html#marketplace">${t('Admin approval', '管理員審核')}</a>` : ''}<a class="btn sm" href="/account.html#selling?new=1">${t('Add new item', '新增商品')}</a></span></div>`
 }
 
 function render() {
@@ -43,7 +47,6 @@ function render() {
       <select id="sort" aria-label="${t('Sort', '排序')}"><option value="new" ${S.sort === 'new' ? 'selected' : ''}>${t('Newest', '最新')}</option><option value="low" ${S.sort === 'low' ? 'selected' : ''}>${t('Price: low to high', '價格：低到高')}</option><option value="high" ${S.sort === 'high' ? 'selected' : ''}>${t('Price: high to low', '價格：高到低')}</option></select>
       <label class="chk"><input type="checkbox" id="stk" ${S.stock ? 'checked' : ''}> ${t('In stock only', '僅顯示有庫存')}</label>
       <span class="grow"></span>
-      <a class="btn o" href="/account.html#selling">${t('+ Sell something', '+ 我要刊登')}</a>
       <button class="btn" id="cartbtn">🛒 ${t('Cart', '購物車')}${n ? ` <b class="cb">${n}</b>` : ''}</button></div>
     <div class="chips" style="margin:14px 0 0">${chips}</div>
     <div class="grid" id="grid" style="margin-top:18px"></div>`
@@ -60,7 +63,7 @@ function render() {
 function paintGrid() {
   const list = filtered()
   const g = document.getElementById('grid')
-  g.innerHTML = `${list.map((r) => `<article class="lcard shop" tabindex="0" data-id="${r.id}" role="button" aria-label="${esc(r.title)}">${photo(r)}
+  g.innerHTML = `${list.map((r) => `<article class="lcard shop" tabindex="0" data-id="${r.id}" role="button" aria-label="${esc(r.title)}"><div class="imgwrap">${stockState(r) === 'out' ? `<span class="ribbon out">${t('Sold out', '已售完')}</span>` : stockState(r) === 'low' ? `<span class="ribbon">${t(`Low stock (${available(r)} left)`, `庫存偏低（剩 ${available(r)} 件）`)}</span>` : ''}${photo(r)}</div>
       <small>${esc(catName(r.category))}</small><h4>${esc(r.title)}</h4>
       <div class="spread"><div class="price">${money(r.price)}</div>${stockBadge(r)}</div>
       <p>${esc((r.description || '').slice(0, 90))}</p><small>${t('Seller', '賣家')}: ${esc(r.seller_name)}</small></article>`).join('') || `<div class="msg" style="grid-column:1/-1">${rows.length ? t('Nothing matches your filters.', '沒有符合條件的商品。') : t('No listings yet.', '目前沒有商品。')}</div>`}`
@@ -105,55 +108,37 @@ function openDetail(id) {
     d.querySelector('#add').onclick = () => {
       const r = cartAdd(cart, l, clamp(+qn.value))
       if (!r.added) return toast(t('All the available stock is already in your cart.', '購物車中已有全部可購買的庫存。'), 'err')
-      cart = r.items; cartSave(session.user.id, cart); d.close(); render()
-      toast(t(`Added to cart: ${l.title}`, `已加入購物車：${l.title}`))
+      cart = r.items; cartSave(session.user.id, cart); d.close(); render(); openCart()
     }
   }
 }
 
-/* ----------------------------------------------- cart ----------------------------------------------- */
+/* ----------------------------------------------- cart drawer ----------------------------------------------- */
 function openCart() {
   if (!session) return dialog(`<h3 style="margin-top:0">${t('Your cart', '購物車')}</h3><p>${t('Sign in to add products to your cart and place orders.', '請先登入才能加入購物車並下單。')}</p><p><a class="btn" href="/account.html">${t('Sign in', '登入')}</a></p>`)
   const draw = () => {
-    const lines = cartLines(cart, rows), total = cartTotal(lines), good = lines.filter((x) => x.ok)
+    const lines = cartLines(cart, rows), tot = checkoutTotals(lines, 'pickup', settings), good = lines.filter((x) => x.ok)
     const d = document.getElementById('dlg'); if (!d) return
     const body = d.querySelector('.cartbody')
-    body.innerHTML = !lines.length ? `<p class="msg">${t('Your cart is empty.', '購物車是空的。')}</p>` : `<ul class="clines">${lines.map((x) => `<li class="${x.ok ? '' : 'bad'}" data-id="${x.id}">
+    body.innerHTML = !lines.length ? `<div class="msg" style="text-align:center">${t('Your cart is empty.', '購物車是空的。')}<br><br><button class="btn o" id="keep">${t('Continue shopping', '繼續購物')}</button></div>` : `<ul class="clines">${lines.map((x) => `<li class="${x.ok ? '' : 'bad'}" data-id="${x.id}">
         ${x.listing ? photo(x.listing, 'cph') : '<div class="cph none">?</div>'}
         <div class="cinfo"><b>${esc(x.listing?.title || t('Item no longer available', '商品已下架'))}</b>
-          <small>${x.listing ? `${money(x.listing.price)} · ${t('Seller', '賣家')}: ${esc(x.listing.seller_name)}` : ''}${x.ok && x.wanted > x.qty ? ` · <span class="warn">${t(`only ${x.max} left`, `僅剩 ${x.max} 件`)}</span>` : ''}${x.listing && !x.ok ? ` · <span class="warn">${t('sold out', '已售完')}</span>` : ''}</small></div>
-        ${x.ok ? `<div class="stepq sm"><button data-m="-1" aria-label="−">−</button><span>${x.qty}</span><button data-m="1" aria-label="+" ${x.qty >= x.max ? 'disabled' : ''}>+</button></div><b class="lt">${money(x.qty * x.listing.price)}</b>` : ''}
+          <small>${x.listing ? `${money(x.listing.price)} · ${esc(x.listing.seller_name)}` : ''}${x.ok && x.wanted > x.qty ? ` · <span class="warn">${t(`only ${x.max} left`, `僅剩 ${x.max} 件`)}</span>` : ''}${x.listing && !x.ok ? ` · <span class="warn">${t('sold out', '已售完')}</span>` : ''}</small>
+          ${x.ok ? `<div class="stepq sm" style="margin-top:6px;align-self:flex-start"><button data-m="-1" aria-label="−">−</button><span>${x.qty}</span><button data-m="1" aria-label="+" ${x.qty >= x.max ? 'disabled' : ''}>+</button></div>` : ''}</div>
+        ${x.ok ? `<b class="lt">${money(x.qty * x.listing.price)}</b>` : ''}
         <button class="rm" data-rm="${x.id}" aria-label="${t('Remove', '移除')}">✕</button></li>`).join('')}</ul>
-      <div class="ctotal"><span>${t('Total', '總計')}</span><b>${money(total)}</b></div>
-      ${new Set(good.map((x) => x.listing.seller_id)).size > 1 ? `<p class="hint">${t('Items from different sellers become separate orders, each handled by its own seller.', '不同賣家的商品會拆成各自的訂單，由各賣家分別處理。')}</p>` : ''}
-      <form id="co">${canTrade() ? `<div class="row2"><div><label>${t('Your name', '您的姓名')}</label><input name="name" maxlength="120" value="${esc(session.user.email.split('@')[0])}"></div>
-        <div><label>${t('Contact for the seller', '給賣家的聯絡方式')} *</label><input name="contact" required minlength="3" maxlength="120" placeholder="${t('LINE ID, phone or email', 'LINE ID、電話或 Email')}" value="${esc(session.user.email)}"></div></div>
-        <label>${t('Note to the seller (optional)', '給賣家的備註（選填）')}</label><textarea name="note" rows="2" maxlength="500" placeholder="${t('Where and when can you meet / ship?', '面交或寄送的時間地點？')}"></textarea>
-        <p class="hint">${t('Payment is arranged directly with the seller. The seller confirms it, ships, and you confirm receipt.', '付款由您與賣家直接約定；賣家確認收款、出貨後，由您確認收貨。')}</p>
-        <p class="acts"><button class="btn" type="submit" ${good.length ? '' : 'disabled'}>${t('Place order', '送出訂單')} · ${money(total)}</button></p>`
-        : `<div class="msg">${t('Your account cannot place orders yet.', '您的帳號目前無法下單。')}</div>`}</form>`
+      <div class="sumline"><span>${t('Subtotal', '小計')}</span><b>${money(tot.subtotal)}</b></div>
+      <p class="freebar">${t('Shipping and the platform fee are calculated at checkout. In-person pickup is free.', '運費與平台手續費於結帳時計算。面交自取免運費。')}</p>
+      <p class="acts" style="margin-top:14px"><a class="btn" style="flex:1;text-align:center;${good.length ? '' : 'pointer-events:none;opacity:.5'}" href="/checkout.html">${t('Proceed to checkout', '前往結帳')}</a></p>`
+    body.querySelector('#keep')?.addEventListener('click', () => d.close())
     body.querySelectorAll('[data-rm]').forEach((b) => (b.onclick = () => { cart = cart.filter((x) => x.id !== b.dataset.rm); cartSave(session.user.id, cart); draw(); render() }))
     body.querySelectorAll('[data-m]').forEach((b) => (b.onclick = () => {
       const id = b.closest('li').dataset.id, l = rows.find((r) => r.id === id)
       cart = cart.map((x) => (x.id === id ? { ...x, qty: Math.max(1, Math.min(Math.min(available(l), 99), x.qty + Number(b.dataset.m))) } : x))
       cartSave(session.user.id, cart); draw(); render()
     }))
-    const f = body.querySelector('#co')
-    if (f && canTrade()) f.onsubmit = async (e) => {
-      e.preventDefault()
-      const btn = f.querySelector('[type=submit]'); btn.disabled = true; btn.textContent = t('Placing order…', '送出中…')
-      const items = good.map((x) => ({ listing_id: x.id, quantity: x.qty }))
-      const { data, error } = await supabase.rpc('place_order', { p_items: items, p_contact: f.contact.value, p_note: f.note.value, p_name: f.name.value })
-      if (error) { toast(error.message, 'err', 7000); await refreshRows(); draw(); return }
-      const ids = new Set(items.map((i) => i.listing_id))
-      cart = cart.filter((x) => !ids.has(x.id)); cartSave(session.user.id, cart)
-      document.getElementById('dlg')?.close(); await refreshRows(); render()
-      const nums = data.map((o) => '#' + o.order_no).join(', ')
-      toast(t(`Order placed: ${nums}. The seller has been notified.`, `訂單已送出：${nums}。賣家已收到通知。`), 'ok', 6500)
-      app.insertAdjacentHTML('afterbegin', `<div class="msg ok" id="placed">${t(`Order ${nums} is waiting for the seller to confirm payment.`, `訂單 ${nums} 正等待賣家確認收款。`)} <a href="/account.html#purchases"><b>${t('Follow it in My orders →', '到「我的訂單」追蹤 →')}</b></a></div>`)
-    }
   }
-  dialog(`<h3 style="margin-top:0">${t('Your cart', '購物車')}</h3><div class="cartbody"></div>`, 'wide')
+  dialog(`<h3 style="margin-top:0">🛒 ${t('Your cart', '購物車')}</h3><div class="cartbody"></div>`, 'drawer')
   draw()
 }
 
@@ -173,7 +158,7 @@ async function load() {
   if (!configured) return
   app.innerHTML = skeletonCards(6)
   const { data } = await supabase.auth.getSession(); session = data.session
-  await Promise.all([whoAmI(), refreshRows().then((ok) => { loaded = ok })])
+  await Promise.all([whoAmI(), loadSettings(supabase).then((x) => (settings = x)), refreshRows().then((ok) => { loaded = ok })])
   if (loaded) render()
   supabase.auth.onAuthStateChange(async (ev, s) => {
     if (ev === 'TOKEN_REFRESHED' || (ev === 'SIGNED_IN' && s?.user?.id === session?.user?.id)) return

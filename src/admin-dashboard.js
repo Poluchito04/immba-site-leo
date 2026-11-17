@@ -68,6 +68,8 @@ export async function loadDashboard(pane, { supabase, goto }) {
   const att = []
   if (newInq) att.push([`${newInq} new inquir${newInq > 1 ? 'ies' : 'y'} to answer`, 'inquiries'])
   if (pendingAdmins) att.push([`${pendingAdmins} administrator${pendingAdmins > 1 ? 's' : ''} waiting for approval`, 'approvals'])
+  const toConfirm = O.filter((o) => o.status === 'payment_submitted').length
+  if (toConfirm) att.push([`${toConfirm} payment${toConfirm > 1 ? 's' : ''} to confirm`, 'orders'])
   const abnormal = O.filter((o) => stalled(o)).length
   if (abnormal) att.push([`${abnormal} stalled transaction${abnormal > 1 ? 's' : ''} to monitor`, 'orders'])
   if (pendingListings) att.push([`${pendingListings} marketplace listing${pendingListings > 1 ? 's' : ''} to review`, 'marketplace'])

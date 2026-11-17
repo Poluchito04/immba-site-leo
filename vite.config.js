@@ -8,6 +8,7 @@ export default defineConfig({
     page: resolve(__dirname, 'page.html'),
     downloads: resolve(__dirname, 'downloads.html'),
     marketplace: resolve(__dirname, 'marketplace.html'),
+    checkout: resolve(__dirname, 'checkout.html'),
     project: resolve(__dirname, 'project.html'),
     contact: resolve(__dirname, 'contact.html'),
     account: resolve(__dirname, 'account.html')

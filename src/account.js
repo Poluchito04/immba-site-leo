@@ -3,11 +3,12 @@ import { mountChrome } from './chrome.js'
 import { t } from './i18n.js'
 import { toast } from './ui.js'
 import { pwField, bindPasswords, matchHint } from './password.js'
-import { loadPurchases, loadSelling, loadSales, sellerTodo } from './account-trade.js'
+import { loadPurchases, loadSelling, loadSales, sellerTodo, buyerTodo, sellerIds } from './account-trade.js'
+import { loadSettings } from './trade-ui.js'
 
 mountChrome({ skeleton: 'form' })
 const app = document.getElementById('app')
-let session = null, role = null, mode = 'login', inquiries = [], pendingEmail = null, tab = (location.hash || '').slice(1)
+let session = null, role = null, mode = 'login', inquiries = [], pendingEmail = null, tab = (location.hash || '').slice(1).split('?')[0]
 
 const STATUS = { new: ['New', '新'], in_progress: ['In progress', '處理中'], answered: ['Answered', '已回覆'], closed: ['Closed', '已結案'] }
 
@@ -52,7 +53,9 @@ function checkEmail() {
   }
 }
 
-const TABS = [['purchases', 'My orders', '我的訂單'], ['selling', 'My listings', '我的商品'], ['sales', 'Sales', '銷售'], ['inquiries', 'My inquiries', '我的諮詢']]
+const TABS = { buyer: [['purchases', 'My orders', '我的訂單'], ['inquiries', 'My inquiries', '我的諮詢']], seller: [['selling', 'My listings', '我的商品'], ['sales', 'Orders & sales', '訂單與銷售'], ['inquiries', 'My inquiries', '我的諮詢']] }
+const getMode = () => { try { return localStorage.getItem('immba-mode') === 'seller' ? 'seller' : 'buyer' } catch { return 'buyer' } }
+const setMode = (m) => { try { localStorage.setItem('immba-mode', m) } catch { /* private mode */ } }
 
 function inquiriesPane(pane) {
   pane.innerHTML = `<div class="spread" style="margin-top:22px"><h3 style="margin:0">${t('My inquiries', '我的諮詢')} (${inquiries.length})</h3><a class="btn sm" href="/contact.html">${t('New inquiry', '新增諮詢')}</a></div>
@@ -67,25 +70,48 @@ async function dashboard() {
   inquiries = data
   const staff = role === 'admin' || role === 'super_admin'
   const trader = staff || role === 'member'              // pending / rejected administrator applicants cannot trade
-  const tabs = trader ? TABS : TABS.filter((x) => x[0] === 'inquiries')
-  if (!tabs.some((x) => x[0] === tab)) tab = tabs[0][0]
-  app.innerHTML = `<div class="spread" style="margin-top:26px"><div><h3 style="margin:0">${t('Welcome', '歡迎')}, ${esc(session.user.email)}</h3><span class="pill ${staff ? 'super_admin' : ''}">${esc(staff ? role : role === 'member' ? 'member' : role || 'member')}</span>
-      ${trader ? `<span class="rolehint">${t('You can buy and sell on the marketplace.', '您可以在市集購買與刊登商品。')}${staff ? ' ' + t('As an administrator you also monitor every transaction in the back office (read-only).', '身為管理員，您也可在後台監看所有交易（唯讀）。') : ''}</span>` : ''}</div>
-    <div class="acts"><a class="btn" href="/marketplace.html">${t('Marketplace', '市集')}</a>${staff ? `<a class="btn o" href="/admin.html">${t('Back office', '後台')}</a>` : ''}<button class="btn o" id="out">${t('Sign out', '登出')}</button></div></div>
-    <div class="tabs" role="tablist">${tabs.map(([k, en, zh]) => `<button role="tab" data-tab="${k}" class="${tab === k ? 'on' : ''}">${t(en, zh)}${k === 'sales' ? '<b class="tbadge" id="todo" hidden></b>' : ''}</button>`).join('')}</div><div id="tpane"></div>`
-  document.getElementById('out').onclick = () => supabase.auth.signOut()
-  const pane = document.getElementById('tpane')
-  const ctx = { supabase, uid: session.user.id, email: session.user.email, role, badges }
-  async function badges() {
-    if (!trader) return
-    const n = await sellerTodo(supabase, ctx.uid), b = document.getElementById('todo')
-    if (b) { b.hidden = !n; b.textContent = n }
+  const settings = trader ? await loadSettings(supabase) : {}
+  const storeId = settings.demo_store_id || null
+  let mode = getMode()
+  if (tab === 'purchases') mode = 'buyer'; else if (tab === 'selling' || tab === 'sales') mode = 'seller'
+  const tabsOf = () => (trader ? TABS[mode] : TABS.buyer.filter((x) => x[0] === 'inquiries'))
+  if (!tabsOf().some((x) => x[0] === tab)) tab = tabsOf()[0][0]
+  const ctx = { supabase, uid: session.user.id, email: session.user.email, role, settings, storeId, badges: null, who: { uid: session.user.id, admin: staff, superAdmin: role === 'super_admin', storeId } }
+  // slide "Seller Mode / Buyer Mode": the same account switches between the two interfaces
+  const [listedQ, boughtQ] = trader ? await Promise.all([
+    supabase.from('listings').select('id', { count: 'exact', head: true }).in('seller_id', sellerIds(ctx)),
+    supabase.from('order_items').select('quantity, orders!inner(buyer_id,status)').eq('orders.buyer_id', ctx.uid).neq('orders.status', 'cancelled'),
+  ]) : [{}, {}]
+  const listed = listedQ.count || 0, bought = (boughtQ.data || []).reduce((a, r) => a + r.quantity, 0)
+
+  const draw = () => {
+    const tabs = tabsOf()
+    app.innerHTML = `<div class="spread" style="margin-top:26px"><div><h3 style="margin:0">${t('Welcome', '歡迎')}, ${esc(session.user.email)}</h3><span class="pill ${staff ? 'super_admin' : ''}">${esc(staff ? role : role === 'member' ? 'member' : role || 'member')}</span>
+        ${trader ? `<span class="rolehint">${t('One account, three possible roles: buyer, seller and (if you are an administrator) platform admin.', '一個帳號，三種可能身分：買家、賣家，以及（若為管理員）平台管理員。')}</span>` : ''}</div>
+      <div class="acts"><a class="btn" href="/marketplace.html">${t('Marketplace', '市集')}</a>${staff ? `<a class="btn o" href="/admin.html#orders">${t('Platform transactions', '平台交易')}</a>` : ''}<button class="btn o" id="out">${t('Sign out', '登出')}</button></div></div>
+      ${trader ? `<div class="modebox"><div class="modesw" role="radiogroup" aria-label="${t('Current role', '目前身分')}"><b>${t('Current role', '目前身分')}</b>
+          <label class="${mode === 'buyer' ? 'on' : ''}"><input type="radio" name="mode" value="buyer" ${mode === 'buyer' ? 'checked' : ''}> 🛒 ${t('Buyer mode', '買家模式')}</label>
+          <label class="${mode === 'seller' ? 'on' : ''}"><input type="radio" name="mode" value="seller" ${mode === 'seller' ? 'checked' : ''}> 🏪 ${t('Seller mode', '賣家模式')}</label></div>
+        <div class="kpis" style="margin:0"><div class="kpi"><b>${listed}</b><span>${t('Number of listed products', '上架商品數')}</span></div><div class="kpi"><b>${bought}</b><span>${t('Number of purchased items', '已購買件數')}</span></div><div class="kpi"><b style="font-size:1.3rem">${mode === 'buyer' ? t('Buyer mode', '買家模式') : t('Seller mode', '賣家模式')}</b><span>${t('Current mode', '目前模式')}</span></div></div></div>
+        <p class="hint" style="margin-top:6px">${mode === 'buyer' ? t('Buyer mode: browse products, pay for your orders and follow them until they arrive.', '買家模式：瀏覽商品、支付訂單並追蹤到貨。') : t('Seller mode: create listings, edit them, manage inventory, mark items as sold and process orders.', '賣家模式：新增與編輯商品、管理庫存、標記售完並處理訂單。')}</p>` : ''}
+      <div class="tabs" role="tablist">${tabs.map(([k, en, zh]) => `<button role="tab" data-tab="${k}" class="${tab === k ? 'on' : ''}">${t(en, zh)}${k === 'sales' ? '<b class="tbadge" id="todo" hidden></b>' : k === 'purchases' ? '<b class="tbadge" id="mine" hidden></b>' : ''}</button>`).join('')}</div><div id="tpane"></div>`
+    document.getElementById('out').onclick = () => supabase.auth.signOut()
+    const pane = document.getElementById('tpane')
+    ctx.badges = async () => {
+      if (!trader) return
+      const [n, m] = await Promise.all([sellerTodo(supabase, ctx), buyerTodo(supabase, ctx.uid)])
+      const b = document.getElementById('todo'), c = document.getElementById('mine')
+      if (b) { b.hidden = !n; b.textContent = n }
+      if (c) { c.hidden = !m; c.textContent = m }
+    }
+    const show = () => ({ purchases: loadPurchases, selling: loadSelling, sales: loadSales, inquiries: inquiriesPane }[tab])(pane, ctx)
+    app.querySelectorAll('input[name=mode]').forEach((r) => (r.onchange = () => { mode = r.value; setMode(mode); tab = TABS[mode][0][0]; history.replaceState(null, '', '#' + tab); draw() }))
+    app.querySelectorAll('[data-tab]').forEach((b) => (b.onclick = () => { tab = b.dataset.tab; history.replaceState(null, '', '#' + tab); app.querySelectorAll('[data-tab]').forEach((x) => x.classList.toggle('on', x === b)); show() }))
+    show(); ctx.badges()
+    // a user who left the tab open sees new orders as soon as they come back to it
+    document.onvisibilitychange = () => { if (!document.hidden && pane.isConnected && ['sales', 'purchases'].includes(tab)) { show(); ctx.badges() } }
   }
-  const show = () => ({ purchases: loadPurchases, selling: loadSelling, sales: loadSales, inquiries: inquiriesPane }[tab])(pane, ctx)
-  app.querySelectorAll('[data-tab]').forEach((b) => (b.onclick = () => { tab = b.dataset.tab; history.replaceState(null, '', '#' + tab); app.querySelectorAll('[data-tab]').forEach((x) => x.classList.toggle('on', x === b)); show() }))
-  show(); badges()
-  // a seller who left the tab open sees new orders as soon as they come back to it
-  document.onvisibilitychange = () => { if (!document.hidden && pane.isConnected && (tab === 'sales' || tab === 'purchases')) { show(); badges() } }
+  draw()
 }
 
 async function refresh() {

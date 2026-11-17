@@ -6,7 +6,7 @@ import { STATUS_EN } from './trade.js'
 const ACTION_CLASS = { CREATE: '', UPDATE: 'pending', DELETE: 'rejected', IMPORT: 'super_admin' }
 const SHOWN = 200
 // audit_log.table_name -> the tab an administrator knows it by
-const AREAS = { news: 'News & events', faculty: 'Faculty', alumni: 'Alumni', pages: 'Pages', downloads: 'Documents', listings: 'Marketplace', orders: 'Transactions', profiles: 'Administrators' }
+const AREAS = { news: 'News & events', faculty: 'Faculty', alumni: 'Alumni', pages: 'Pages', downloads: 'Documents', listings: 'Marketplace', orders: 'Transactions', app_settings: 'Marketplace settings', profiles: 'Administrators' }
 
 // filters survive the full re-render that every notify() triggers
 const S = { area: '', act: '', who: '' }

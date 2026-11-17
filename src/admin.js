@@ -16,7 +16,7 @@ const who = document.getElementById('who')
 const BUCKET = 'faculty-photos'
 const FIELDS = ['name', 'title', 'education', 'research_fields', 'department', 'phone', 'email', 'website', 'category', 'name_zh', 'title_zh', 'education_zh', 'research_fields_zh', 'department_zh']
 let movedId = null // faculty row to highlight after a reorder
-let session = null, profile = null, faculty = [], news = [], editingNews = null, tab = 'dashboard', editing = null, flash = null
+let session = null, profile = null, faculty = [], news = [], editingNews = null, tab = (location.hash.slice(1) || 'dashboard'), editing = null, flash = null
 
 const PW_TXT = { show: ['Show password', '顯示密碼'], hide: ['Hide password', '隱藏密碼'], match: ['Passwords match', '密碼相符'], mismatch: ['Passwords do not match', '兩次輸入的密碼不一致'] }
 const pwText = (k) => PW_TXT[k][isZh() ? 1 : 0]

@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { actionsFor, available, stockState, stalled, salesSummary, matchesOrder, ordersToCsv, cartAdd, cartLines, cartTotal, cartCount, cartLoad, cartSave, progress, STATUS, FLOW, DAY } from '../src/trade.js'
+import { monthStats, monthsWithSales, platformStats, checkoutTotals, earned, STEPS, actionsFor, available, stockState, stalled, salesSummary, matchesOrder, ordersToCsv, cartAdd, cartLines, cartTotal, cartCount, cartLoad, cartSave, progress, STATUS, FLOW, DAY } from '../src/trade.js'
 
 const o = (over = {}) => ({ id: 'aaaa1111', order_no: 1001, buyer_id: 'B', seller_id: 'S', buyer_name: 'Bea', buyer_email: 'b@x.tw', buyer_contact: 'LINE bea', seller_name: 'Sam', seller_email: 's@x.tw', status: 'waiting_payment', total: 500, created_at: '2026-11-01T10:00:00Z', status_at: '2026-11-01T10:00:00Z', ...over })
 const tos = (order, uid) => actionsFor(order, uid).map((a) => a.to)
@@ -13,28 +13,50 @@ test('stock formula: available = inventory − purchased, never negative', () =>
   assert.equal(stockState({ quantity: 5, purchased: 0 }), 'in')
 })
 
-test('the seller drives the order forward step by step', () => {
-  assert.deepEqual(tos(o(), 'S'), ['payment_confirmed', 'cancelled'])
-  assert.deepEqual(tos(o({ status: 'payment_confirmed' }), 'S'), ['ready_to_ship', 'cancelled'])
-  assert.deepEqual(tos(o({ status: 'ready_to_ship' }), 'S'), ['shipped', 'cancelled'])
-  assert.deepEqual(tos(o({ status: 'shipped' }), 'S'), ['completed'])
+const B = { uid: 'B' }, S = { uid: 'S' }, ADMIN = { uid: 'ADMIN', admin: true }
+const STORE = 'STORE'
+
+test('buyer pays first: "I have paid" asks for a reference; nobody else can say it', () => {
+  assert.deepEqual(tos(o(), B), ['payment_submitted', 'cancelled'])
+  assert.equal(actionsFor(o(), B)[0].ask, 'ref')
+  assert.deepEqual(tos(o(), S), ['cancelled'])
+  assert.deepEqual(tos(o(), ADMIN), [])
 })
 
-test('the buyer can only cancel before payment and confirm receipt after shipping', () => {
-  assert.deepEqual(tos(o(), 'B'), ['cancelled'])
-  assert.deepEqual(tos(o({ status: 'payment_confirmed' }), 'B'), [])
-  assert.deepEqual(tos(o({ status: 'shipped' }), 'B'), ['completed'])
+test('only an administrator confirms (or rejects) the payment, never the seller or the buyer', () => {
+  const sub = o({ status: 'payment_submitted' })
+  assert.deepEqual(tos(sub, ADMIN), ['payment_confirmed', 'waiting_payment', 'cancelled'])
+  assert.deepEqual(tos(sub, S), [])
+  assert.deepEqual(tos(sub, B), [])
 })
 
-test('administrators, visitors and strangers get no actions (monitoring is not editing)', () => {
-  for (const s of FLOW.concat('cancelled')) { assert.deepEqual(tos(o({ status: s }), 'ADMIN'), []); assert.deepEqual(tos(o({ status: s }), null), []) }
+test('after confirmation the seller prepares and ships; the buyer confirms receipt', () => {
+  assert.deepEqual(tos(o({ status: 'payment_confirmed' }), S), ['ready_to_ship', 'cancelled'])
+  assert.deepEqual(tos(o({ status: 'ready_to_ship' }), S), ['shipped', 'cancelled'])
+  assert.deepEqual(tos(o({ status: 'shipped' }), S), ['completed'])
+  assert.deepEqual(tos(o({ status: 'shipped' }), B), ['completed'])
+  assert.deepEqual(tos(o({ status: 'payment_confirmed' }), B), [])
+})
+
+test('administrators cannot ship or complete, and visitors get nothing (monitoring is not editing)', () => {
+  for (const st of ['waiting_payment', 'payment_confirmed', 'ready_to_ship', 'shipped', 'completed', 'cancelled']) {
+    const t = tos(o({ status: st }), ADMIN)
+    assert.ok(!t.includes('ready_to_ship') && !t.includes('shipped') && !t.includes('completed'), st)
+    assert.deepEqual(tos(o({ status: st }), null), [])
+  }
+})
+
+test('the super admin runs the demo store as its seller', () => {
+  const order = o({ seller_id: STORE, status: 'payment_confirmed' })
+  assert.deepEqual(tos(order, { uid: 'ROOT', admin: true, superAdmin: true, storeId: STORE }), ['ready_to_ship', 'cancelled'])
+  assert.deepEqual(tos(order, { uid: 'ADMIN2', admin: true, storeId: STORE }), ['cancelled'])
 })
 
 test('completed and cancelled orders are final', () => {
-  assert.deepEqual(tos(o({ status: 'completed' }), 'S'), [])
-  assert.deepEqual(tos(o({ status: 'cancelled' }), 'B'), [])
+  assert.deepEqual(tos(o({ status: 'completed' }), S), [])
+  assert.deepEqual(tos(o({ status: 'cancelled' }), B), [])
   assert.equal(progress('cancelled'), -1)
-  assert.equal(progress('shipped'), 3)
+  assert.equal(progress('shipped'), 4)
 })
 
 test('every status has English and Chinese labels', () => {
@@ -44,6 +66,7 @@ test('every status has English and Chinese labels', () => {
 test('stalled orders are flagged by how long they sit in one state', () => {
   const now = new Date('2026-11-10T10:00:00Z').getTime()
   assert.deepEqual(stalled(o(), now), { days: 9, limit: 3 })
+  assert.deepEqual(stalled(o({ status: 'payment_submitted', status_at: new Date(now - 2 * DAY).toISOString() }), now), { days: 2, limit: 1 })
   assert.equal(stalled(o({ status_at: new Date(now - DAY).toISOString() }), now), null)
   assert.equal(stalled(o({ status: 'completed' }), now), null)
   assert.equal(stalled(o({ status: 'cancelled' }), now), null)
@@ -52,7 +75,7 @@ test('stalled orders are flagged by how long they sit in one state', () => {
 test('seller accounting: revenue counts completed sales of the month, pending money is separate', () => {
   const now = new Date(2026, 10, 17)
   const orders = [
-    o({ status: 'completed', total: 300, completed_at: new Date(2026, 10, 3).toISOString() }),
+    o({ status: 'completed', total: 384, subtotal: 300, shipping_fee: 80, platform_fee: 4, completed_at: new Date(2026, 10, 3).toISOString() }),
     o({ status: 'completed', total: 200, completed_at: new Date(2026, 9, 20).toISOString() }),
     o({ status: 'waiting_payment', total: 100 }),
     o({ status: 'payment_confirmed', total: 50 }),
@@ -60,13 +83,13 @@ test('seller accounting: revenue counts completed sales of the month, pending mo
     o({ status: 'cancelled', total: 999 }),
   ]
   const s = salesSummary(orders, now)
-  assert.equal(s.monthRevenue, 300)
-  assert.equal(s.totalRevenue, 500)
+  assert.equal(s.monthRevenue, 380, 'seller earns goods + shipping, not the platform fee')
+  assert.equal(s.totalRevenue, 580)
   assert.equal(s.completedCount, 2)
   assert.deepEqual(s.pendingPayments, { count: 1, amount: 100 })
   assert.deepEqual(s.toShip, { count: 2, amount: 75 })
   assert.equal(s.months.length, 6)
-  assert.equal(s.months.at(-1).revenue, 300)
+  assert.equal(s.months.at(-1).revenue, 380)
   assert.equal(s.months.at(-2).revenue, 200)
 })
 
@@ -78,7 +101,7 @@ test('admin search by order id accepts 1001, #1001, partial uuid, names', () => 
 
 test('transaction CSV: seller columns, items joined, formulas defused, BOM for Excel', () => {
   const csv = ordersToCsv([o({ buyer_name: '=HYPERLINK("x")', status: 'completed', completed_at: '2026-11-05T00:00:00Z' })], [{ order_id: 'aaaa1111', title: 'Kotler', quantity: 2 }], 'seller')
-  assert.ok(csv.startsWith('﻿Order ID,Order date,Status,Products,Total (NT$),Buyer,Buyer contact'))
+  assert.ok(csv.startsWith('﻿Order ID,Order date,Status,Products,Shipping,Subtotal (NT$),Shipping fee (NT$),Revenue (NT$),Buyer,Buyer contact'))
   assert.match(csv, /#1001/); assert.match(csv, /Kotler × 2/); assert.match(csv, /Completed/)
   assert.ok(csv.includes("'=HYPERLINK"), 'formula must be neutralised')
   assert.ok(ordersToCsv([], [], 'admin').includes('Order ID'))
@@ -102,3 +125,24 @@ test('cart lines re-check stock and flag vanished or sold-out items; total skips
   assert.deepEqual(lines.map((x) => [x.ok, x.qty]), [[true, 2], [false, 0], [false, 0]])
   assert.equal(cartTotal(lines), 200)
 })
+
+test('financial report by month, and the months that have sales', () => {
+  const orders = [o({ status: 'completed', subtotal: 100, total: 104, platform_fee: 4, completed_at: '2026-11-03T00:00:00Z' }), o({ status: 'completed', total: 50, completed_at: '2026-10-03T00:00:00Z' }), o({ status: 'shipped', total: 999 })]
+  assert.equal(monthStats(orders, 'all').revenue, 150)
+  assert.deepEqual(monthStats(orders, '2026-11').count, 1)
+  assert.deepEqual(monthsWithSales(orders), ['2026-11', '2026-10'])
+  assert.equal(earned(orders[0]), 100)
+})
+
+test('platform view: transactions, amount, fees only once paid, payments waiting for an admin', () => {
+  const orders = [o({ status: 'payment_submitted', total: 104, platform_fee: 4 }), o({ status: 'completed', total: 204, platform_fee: 4 }), o({ status: 'cancelled', total: 500, platform_fee: 4 }), o({ status: 'waiting_payment', total: 10, platform_fee: 4 })]
+  assert.deepEqual(platformStats(orders), { count: 4, amount: 318, fees: 4, toConfirm: 1 })
+})
+
+test('checkout totals: shipping and platform fee are charged once per seller order', () => {
+  const lines = [{ ok: true, qty: 2, listing: { seller_id: 'S1', price: 100 } }, { ok: true, qty: 1, listing: { seller_id: 'S2', price: 50 } }, { ok: false, qty: 0, listing: null }]
+  assert.deepEqual(checkoutTotals(lines, 'pickup', { platform_fee: 4, delivery_fee: 80 }), { orders: 2, subtotal: 250, shipping: 0, fee: 8, total: 258 })
+  assert.deepEqual(checkoutTotals(lines, 'delivery', { platform_fee: 4, delivery_fee: 80 }), { orders: 2, subtotal: 250, shipping: 160, fee: 8, total: 418 })
+})
+
+test('the stepper has one label per step of the lifecycle', () => assert.equal(STEPS.length, FLOW.length))

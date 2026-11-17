@@ -53,7 +53,7 @@ MVP (midterm): public home, bilingual switch, news cards, faculty, content pages
 1. **Visitor reads:** open page, choose language, read or search, optionally download a file (documents show their type).
 2. **Visitor asks:** contact form, row in `inquiries` with status `new`; if logged in as member the row is linked to them.
 3. **Member lists an item:** Account → My listings → new listing (name, category, price, quantity, image), `status = 'pending'`, invisible to the public until an admin approves it in the Marketplace tab.
-3b. **Buy:** Marketplace → product → quantity → cart → contact and note → Place order; one order per seller, stock reserved; the seller sees it under Account → Sales (badge on the tab); seller confirms payment, ready to ship, shipped; buyer confirms receipt; both keep it in their history; admin sees it in back office → Transactions.
+3b. **Buy:** Marketplace → product → quantity → cart drawer → Checkout page (contact, pickup or delivery, payment instructions, Subtotal + Shipping + Platform fee = Total Due) → Place order; one order per seller, stock reserved; the seller sees it under Account → Sales (badge on the tab); buyer presses "I have paid", **the administrator confirms the payment received** (Transactions tab), then the seller marks ready to ship and shipped; buyer confirms receipt; both keep it in their history; admin sees it in back office → Transactions.
 4. **Administrator onboarding:** register, verify email, role `pending`, waiting screen; super admin approves in the Administrators tab, role becomes `admin` (or `rejected`); the change is written to the audit log.
 5. **Publish bilingual news:** fill English, press auto-translate for a Chinese draft, edit, save; the system warns if one language is missing and asks for confirmation.
 6. **Import alumni:** download template, choose CSV, validate and preview with row-level errors, pick skip or update duplicates, import, verify counts, see one `IMPORT` row in the Activity log.
@@ -91,7 +91,7 @@ Each item is checked by hand in production unless a test is named.
 - **A3 (F3, F8)** Given a super admin approves a `pending` user, then the user becomes `admin`, can edit news, and one audit row with old and new role exists.
 - **A4 (F5)** Given a member's listing, then it is saved as `pending`, does not appear on `/marketplace.html`, and appears after approval; a rejected or hidden listing never appears. An anonymous insert, or an insert with `status='approved'`, is refused.
 - **A12 (F5)** Given a member orders 2 of a listing with 3 in stock, then an order `waiting_payment` exists, available stock is 1 and the seller sees it; ordering 2 more fails with "Only 1 left". Cancelling returns the stock. Test: `tests/trade.test.js` (rules), SQL role simulation (database).
-- **A13 (F5)** Only the seller can confirm payment, mark ready to ship and ship; the buyer can confirm receipt and cancel while waiting for payment; an admin, a stranger or a visitor calling `advance_order` is rejected; a seller cannot buy their own listing.
+- **A13 (F5)** Only the buyer can report payment ("I have paid"); only an administrator can confirm it or say it was not received; the seller can mark ready to ship and ship only after confirmation; the seller cannot confirm payment; the buyer can confirm receipt and cancel while waiting for payment; an admin, a stranger or a visitor calling `advance_order` is rejected; a seller cannot buy their own listing.
 - **A14 (F5b)** Given a completed order, then `delete` on `orders` or `order_items` fails for everyone, including an admin, and the order remains in buyer history, seller history and the admin Transactions tab.
 - **A15 (F5)** Seller dashboard: monthly revenue counts completed orders only; the CSV opens in Excel with Chinese text and neutralises cells starting with `=`. Admin can search an order by `#1001`, filter by status and see stalled orders.
 - **A5 (F7)** Given the 20-row class CSV, when imported, then 20 rows are added and ROC year 110 is stored as 2021. Given a repeated Student ID, then the row is reported as duplicate and the form is not lost. Test: `tests/alumni-csv.test.js`.
@@ -101,6 +101,8 @@ Each item is checked by hand in production unless a test is named.
 - **A9 (privacy)** Given an anonymous client, then `select` on `alumni`, `audit_log`, `profiles` returns nothing or an error.
 - **A10 (N4)** Given a slow connection, then skeletons show instead of a blank page.
 - **A11 (Markdown)** Given news content with HTML or a `javascript:` link, then it is escaped or dropped. Test: `tests/md.test.js`.
+
+- **A16 (F5)** Checkout totals: Subtotal + Shipping (per seller, delivery only) + Platform fee (per order) = Total Due; delivery without an address is refused; the fees come from `app_settings` and only the super admin can change them. Test: `tests/trade.test.js` (checkoutTotals).
 
 ## 10. Edge cases the agent must handle
 - Missing translation (fallback and flag); news with only one language.
