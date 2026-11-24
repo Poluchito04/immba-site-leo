@@ -1,6 +1,6 @@
 // Marketplace business rules shared by the shop, the account hub and the back office. Pure functions (no DOM, no network)
 // so they can be unit-tested. The database enforces the same rules again (supabase/v6.sql): this file only drives the UI.
-import { toCsv } from './alumni-csv.js'
+import { toCsv, csvCell } from './alumni-csv.js'
 
 /** Order lifecycle (slide "What happens after an order is submitted?"):
  *  Order Placed → Waiting for Payment Confirmation → Payment Confirmed → Ready to Ship → Shipped → Completed.
@@ -140,7 +140,61 @@ export function ordersToCsv(orders, items = [], side = 'seller') {
     return { ...base(o), 'Subtotal (NT$)': Number(o.subtotal ?? o.total), 'Shipping fee (NT$)': Number(o.shipping_fee || 0), 'Platform fee (NT$)': Number(o.platform_fee || 0), 'Total due (NT$)': Number(o.total), 'Buyer': o.buyer_name, 'Buyer email': o.buyer_email, 'Seller': o.seller_name, 'Seller email': o.seller_email, 'Payment reference': o.payment_ref || '', 'Last change': stamp(o.status_at) }
   })
   const cols = rows[0] ? Object.keys(rows[0]) : ['Order ID', 'Order date', 'Status', 'Products', 'Shipping']
-  return toCsv(rows, cols)
+  const csv = toCsv(rows, cols)
+  if (!orders.length) return csv
+  const sum = financialSummary(orders, side)
+  const at = [new Date().toISOString().slice(0, 19).replace('T', ' ')]
+  const block = [['FINANCIAL SUMMARY'], ['Generated at (UTC)', ...at], ['Amounts in NT$ (TWD). Cancelled orders are listed but never counted as money.'], [],
+    ...sum.map((r) => r.map((v) => (v === '' ? '' : v)))]
+  return csv + '\r\n' + block.map((r) => r.map(csvCell).join(',')).join('\r\n') + '\r\n'
+}
+
+/**
+ * Financial summary appended to the transaction CSV (accounting view). Money only counts once it is real:
+ * "Realised" = completed orders; "In progress" = paid or promised but not completed; cancelled orders are 0.
+ * Admin/platform: goods, shipping, platform fees (earned once the payment is confirmed) and total billed.
+ * Seller: revenue = goods + shipping, the platform fee is not theirs. Buyer: what they paid.
+ */
+export function financialSummary(orders, side = 'seller') {
+  const n = (v) => Number(v || 0)
+  const sub = (o) => n(o.subtotal ?? o.total), ship = (o) => n(o.shipping_fee), fee = (o) => n(o.platform_fee)
+  const by = (st) => orders.filter((o) => (Array.isArray(st) ? st.includes(o.status) : o.status === st))
+  const live = orders.filter((o) => o.status !== 'cancelled')
+  const done = by('completed'), cancelled = by('cancelled')
+  const unpaid = by(['waiting_payment', 'payment_submitted'])
+  const paidOpen = by(['payment_confirmed', 'ready_to_ship', 'shipped'])
+  const feesOwed = (o) => (['waiting_payment', 'payment_submitted'].includes(o.status) ? 0 : fee(o))
+  const agg = (l) => ({ count: l.length, sub: l.reduce((a, o) => a + sub(o), 0), ship: l.reduce((a, o) => a + ship(o), 0), fee: l.reduce((a, o) => a + fee(o), 0) })
+  const tot = (a) => a.sub + a.ship + a.fee
+  const row = (label, l) => { const a = agg(l); return [label, a.count, a.sub, a.ship, a.fee, tot(a)] }
+  const head = ['By status', 'Orders', 'Goods (NT$)', 'Shipping (NT$)', 'Platform fee (NT$)', 'Total (NT$)']
+  const A = agg(live), D = agg(done)
+  const lines = [head,
+    row('Completed (realised)', done), row('Shipped / paid, not completed', paidOpen), row('Awaiting or confirming payment', unpaid), row('Cancelled (not counted)', cancelled),
+    ['TOTAL excluding cancelled', A.count, A.sub, A.ship, A.fee, tot(A)], []]
+  if (side === 'seller') {
+    lines.push(['Key figures', 'NT$'],
+      ['Total earned (completed orders: goods + shipping)', D.sub + D.ship],
+      ['Still to collect or deliver (not completed)', agg([...unpaid, ...paidOpen]).sub + agg([...unpaid, ...paidOpen]).ship],
+      ['Average order value (completed)', done.length ? Math.round((D.sub + D.ship) / done.length) : 0],
+      ['Platform fees are paid by the buyer and are not part of your revenue', ''])
+  } else if (side === 'buyer') {
+    lines.push(['Key figures', 'NT$'], ['Total spent (completed orders)', tot(D)], ['Committed, not completed', tot(agg([...unpaid, ...paidOpen]))])
+  } else {
+    const feeEarned = live.reduce((a, o) => a + feesOwed(o), 0), feeDone = done.reduce((a, o) => a + fee(o), 0)
+    lines.push(['Key figures', 'NT$'],
+      ['Gross merchandise value (goods + shipping, excl. cancelled)', A.sub + A.ship],
+      ['Total billed to buyers (goods + shipping + fees, excl. cancelled)', tot(A)],
+      ['Money realised on completed orders (total billed)', tot(D)],
+      ['Platform fee income (payment confirmed or later)', feeEarned],
+      ['Platform fee income on completed orders', feeDone],
+      ['Owed to sellers on completed orders (goods + shipping)', D.sub + D.ship],
+      ['Payments still to collect or confirm (total billed)', tot(agg(unpaid))],
+      ['Payments to confirm now (waiting for confirmation)', by('payment_submitted').length],
+      ['Average order value (excl. cancelled)', live.length ? Math.round(tot(A) / live.length) : 0],
+      ['Cancellation rate', orders.length ? (cancelled.length / orders.length * 100).toFixed(1) + '%' : '0%'])
+  }
+  return lines
 }
 
 /* ------------------------------------ cart (kept in the browser, per account) ------------------------------------ */

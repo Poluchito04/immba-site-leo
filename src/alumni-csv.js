@@ -94,7 +94,7 @@ const safeCell = (v) => {
   const s = String(v ?? '')
   return /^[=@\t\r]/.test(s) || /^[+-](?!\d[\d\s\-().]*$)/.test(s) ? "'" + s : s
 }
-const csvCell = (v) => { const s = safeCell(v); return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s }
+export const csvCell = (v) => { const s = safeCell(v); return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s }
 
 export function toCsv(rows, cols = COLUMNS) {
   const head = cols.map((c) => csvCell(LABELS[c] || c)).join(',')

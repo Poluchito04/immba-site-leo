@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { monthStats, monthsWithSales, platformStats, checkoutTotals, earned, STEPS, actionsFor, available, stockState, stalled, salesSummary, matchesOrder, ordersToCsv, cartAdd, cartLines, cartTotal, cartCount, cartLoad, cartSave, progress, STATUS, FLOW, DAY } from '../src/trade.js'
+import { monthStats, monthsWithSales, platformStats, checkoutTotals, earned, STEPS, actionsFor, available, stockState, stalled, salesSummary, matchesOrder, ordersToCsv, financialSummary, cartAdd, cartLines, cartTotal, cartCount, cartLoad, cartSave, progress, STATUS, FLOW, DAY } from '../src/trade.js'
 
 const o = (over = {}) => ({ id: 'aaaa1111', order_no: 1001, buyer_id: 'B', seller_id: 'S', buyer_name: 'Bea', buyer_email: 'b@x.tw', buyer_contact: 'LINE bea', seller_name: 'Sam', seller_email: 's@x.tw', status: 'waiting_payment', total: 500, created_at: '2026-11-01T10:00:00Z', status_at: '2026-11-01T10:00:00Z', ...over })
 const tos = (order, uid) => actionsFor(order, uid).map((a) => a.to)
@@ -235,4 +235,26 @@ test('regression (class 11): members can reset a forgotten password from the sig
   assert.match(src, /resetPasswordForEmail/)
   assert.match(src, /PASSWORD_RECOVERY/)
   assert.match(src, /Forgot password\?', '忘記密碼？'/)
+})
+
+test('financial summary in the transaction CSV: realised vs in progress, cancelled excluded, platform fees', () => {
+  const orders = [
+    o({ id: 'a1', order_no: 1, status: 'completed', subtotal: 400, shipping_fee: 80, platform_fee: 4, total: 484 }),
+    o({ id: 'a2', order_no: 2, status: 'shipped', subtotal: 200, shipping_fee: 0, platform_fee: 4, total: 204 }),
+    o({ id: 'a3', order_no: 3, status: 'waiting_payment', subtotal: 100, shipping_fee: 0, platform_fee: 4, total: 104 }),
+    o({ id: 'a4', order_no: 4, status: 'cancelled', subtotal: 999, shipping_fee: 0, platform_fee: 4, total: 1003 }),
+  ]
+  const s = financialSummary(orders, 'admin')
+  const k = Object.fromEntries(s.filter((r) => r.length === 2).map((r) => [r[0], r[1]]))
+  assert.equal(k['Gross merchandise value (goods + shipping, excl. cancelled)'], 780)
+  assert.equal(k['Total billed to buyers (goods + shipping + fees, excl. cancelled)'], 792)
+  assert.equal(k['Money realised on completed orders (total billed)'], 484)
+  assert.equal(k['Platform fee income (payment confirmed or later)'], 8)   // unpaid and cancelled orders earn no fee yet
+  assert.equal(k['Owed to sellers on completed orders (goods + shipping)'], 480)
+  assert.equal(k['Cancellation rate'], '25.0%')
+  const seller = Object.fromEntries(financialSummary(orders, 'seller').filter((r) => r.length === 2).map((r) => [r[0], r[1]]))
+  assert.equal(seller['Total earned (completed orders: goods + shipping)'], 480)
+  const csv = ordersToCsv(orders, [], 'admin')
+  assert.match(csv, /FINANCIAL SUMMARY/); assert.match(csv, /TOTAL excluding cancelled,3,700,80,12,792/)
+  assert.ok(!ordersToCsv([], [], 'admin').includes('FINANCIAL SUMMARY'))
 })
