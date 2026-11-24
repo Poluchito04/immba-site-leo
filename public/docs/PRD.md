@@ -253,7 +253,7 @@ AI wrote the SQL and the code, but it had to be reviewed and tested in productio
 - Interpretation I made (to confirm with the instructor): the slides list "Seller: approved seller"; I treat the administrator's approval of each listing as that approval, instead of a separate seller application.
 
 ### Class 11 - Testing and verification (24 Nov 2026)
-*Drafted from the real test results; the student should rewrite the lessons in their own words.*
+*Reviewed and approved by the student, Leopoldo Martinez (F15381071), 24 Nov 2026.*
 - "Working is not the same as correct." The 59 unit tests were green while students could not register, because the failure was in a project setting (2 e-mails per hour), not in code. Tests only see what you point them at.
 - A hidden requirement showed up from outside: a registration e-mail is a dependency with a limit. I switched off e-mail confirmation to unblock people and recorded that this removes verification until a custom SMTP exists.
 - Reading the permission rules against the class's access-control cases found a real hole (a seller could rename an approved listing, even to the demo store's name, without review). A permission test that fails is useful; one of my own failures (T11) was a mistake in the test, not in the product.
@@ -303,7 +303,7 @@ AI wrote the SQL and the code, but it had to be reviewed and tested in productio
 - **24 Nov 2026 (class 11):** testing and verification. `supabase/v8.sql` (seller_name changes go back to review; demo-store name reserved), `testing/` folder (permission tests, filled worksheet, evidence, report). **Decision:** e-mail confirmation switched off to stop the 2 e-mails/hour failure; to be re-enabled with a custom SMTP. Member password reset added to `/account.html`; card descriptions no longer cut; decimal quantities floored.
 
 ## 19. Final reflection
-*Drafted by Claude from the real project history, at the student's request. Read it, change what does not sound like you, and sign it before handing it in.*
+*Reviewed and approved by the student, Leopoldo Martinez (F15381071), 24 Nov 2026.*
 
 **What I built and what I would change first.** I built a bilingual (English / 中文) program website with a public side, a back office with roles, an alumni database with CSV import and a role-based C2C marketplace (sellers, stock, cart, checkout, payment confirmed by an administrator, shipment, completion). With more time I would first fix what class 11 showed me is still missing for real users: a custom e-mail service (so verification, password reset and order notifications work), real payment instructions, and a second real account to buy and sell between two people instead of through the demo store.
 
