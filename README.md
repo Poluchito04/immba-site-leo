@@ -11,7 +11,7 @@ Live: https://immba-copia.vercel.app · Product docs: `/project.html` (sources: 
 - Security: Row Level Security on every table, safe markdown renderer, link sanitising, no secrets in the repo.
 
 ## Setup
-1. Create a Supabase project. In the SQL Editor run, in order: `supabase/schema.sql`, `supabase/seed-faculty.sql`, `supabase/news.sql`, `supabase/seed-news.sql`, `supabase/v2.sql`, `supabase/fix-file-links.sql` (corrects old university file paths), then the later migrations `supabase/v3.sql`, `supabase/v4.sql`, `supabase/v5.sql` (alumni database, audit trail, CSV import) `supabase/v6.sql` (class 10: role-based marketplace with orders and inventory) and `supabase/v7.sql` (class 10 part 2: admin-confirmed payments, shipping method, platform fee, demo store with real photos).
+1. Create a Supabase project. In the SQL Editor run, in order: `supabase/schema.sql`, `supabase/seed-faculty.sql`, `supabase/news.sql`, `supabase/seed-news.sql`, `supabase/v2.sql`, `supabase/fix-file-links.sql` (corrects old university file paths), then the later migrations `supabase/v3.sql`, `supabase/v4.sql`, `supabase/v5.sql` (alumni database, audit trail, CSV import) `supabase/v6.sql` (class 10: role-based marketplace with orders and inventory) `supabase/v7.sql` (class 10 part 2: admin-confirmed payments, shipping method, platform fee, demo store with real photos) and `supabase/v8.sql` (class 11: listing guard fixes found by testing).
 2. Register once in `/admin.html`, then make yourself the first super admin:
    `update public.profiles set role = 'super_admin' where email = 'YOUR_EMAIL';`
 3. In Supabase → Auth → URL configuration set the Site URL and add `https://YOUR-DOMAIN/admin.html` as a redirect URL.
@@ -20,7 +20,10 @@ Live: https://immba-copia.vercel.app · Product docs: `/project.html` (sources: 
 
 ## Scripts
 - `npm run dev` / `npm run build`
-- `npm test`: unit tests for the markdown renderer, sanitisers, retrieval and the alumni CSV parser/validator and the marketplace rules (`tests/`)
+- `npm test`: unit tests for the markdown renderer, sanitisers, retrieval and the alumni CSV parser/validator and the marketplace rules including boundary values and access (`tests/`, 59 tests)
+
+## Testing (class 11)
+`testing/` holds the test report (`TEST-REPORT.md`), the permission tests (`permissions-tests.sql`: run in the Supabase SQL editor, ends in a rollback), the filled worksheet (`C2C_Peer_System_Testing_Worksheet_SELF-TEST_Leopoldo.docx`) and the evidence screenshots. `testing/cleanup-test-order.sql` is optional.
 
 ## Data sources
 Faculty, news, pages and document links come from the official imMBA website (cited on every page). Photos and files are linked, not copied.

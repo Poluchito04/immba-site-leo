@@ -8,18 +8,18 @@ import { loadSettings } from './trade-ui.js'
 
 mountChrome({ skeleton: 'form' })
 const app = document.getElementById('app')
-let session = null, role = null, mode = 'login', inquiries = [], pendingEmail = null, tab = (location.hash || '').slice(1).split('?')[0]
+let session = null, role = null, mode = 'login', recovering = false, inquiries = [], pendingEmail = null, tab = (location.hash || '').slice(1).split('?')[0]
 
 const STATUS = { new: ['New', '新'], in_progress: ['In progress', '處理中'], answered: ['Answered', '已回覆'], closed: ['Closed', '已結案'] }
 
 function authForm() {
-  const titles = { login: t('Sign in', '登入'), register: t('Create your account', '建立帳號') }
+  const titles = { login: t('Sign in', '登入'), register: t('Create your account', '建立帳號'), reset: t('Reset your password', '重設密碼') }
   app.innerHTML = `<form class="box auth" id="f"><h3 style="margin-top:0">${titles[mode]}</h3>
     <label>Email</label><input type="email" name="email" required autocomplete="email">
-    ${pwField({ name: 'password', label: t('Password', '密碼'), autocomplete: mode === 'login' ? 'current-password' : 'new-password' })}
+    ${mode === 'reset' ? `<p style="font-size:14px;color:var(--mut)">${t('Enter your email and we will send you a link to choose a new password.', '輸入電子郵件，我們會寄給您設定新密碼的連結。')}</p>` : pwField({ name: 'password', label: t('Password', '密碼'), autocomplete: mode === 'login' ? 'current-password' : 'new-password' })}
     ${mode === 'register' ? `${pwField({ name: 'password2', label: t('Confirm password', '確認密碼'), autocomplete: 'new-password' })}${matchHint}<p style="font-size:12px;color:var(--mut);margin:8px 0 0">${t('At least 6 characters.', '至少 6 個字元。')}</p>` : ''}
     <p><button class="btn" type="submit" style="width:100%">${titles[mode]}</button></p>
-    <p style="font-size:14px;text-align:center">${mode === 'login' ? `<a href="#" data-m="register">${t('Create an account', '建立帳號')}</a>` : `<a href="#" data-m="login">${t('Already registered? Sign in', '已有帳號？登入')}</a>`}</p>
+    <p style="font-size:14px;text-align:center">${mode === 'login' ? `<a href="#" data-m="register">${t('Create an account', '建立帳號')}</a> · <a href="#" data-m="reset">${t('Forgot password?', '忘記密碼？')}</a>` : `<a href="#" data-m="login">${mode === 'reset' ? t('← Back to sign in', '← 返回登入') : t('Already registered? Sign in', '已有帳號？登入')}</a>`}</p>
     <p style="font-size:12px;color:var(--mut);text-align:center">${t('Member accounts let you follow your inquiries. Administrators use the', '會員帳號可追蹤您的諮詢。管理員請使用')} <a href="/admin.html">${t('back office', '後台')}</a>.</p></form>`
   app.querySelectorAll('[data-m]').forEach((a) => (a.onclick = (e) => { e.preventDefault(); mode = a.dataset.m; authForm() }))
   const pw = bindPasswords(app, (k) => ({ show: t('Show password', '顯示密碼'), hide: t('Hide password', '隱藏密碼'), match: t('Passwords match', '密碼相符'), mismatch: t('Passwords do not match', '兩次輸入的密碼不一致') }[k]))
@@ -27,8 +27,15 @@ function authForm() {
     e.preventDefault()
     if (mode === 'register' && !pw.matches()) return document.querySelector('[name=password2]').reportValidity()
     const fd = new FormData(e.target), email = fd.get('email'), password = fd.get('password')
-    const btn = e.target.querySelector('button'); btn.disabled = true
+    const btn = e.target.querySelector('button[type=submit]'); btn.disabled = true
     let error
+    if (mode === 'reset') {
+      ;({ error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: location.origin + '/account.html' }))
+      btn.disabled = false
+      if (error) return toast(error.message, 'err', 6000)
+      toast(t('If that email has an account, a reset link is on its way. Check your spam folder too.', '若該電子郵件已註冊，重設連結即將寄出（請也檢查垃圾郵件匣）。'), 'ok', 7000)
+      mode = 'login'; return authForm()
+    }
     if (mode === 'login') ({ error } = await supabase.auth.signInWithPassword({ email, password }))
     else {
       const r = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: location.origin + '/account.html', data: { kind: 'member' } } })
@@ -38,8 +45,24 @@ function authForm() {
     btn.disabled = false
     if (error) {
       if (/not confirmed/i.test(error.message)) { pendingEmail = email; return checkEmail() }
-      toast(error.message, 'err', 6000)
+      toast(/rate limit/i.test(error.message) ? t('Too many e-mails were requested in the last hour. Please wait a little and try again, or ask the administrator.', '近一小時寄出的郵件過多，請稍候再試，或聯絡管理員。') : error.message, 'err', 6000)
     }
+  }
+}
+
+/** the user came back from the reset e-mail: Supabase has signed them in with a recovery session, so ask for the new password */
+function newPassword() {
+  app.innerHTML = `<form class="box auth" id="f"><h3 style="margin-top:0">${t('Choose a new password', '設定新密碼')}</h3>
+    ${pwField({ name: 'password', label: t('New password', '新密碼'), autocomplete: 'new-password' })}${pwField({ name: 'password2', label: t('Confirm password', '確認密碼'), autocomplete: 'new-password' })}${matchHint}
+    <p style="font-size:12px;color:var(--mut);margin:8px 0 0">${t('At least 6 characters.', '至少 6 個字元。')}</p>
+    <p><button class="btn" type="submit" style="width:100%">${t('Save password', '儲存密碼')}</button></p></form>`
+  const pw = bindPasswords(app, (k) => ({ show: t('Show password', '顯示密碼'), hide: t('Hide password', '隱藏密碼'), match: t('Passwords match', '密碼相符'), mismatch: t('Passwords do not match', '兩次輸入的密碼不一致') }[k]))
+  document.getElementById('f').onsubmit = async (e) => {
+    e.preventDefault()
+    if (!pw.matches()) return app.querySelector('[name=password2]').reportValidity()
+    const { error } = await supabase.auth.updateUser({ password: new FormData(e.target).get('password') })
+    if (error) return toast(error.message, 'err', 6000)
+    recovering = false; toast(t('Password updated.', '密碼已更新。'), 'ok'); refresh()
   }
 }
 
@@ -119,13 +142,15 @@ async function refresh() {
   document.getElementById('h-sub').textContent = t('Buy, sell and follow your orders and inquiries.', '購買、刊登，並追蹤您的訂單與諮詢。')
   document.title = t('My account · imMBA', '我的帳號 · imMBA')
   if (!session) return pendingEmail ? checkEmail() : authForm()
+  if (recovering) return newPassword()
   const { data } = await supabase.from('profiles').select('role').eq('id', session.user.id).maybeSingle()
   role = data?.role
+  if (recovering) return newPassword()   // the recovery event can arrive while the profile is loading
   dashboard()
 }
 
 if (!configured) app.innerHTML = '<div class="msg err">Backend not connected.</div>'
 else {
-  supabase.auth.onAuthStateChange((ev, s) => { const prev = session?.user?.id; session = s; if (ev === 'TOKEN_REFRESHED' || (ev === 'SIGNED_IN' && prev === s?.user?.id && role)) return; refresh() })
+  supabase.auth.onAuthStateChange((ev, s) => { const prev = session?.user?.id; session = s; if (ev === 'PASSWORD_RECOVERY') { recovering = true; return newPassword() } if (ev === 'TOKEN_REFRESHED' || (ev === 'SIGNED_IN' && prev === s?.user?.id && role)) return; refresh() })
   window.addEventListener('langchange', refresh)
 }

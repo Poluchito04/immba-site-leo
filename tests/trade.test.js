@@ -146,3 +146,93 @@ test('checkout totals: shipping and platform fee are charged once per seller ord
 })
 
 test('the stepper has one label per step of the lifecycle', () => assert.equal(STEPS.length, FLOW.length))
+
+/* ------------------------------ class 11: testing & verification (boundary + negative + access) ------------------------------ */
+import { readFileSync } from 'node:fs'
+const L = (over = {}) => ({ id: 'L1', price: 100, quantity: 5, purchased: 0, seller_id: 'S', ...over })
+
+test('B09 boundary: quantity 1 and the maximum stock are added; 0, -1, decimals, NaN and text add nothing', () => {
+  assert.equal(cartAdd([], L(), 1).added, 1)
+  assert.equal(cartAdd([], L(), 5).added, 5)                       // = maximum stock
+  for (const bad of [0, -1, -100, 0.4, NaN, undefined === 1 ? 1 : 'abc', null]) {
+    const r = cartAdd([], L(), bad)
+    assert.equal(r.added, 0, `qty ${bad}`)
+    assert.deepEqual(r.items, [], `qty ${bad}`)
+  }
+  assert.equal(cartAdd([], L(), '3').added, 3)                     // a numeric string from an input box
+  assert.equal(cartAdd([], L(), 2.9).added, 2)                     // decimals are floored, never rounded up past stock
+})
+
+test('B09 boundary: above available stock is capped, the stock cap of 99 holds, sold out adds nothing', () => {
+  assert.equal(cartAdd([], L(), 6).added, 5)
+  assert.equal(cartAdd([], L({ quantity: 500 }), 300).added, 99)
+  assert.equal(cartAdd([], L({ quantity: 5, purchased: 5 }), 1).added, 0)
+  const once = cartAdd([], L(), 3)
+  assert.equal(cartAdd(once.items, L(), 3).added, 2)               // 3 already in the cart + 3 more, only 2 fit
+  assert.equal(cartAdd(cartAdd(once.items, L(), 2).items, L(), 1).added, 0)
+})
+
+test('a cart must never carry a NaN or negative line into checkout', () => {
+  assert.deepEqual(cartLoad('u', { getItem: () => JSON.stringify([{ id: 'a', qty: NaN }, { id: 'b', qty: -2 }, { id: 'c', qty: 0 }, { id: 'd', qty: 2 }]) }), [{ id: 'd', qty: 2 }])
+  assert.deepEqual(cartLoad('u', { getItem: () => 'not json' }), [])
+  const lines = cartLines([{ id: 'L1', qty: 9 }], [L({ quantity: 3 })])
+  assert.equal(lines[0].qty, 3); assert.equal(lines[0].wanted, 9); assert.equal(lines[0].ok, true)   // stock fell after adding: shown as "only 3 left"
+})
+
+test('checkout totals: an empty cart costs nothing, and odd settings fall back to the defaults', () => {
+  assert.deepEqual(checkoutTotals([], 'pickup', {}), { orders: 0, subtotal: 0, shipping: 0, fee: 0, total: 0 })
+  const lines = [{ ok: true, qty: 2, listing: { seller_id: 'S', price: 100 } }]
+  assert.equal(checkoutTotals(lines, 'pickup', {}).total, 204)                       // 200 + default fee 4
+  assert.equal(checkoutTotals(lines, 'delivery', { delivery_fee: '120', platform_fee: '0' }).total, 320)   // numeric strings from the database
+  assert.equal(checkoutTotals(lines, 'delivery', {}).total, 284)                     // 200 + default shipping 80 + default fee 4
+})
+
+test('access control: someone who is neither buyer, seller nor admin gets no action on any state', () => {
+  for (const st of FLOW.concat(['cancelled'])) assert.deepEqual(tos(o({ status: st }), { uid: 'STRANGER' }), [], st)
+  assert.deepEqual(tos(o({ status: 'payment_submitted' }), { uid: 'STRANGER', admin: false, superAdmin: true, storeId: 'S' }), [], 'superAdmin without admin flag')
+  assert.deepEqual(tos(o({ status: 'shipped' }), {}), [])
+})
+
+test('access control: a plain admin cannot operate the demo store; only the super admin can', () => {
+  const order = o({ seller_id: 'STORE', status: 'ready_to_ship' })
+  assert.deepEqual(tos(order, { uid: 'A', admin: true, storeId: 'STORE' }), ['cancelled'])
+  assert.deepEqual(tos(order, { uid: 'ROOT', admin: true, superAdmin: true, storeId: 'STORE' }), ['shipped', 'cancelled'])
+  assert.deepEqual(tos(order, { uid: 'ROOT', admin: true, superAdmin: true, storeId: null }), ['cancelled'])
+})
+
+test('the lifecycle has no way back except "payment not received": nothing offers a backwards move', () => {
+  const rank = (s) => FLOW.indexOf(s)
+  for (const st of FLOW) for (const who of [B, S, ADMIN, { uid: 'R', admin: true, superAdmin: true, storeId: 'S' }]) {
+    for (const a of actionsFor(o({ status: st }), who)) {
+      if (a.to === 'cancelled') continue
+      assert.ok(rank(a.to) > rank(st) || (st === 'payment_submitted' && a.to === 'waiting_payment'), `${st} → ${a.to}`)
+    }
+  }
+})
+
+test('a stalled order is only flagged for open states, never for completed or cancelled', () => {
+  const old = '2020-01-01T00:00:00Z'
+  assert.equal(stalled(o({ status: 'completed', status_at: old })), null)
+  assert.equal(stalled(o({ status: 'cancelled', status_at: old })), null)
+  assert.ok(stalled(o({ status: 'payment_submitted', status_at: old })))
+})
+
+test('search by order id: empty finds everything, a missing order finds nothing, "#" is ignored', () => {
+  assert.equal(matchesOrder(o(), ''), true)
+  assert.equal(matchesOrder(o(), '   '), true)
+  assert.equal(matchesOrder(o(), '#1001'), true)
+  assert.equal(matchesOrder(o(), '9999'), false)
+})
+
+test('regression (class 11 bug): marketplace cards show the whole description, never cut at a fixed length', () => {
+  const src = readFileSync(new URL('../src/marketplace.js', import.meta.url), 'utf8')
+  assert.doesNotMatch(src, /description[^`]*slice\(0,\s*\d+\)/)
+  assert.match(readFileSync(new URL('../src/ui.css', import.meta.url), 'utf8'), /\.lcard\.shop \.desc\{[^}]*line-clamp/)
+})
+
+test('regression (class 11): members can reset a forgotten password from the sign-in page, in English and Chinese', () => {
+  const src = readFileSync(new URL('../src/account.js', import.meta.url), 'utf8')
+  assert.match(src, /resetPasswordForEmail/)
+  assert.match(src, /PASSWORD_RECOVERY/)
+  assert.match(src, /Forgot password\?', '忘記密碼？'/)
+})

@@ -1,0 +1,45 @@
+Permission / RLS tests, run on 24 Nov 2026 in the Supabase SQL editor (production project, inside one transaction that ends in an error, so nothing is kept).
+Script: testing/permissions-tests.sql. Raw report copied from the editor.
+
+BEFORE supabase/v8.sql  ->  PASSED 25 / 28   FAILED 3
+  T11 FAIL  "seller cannot approve own pending listing" was a mistake in my test (the test listing was already approved, so nothing changed). Test fixed.
+  T12 FAIL  seller can rename a listing to "imMBA Demo Store"                       (REAL BUG, fixed by v8)
+  T13 FAIL  seller editing seller_name keeps the listing approved ("stayed approved") (REAL BUG, fixed by v8)
+
+AFTER supabase/v8.sql   ->  PASSED 28 / 28   FAILED 0
+  B09a PASS quantity = 0 is rejected                       -> Choose a quantity between 1 and 99
+  B09b PASS quantity = -1 is rejected                      -> Choose a quantity between 1 and 99
+  B09c PASS quantity above available stock (4 of 3)        -> Only 3 left
+  B09d PASS quantity = maximum stock (3 of 3) is accepted
+  B09e PASS after buying all 3, one more is rejected       -> Only 0 left
+  S04  PASS negative price is rejected                     -> listings_price_check
+  S06a PASS inventory below what was purchased is refused  -> listings_stock_check
+  S06b PASS seller can raise inventory to 10
+  S12a PASS seller cannot confirm payment (admin only)
+  S12b PASS seller cannot ship before payment is confirmed
+  T01  PASS buyer cannot edit another seller's listing     -> 0 rows (RLS)
+  T02  PASS buyer cannot delete another seller's listing   -> 0 rows (RLS)
+  T03  PASS buyer cannot write orders directly             -> row-level security
+  T04  PASS buyer cannot create an already-approved listing
+  T05  PASS buyer cannot start a listing with purchased > 0
+  T06  PASS buyer cannot change marketplace fees           -> 0 rows (RLS)
+  T07  PASS buyer cannot confirm payment (admin only)
+  T08  PASS buyer can say "I have paid"
+  T09  PASS buyer cannot mark it shipped
+  T10  PASS an order cannot be deleted
+  T11  PASS seller cannot approve their own pending listing
+  T12  PASS seller cannot rename a listing to the demo store
+  T13  PASS editing seller_name sends an approved listing back to review
+  T14  PASS seller cannot buy their own listing
+  T15  PASS a pending account cannot create a listing
+  T16  PASS a pending account cannot place an order
+  T17  PASS admin cannot ship (monitoring is not editing)
+  T18  PASS admin confirms the payment the buyer reported
+
+Check afterwards: 0 test users, 0 test listings, 0 orders, 8 listings (unchanged).
+
+Anonymous key over REST (read-only calls, 24 Nov 2026):
+  GET listings      -> 8 rows, all approved and active
+  GET orders / order_items / profiles / audit_log -> HTTP 200, []  (RLS hides everything)
+  GET app_settings  -> readable on purpose (fees and payment instructions); also exposes demo_store_id (harmless uuid)
+  RPC place_order / advance_order -> HTTP 401 "permission denied for function"

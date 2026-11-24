@@ -47,7 +47,7 @@ MVP (midterm): public home, bilingual switch, news cards, faculty, content pages
 - Back office: `src/admin.js` (shell, tabs, roles), `admin-content.js`, `admin-alumni.js`, `alumni-csv.js`, `admin-activity.js`, `admin-dashboard.js`, `admin-i18n.js`, `admin-orders.js` (Transactions tab).
 - Marketplace: `src/marketplace.js` (browse, detail, cart, checkout), `src/account.js` + `src/account-trade.js` (My orders, My listings, Sales), `src/trade-ui.js` (order card and stepper shared by buyer, seller and admin).
 - Database: `supabase/schema.sql`, then `v2.sql` to `v6.sql` in order (idempotent, safe to re-run). New work goes in a **new** numbered SQL file.
-- Tests: `tests/*.test.js`, run with `npm test` (Node test runner, no browser tests yet).
+- Tests: `tests/*.test.js`, run with `npm test` (Node test runner, no browser tests yet). Database permission tests: `testing/permissions-tests.sql` (SQL editor, rolled back).
 
 ## 6. User flows
 1. **Visitor reads:** open page, choose language, read or search, optionally download a file (documents show their type).
@@ -91,6 +91,8 @@ Each item is checked by hand in production unless a test is named.
 - **A3 (F3, F8)** Given a super admin approves a `pending` user, then the user becomes `admin`, can edit news, and one audit row with old and new role exists.
 - **A4 (F5)** Given a member's listing, then it is saved as `pending`, does not appear on `/marketplace.html`, and appears after approval; a rejected or hidden listing never appears. An anonymous insert, or an insert with `status='approved'`, is refused.
 - **A12 (F5)** Given a member orders 2 of a listing with 3 in stock, then an order `waiting_payment` exists, available stock is 1 and the seller sees it; ordering 2 more fails with "Only 1 left". Cancelling returns the stock. Test: `tests/trade.test.js` (rules), SQL role simulation (database).
+- **A13 (F5, class 11)** Given a quantity of 0, -1, a decimal or more than the stock, then the cart adds nothing or the allowed amount and the database rejects it ("Choose a quantity between 1 and 99", "Only N left"). Test: `tests/trade.test.js` (boundary), `testing/permissions-tests.sql` B09a-e.
+- **A14 (F5, class 11)** Given a seller, when they rename an approved listing or try the reserved name "imMBA Demo Store", then the listing returns to review or the change is refused. Test: `testing/permissions-tests.sql` T12-T13 (needs `supabase/v8.sql`).
 - **A13 (F5)** Only the buyer can report payment ("I have paid"); only an administrator can confirm it or say it was not received; the seller can mark ready to ship and ship only after confirmation; the seller cannot confirm payment; the buyer can confirm receipt and cancel while waiting for payment; an admin, a stranger or a visitor calling `advance_order` is rejected; a seller cannot buy their own listing.
 - **A14 (F5b)** Given a completed order, then `delete` on `orders` or `order_items` fails for everyone, including an admin, and the order remains in buyer history, seller history and the admin Transactions tab.
 - **A15 (F5)** Seller dashboard: monthly revenue counts completed orders only; the CSV opens in Excel with Chinese text and neutralises cells starting with `=`. Admin can search an order by `#1001`, filter by status and see stalled orders.

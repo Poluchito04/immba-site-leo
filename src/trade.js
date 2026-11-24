@@ -152,6 +152,8 @@ export function cartLoad(uid, s = store()) {
 export function cartSave(uid, items, s = store()) { try { s?.setItem(CART_KEY(uid), JSON.stringify(items)) } catch { /* private mode */ } }
 /** add `qty` of a listing, never above what is in stock; returns the new cart and what was really added */
 export function cartAdd(items, listing, qty = 1) {
+  qty = Math.floor(Number(qty))                     // boundary values: NaN, 0, negatives and decimals add nothing
+  if (!Number.isFinite(qty) || qty < 1) return { items, added: 0 }
   const max = Math.min(available(listing), 99)
   const cur = items.find((x) => x.id === listing.id)
   const next = Math.min(max, (cur?.qty || 0) + qty)

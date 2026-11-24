@@ -291,3 +291,6 @@ dialog.modal.drawer .cartbody{flex:1;overflow:auto}
 .ship-opt.on{border-color:var(--g);background:var(--b2)}.ship-opt input{width:auto;margin-top:3px}.ship-opt small{display:block;color:var(--mut);font-weight:400}
 .sumline{display:flex;justify-content:space-between;gap:10px;padding:5px 0;font-size:14px}.sumline.tot{border-top:1px solid var(--bd);margin-top:8px;padding-top:12px;font-size:1.15rem;font-weight:700;color:var(--g)}
 .sitem{display:flex;gap:12px;align-items:center;padding:8px 0}.sitem .cph{width:52px}.sitem .q{position:relative}
+
+/* class 11 fix: a card shows the description in full sentences (3 lines, ellipsis only if it really overflows) instead of cutting at 90 characters */
+.lcard.shop .desc{display:-webkit-box;-webkit-line-clamp:3;line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}

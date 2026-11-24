@@ -66,7 +66,7 @@ function paintGrid() {
   g.innerHTML = `${list.map((r) => `<article class="lcard shop" tabindex="0" data-id="${r.id}" role="button" aria-label="${esc(r.title)}"><div class="imgwrap">${stockState(r) === 'out' ? `<span class="ribbon out">${t('Sold out', '已售完')}</span>` : stockState(r) === 'low' ? `<span class="ribbon">${t(`Low stock (${available(r)} left)`, `庫存偏低（剩 ${available(r)} 件）`)}</span>` : ''}${photo(r)}</div>
       <small>${esc(catName(r.category))}</small><h4>${esc(r.title)}</h4>
       <div class="spread"><div class="price">${money(r.price)}</div>${stockBadge(r)}</div>
-      <p>${esc((r.description || '').slice(0, 90))}</p><small>${t('Seller', '賣家')}: ${esc(r.seller_name)}</small></article>`).join('') || `<div class="msg" style="grid-column:1/-1">${rows.length ? t('Nothing matches your filters.', '沒有符合條件的商品。') : t('No listings yet.', '目前沒有商品。')}</div>`}`
+      <p class="desc">${esc(r.description || '')}</p><small>${t('Seller', '賣家')}: ${esc(r.seller_name)}</small></article>`).join('') || `<div class="msg" style="grid-column:1/-1">${rows.length ? t('Nothing matches your filters.', '沒有符合條件的商品。') : t('No listings yet.', '目前沒有商品。')}</div>`}`
   g.querySelectorAll('.shop').forEach((c) => { c.onclick = () => openDetail(c.dataset.id); c.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDetail(c.dataset.id) } } })
 }
 
